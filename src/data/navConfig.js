@@ -1,57 +1,55 @@
 export const NAV_CONFIG = {
-  superadmin: [
+  useradmin: [
     { key: 'dashboard', label: 'Admin Dashboard', icon: 'LayoutDashboard' },
-    { key: 'permissions', label: 'Permission Matrix', icon: 'Grid3x3' },
+    { key: 'users', label: 'User Management', icon: 'Users' },
+    { key: 'access', label: 'Role & Access', icon: 'Grid3x3' },
+    { key: 'taskoverview', label: 'Task Overview', icon: 'ListChecks' },
+    { key: 'shiftcalendar', label: 'Shift Calendar', icon: 'CalendarDays' },
+    { key: 'certifications', label: 'Certifications', icon: 'BadgeCheck' },
+    { key: 'announcements', label: 'Announcements', icon: 'Megaphone' },
     { key: 'masterdata', label: 'Master Data', icon: 'Database' }
   ],
-  requester: [
-    { key: 'mypermits', label: 'My Permits', icon: 'FileText' },
-    { key: 'create', label: 'Create Permit', icon: 'FilePlus2' }
+  hod: [
+    { key: 'dashboard', label: 'HOD Dashboard', icon: 'LayoutDashboard' },
+    { key: 'myteam', label: 'My Team', icon: 'Users' },
+    { key: 'shiftcalendar', label: 'Shift Calendar', icon: 'CalendarDays' },
+    { key: 'taskmanagement', label: 'Task Management', icon: 'ListChecks' },
+    { key: 'activeloto', label: 'Active Tasks & LOTO', icon: 'Lock' },
+    { key: 'compliance', label: 'Compliance', icon: 'ShieldAlert' },
+    { key: 'instruments', label: 'Instruments', icon: 'Wrench' }
   ],
-  approver: [
-    { key: 'queue', label: 'Pending Queue', icon: 'ListChecks' }
-  ],
-  observer: [
-    { key: 'dashboard', label: 'Safety Dashboard', icon: 'ShieldAlert' }
-  ],
-  issuer: [
-    { key: 'dashboard', label: 'Issuer Dashboard', icon: 'FileCheck2' }
-  ],
-  receiver: [
-    { key: 'mypermits', label: 'My Assigned Permits', icon: 'ClipboardList' }
-  ],
-  loto: [
-    { key: 'tasks', label: 'LOTO Task List', icon: 'Lock' }
-  ],
-  competent: [
-    { key: 'dashboard', label: 'My Competency', icon: 'BadgeCheck' }
+  safety: [
+    { key: 'dashboard', label: 'Dashboard', icon: 'ShieldAlert' },
+    { key: 'lotomonitor', label: 'LOTO Monitor', icon: 'Lock' },
+    { key: 'compliance', label: 'Compliance', icon: 'BadgeCheck' },
+    { key: 'profile', label: 'Profile', icon: 'User' }
   ],
   supervisor: [
     { key: 'dashboard', label: 'Shift Dashboard', icon: 'Users' },
-    { key: 'loto-assign', label: 'LOTO Assignment', icon: 'Lock' }
+    { key: 'maintenance', label: 'Maintenance Requests', icon: 'Wrench' },
+    { key: 'lotoapprovals', label: 'LOTO Approvals', icon: 'Lock' }
+  ],
+  personnel: [
+    { key: 'mytasks', label: 'My Tasks', icon: 'ClipboardList' },
+    { key: 'create', label: 'Create', icon: 'FilePlus2' },
+    { key: 'loto', label: 'LOTO', icon: 'Lock' },
+    { key: 'inventory', label: 'Inventory', icon: 'Package' },
+    { key: 'profile', label: 'Profile', icon: 'User' }
   ]
 };
 
 export const ROLE_LABELS = {
-  superadmin: 'Super Admin',
-  requester: 'Requester',
-  approver: 'Approver / HoD',
-  observer: 'Safety Officer',
-  issuer: 'Permit Issuer',
-  receiver: 'Permit Receiver',
-  loto: 'LOTO Responsible',
-  competent: 'Competent Personnel',
-  supervisor: 'Shift Supervisor'
+  useradmin: 'User Admin',
+  hod: 'HOD',
+  safety: 'Safety Officer',
+  supervisor: 'Shift Supervisor',
+  personnel: 'Personnel'
 };
 
 export const ROLE_PLATFORM = {
-  superadmin: 'web',
-  requester: 'mobile',
-  approver: 'web',
-  observer: 'web',
-  issuer: 'web',
-  receiver: 'mobile',
-  loto: 'mobile',
-  competent: 'mobile',
-  supervisor: 'web'
+  useradmin: 'web',
+  hod: 'web',
+  safety: 'mobile',
+  supervisor: 'web',
+  personnel: 'mobile'
 };

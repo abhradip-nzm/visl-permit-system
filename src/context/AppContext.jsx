@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { PERMITS, NOTIFICATIONS } from '../data/mockData.js';
+import { TASKS } from '../data/tasksData.js';
 
 const AppContext = createContext(null);
 
@@ -8,6 +9,7 @@ let toastId = 0;
 export function AppProvider({ children }) {
   const [currentRole, setCurrentRole] = useState(null);
   const [permits, setPermits] = useState(PERMITS);
+  const [tasks, setTasks] = useState(TASKS);
   const [notifications, setNotifications] = useState(NOTIFICATIONS);
   const [toasts, setToasts] = useState([]);
   const [language, setLanguage] = useState('English');
@@ -42,6 +44,10 @@ export function AppProvider({ children }) {
     }));
   }, []);
 
+  const updateTask = useCallback((id, patch) => {
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
+  }, []);
+
   const value = useMemo(
     () => ({
       currentRole,
@@ -50,6 +56,9 @@ export function AppProvider({ children }) {
       setPermits,
       updatePermit,
       addTimelineEvent,
+      tasks,
+      setTasks,
+      updateTask,
       notifications,
       markNotificationsRead,
       toasts,
@@ -59,7 +68,7 @@ export function AppProvider({ children }) {
       aiOpen,
       setAiOpen
     }),
-    [currentRole, permits, notifications, toasts, language, aiOpen, pushToast, updatePermit, addTimelineEvent, markNotificationsRead]
+    [currentRole, permits, tasks, notifications, toasts, language, aiOpen, pushToast, updatePermit, addTimelineEvent, updateTask, markNotificationsRead]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -1,103 +1,66 @@
 // ============================================================================
 // MOCK AI ASSISTANT DATA — keyword-matched canned replies per role.
 // No live model calls. All replies are pre-authored demo content.
+// Structure mirrors the 5-role mock-ai-responses.json spec: each role has a
+// set of {match, reply} intents plus a role-specific fallback.
 // ============================================================================
 export const aiAssistant = {
-  requester: {
-    chips: ['Create a hot work permit', "What's blocking permit WP-1042?", 'Show my pending permits', 'What PPE do I need for welding?'],
+  useradmin: {
+    chips: ['System health check', 'Any integration errors?', 'Users with expired certs', 'How many active permits?', 'Show shift roster for tomorrow', 'List pending task assignments'],
     intents: [
-      { match: ['create', 'new permit', 'hot work', 'welding'], reply: "Sure — describe the job in plain language and I'll pre-fill it. Example: *'welding on conveyor belt 7 in crushing plant, tomorrow morning shift.'* I'll set **Permit Type = Hot Work**, **Equipment = Conveyor Belt #7**, **Location = Crushing Plant**, and auto-add hazards, PPE and controls for review." },
-      { match: ['blocking', 'block', 'why', 'wp-1042', 'status'], reply: '**Permit WP-1042 is blocked.** Reason: Equipment *Conveyor Belt #7* has an **overdue calibration** (expired 12 Jun). Also your **Hot Work certification** renews in 4 days. Resolve calibration via Shift Supervisor, then resubmit.' },
-      { match: ['pending', 'my permits', 'list'], reply: 'You have **3 active items**: WP-1042 (Blocked), WP-1039 (Awaiting Approval), WP-1031 (Approved — awaiting issue).' },
-      { match: ['ppe', 'protective', 'welding gear'], reply: 'For Hot Work / welding: **fire-resistant coveralls, welding helmet, leather gloves, face shield, fire watch + extinguisher on standby.** Auto-added to your permit — review before submit.' }
+      { match: ['health', 'system', 'status', 'integration'], reply: 'All systems operational.\n- SAP PM: connected (last sync 2 min ago)\n- Enablon: connected\n- OCR Engine: elevated latency (avg 2.3s, threshold 1.5s)\n\nRecommendation: check OCR queue depth.' },
+      { match: ['expired', 'cert', 'certification'], reply: '2 certifications expired:\n- R. Das: Confined Space (expired 28 Jun)\n- M. Khan: LOTO (expired 01 Jul)\n\n1 expiring soon:\n- S. Iyer: Hot Work (expires in 4 days)\n\nAction: Notify personnel for renewal.' },
+      { match: ['active permit', 'how many', 'permit'], reply: '38 open permits across all plants:\n- Draft: 12\n- Awaiting Approval: 9\n- Approved: 6\n- In Execution: 8\n- Due Closure: 3\n\n2 permits are currently blocked due to equipment/certification issues.' },
+      { match: ['shift', 'roster', 'tomorrow', 'schedule'], reply: "Tomorrow's Morning Shift (07:00-15:00):\n- Crushing Plant: 8 personnel (1 cert expiring)\n- Tank Farm: 5 personnel (all certs valid)\n- Process Unit 2: 6 personnel\n\nNo LOTO tasks scheduled for morning shift." },
+      { match: ['pending', 'task', 'assignment', 'unassigned'], reply: 'Task Overview:\n- Total: 24 active tasks\n- Assigned: 19\n- Pending assignment: 5\n- Overdue: 2 (Task T-0087 maintenance, Task T-0091 inspection)\n\nRecommendation: Assign pending tasks before next shift change.' }
     ],
-    fallback: 'I can help you create permits, check status, or explain safety requirements. Try one of the suggestions above.'
+    fallback: 'I surface system health, integrations, users, master data, shift rosters, and permit/task stats.'
   },
-  approver: {
-    chips: ['Summarize my approval queue', 'Any high-risk permits?', 'Why is WP-1042 flagged?', 'What needs my signature?'],
+  hod: {
+    chips: ['Pending approvals summary', 'Team certification status', 'Active LOTO tasks', 'Overdue compliance items'],
     intents: [
-      { match: ['queue', 'summarize', 'pending'], reply: '**5 permits awaiting you.** 2 high-risk (Hot Work), 1 aging >24h (WP-1037), 1 re-submitted (WP-1042), 1 routine. Recommend reviewing WP-1037 first (SLA breach risk).' },
-      { match: ['high-risk', 'risk', 'dangerous'], reply: 'High-risk in queue: **WP-1044 (Confined Space)** and **WP-1042 (Hot Work near conveyor)**. Both have incident history at the location — see the Compliance panel before signing.' },
-      { match: ['wp-1042', 'flagged', 'why'], reply: 'WP-1042 is flagged because the linked equipment calibration is **overdue** and the location had **2 near-misses in 90 days**. You cannot sign until calibration is cleared.' },
-      { match: ['signature', 'sign', 'need'], reply: '3 permits are cleared for your signature: WP-1039, WP-1031, WP-1028. WP-1042 and WP-1044 are **blocked** pending safety resolution.' }
+      { match: ['pending', 'approval', 'review', 'approve'], reply: '3 permits awaiting your approval:\n1. WP-1037 — Confined Space, A. Chatterjee (30h, SLA risk, High Risk)\n2. WP-1039 — Electrical, S. Iyer (6h, Medium Risk)\n3. WP-1042 — Hot Work, S. Iyer (Blocked — equipment calibration overdue)\n\nPriority: Review WP-1037 first (SLA breach in 2h).' },
+      { match: ['team', 'cert', 'certification', 'competency'], reply: 'Department certification status:\n- 12 personnel total\n- 9 fully certified\n- 2 expired (R. Das: Confined Space, M. Khan: LOTO)\n- 1 expiring in 4 days (S. Iyer: Hot Work)\n\nBlocked permits: WP-1042 linked to S. Iyer\'s expiring cert.' },
+      { match: ['loto', 'lockout', 'lock'], reply: 'Active LOTO tasks:\n1. WP-1044 — Hydraulic Accumulator H-9, isolation required (not yet acknowledged)\nEnergy source: Electrical + Hydraulic\nAssigned to: P. Rao\n\nNo other active lockouts in your department.' },
+      { match: ['compliance', 'overdue', 'renewal'], reply: 'Compliance summary for your department:\n- 3 compliance items due this month\n- 1 overdue: Fire Safety Audit (was due 01 Jul)\n- Equipment calibration: 1 overdue (Conveyor Belt #7, expired 12 Jun)\n\nAction: Escalate Conveyor Belt #7 calibration to maintenance.' }
     ],
-    fallback: 'I can summarize your queue, surface risk, or explain why a permit is flagged.'
+    fallback: 'I can summarize your approval queue, team certifications, active LOTO tasks, and compliance status.'
   },
-  observer: {
-    chips: ["Show today's safety flags", 'Any expired certifications?', 'Incident history for Crushing Plant', 'Which permits are high-risk?'],
+  safety: {
+    chips: ['Active LOTO summary', 'High-risk permits right now', 'Expired certifications', 'Recent safety observations'],
     intents: [
-      { match: ['flag', 'today', 'safety'], reply: '**4 open flags today.** 1 critical: LOTO not applied on WP-1044 though work marked active. Recommend escalation to Shift Supervisor.' },
-      { match: ['expired', 'certification', 'cert'], reply: '**7 personnel** have certifications expiring in 30 days; **2 are already expired** (R. Das — Confined Space, M. Khan — LOTO). Any permit linking them is auto-blocked.' },
-      { match: ['incident', 'history', 'crushing'], reply: '**Crushing Plant, last 90 days:** 2 near-misses, 1 unsafe-act report. Most recent: hot-work spark near conveyor guard, 18 May.' },
-      { match: ['high-risk', 'risk'], reply: 'Currently high-risk: WP-1044 (Confined Space) and WP-1042 (Hot Work). Both open — monitoring.' }
+      { match: ['loto', 'lock', 'lockout', 'key'], reply: 'Currently active locks:\n1. Lock L-2044 — Hydraulic Accumulator H-9, applied by P. Rao, 3h ago\n2. Lock L-1031 — MCC-3 Drive Panel, applied by A. Singh, 6h ago (nearing shift end)\n\nAlert: L-1031 should be released before shift handover at 15:00.' },
+      { match: ['high risk', 'risk', 'dangerous'], reply: '3 high-risk permits currently active:\n1. WP-1037 — Confined Space, Tank Farm (1 near-miss in 90 days)\n2. WP-1042 — Hot Work, Crushing Plant (equipment calibration overdue)\n3. WP-1044 — Confined Space, Crushing Plant (LOTO not yet acknowledged)\n\nRecommendation: Prioritize WP-1044 — LOTO isolation pending.' },
+      { match: ['expired', 'cert', 'certification'], reply: 'Expired certifications across site:\n- A. Singh: LOTO, Confined Space\n- P. Rao: LOTO\n- R. Das: Confined Space, Working at Height\n- M. Khan: LOTO, First Aid\n- S. Iyer: Hot Work (4 days remaining)\n\nTotal: 8 expired certs affecting 4 personnel.' },
+      { match: ['observation', 'safety', 'flag', 'report'], reply: 'Recent safety observations:\n- 3 open flags (all High Risk)\n- WP-1037: Near-miss at Tank Farm\n- WP-1042: Overdue calibration on Conveyor Belt #7\n- WP-1044: LOTO isolation delay\n\nNo new observations submitted today.' }
     ],
-    fallback: 'I give read-only safety insight: flags, expiries, incident history, and risk across all permits.'
-  },
-  issuer: {
-    chips: ["What's ready to issue?", 'Is WP-1031 cleared to issue?', "What's due for closure?", 'Any LOTO pending?'],
-    intents: [
-      { match: ['ready', 'issue', 'list'], reply: '**2 permits ready to issue:** WP-1031 and WP-1028 (approved, signatures complete, no blocks).' },
-      { match: ['wp-1031', 'cleared'], reply: '**WP-1031 is cleared.** Approvals ✅, competency ✅, equipment valid ✅, LOTO not required. Safe to issue and notify the receiver.' },
-      { match: ['closure', 'close', 'due'], reply: '**1 permit due for closure:** WP-1019 — all checklists complete, awaiting your closure signature (will confirm job closure to SAP PM).' },
-      { match: ['loto', 'pending'], reply: 'WP-1044 requires LOTO — lockout **not yet acknowledged** by the LOTO Responsible person. Cannot issue until lock is applied and reserved.' }
-    ],
-    fallback: 'I help you verify, issue, and close permits, and flag anything blocking issuance.'
-  },
-  receiver: {
-    chips: ['What permits are assigned to me?', 'What checklist is due?', 'What are the hazards on WP-1031?', 'Report a safety concern'],
-    intents: [
-      { match: ['assigned', 'my permits'], reply: '**1 permit issued to you: WP-1031** (Mechanical, Crushing Plant, morning shift). Acknowledge receipt to begin.' },
-      { match: ['checklist', 'due', 'tasks'], reply: 'WP-1031 has a **6-item SAP maintenance checklist** (2 done, 4 pending). You can complete it offline; it syncs when you\'re back online.' },
-      { match: ['hazard', 'wp-1031', 'risk', 'danger'], reply: '**WP-1031 hazards:** rotating equipment, pinch points. **Controls:** machine guarding, isolation confirmed. **PPE:** gloves, safety glasses, steel-toe boots.' },
-      { match: ['report', 'concern', 'stop', 'unsafe'], reply: 'Opening a **Stop-Work / Safety Flag**. Describe or speak the concern and attach a photo — it notifies the Issuer and Safety Officer immediately.' }
-    ],
-    fallback: 'I help you receive permits, run checklists, and raise safety concerns from the field.'
-  },
-  loto: {
-    chips: ['What LOTO tasks are assigned?', 'Which locks are available?', 'Isolation steps for WP-1044', 'Release a lock'],
-    intents: [
-      { match: ['task', 'assigned', 'loto'], reply: '**1 LOTO task: WP-1044** — isolate conveyor drive (electrical + hydraulic). Assigned by Shift Supervisor at 08:15.' },
-      { match: ['lock', 'available', 'device'], reply: '**3 certified locks available:** LK-207, LK-214, LK-231. LK-198 is **reserved** (WP-1039). LK-176 is **cert-expired** and hidden from selection.' },
-      { match: ['isolation', 'steps', 'wp-1044'], reply: '**Isolation for WP-1044:** 1) De-energize drive MCC-3, 2) Lock main breaker, 3) Bleed hydraulic accumulator, 4) Apply lock + tag, 5) Upload photo & acknowledge.' },
-      { match: ['release', 'unlock'], reply: 'To release: confirm work complete on the permit, then formally release the lock. Reservation lifts system-wide and the event is logged with your ID and timestamp.' }
-    ],
-    fallback: 'I help with LOTO tasks, lock selection/reservation, isolation steps, and lock release.'
-  },
-  competent: {
-    chips: ['When do my certs expire?', 'Am I cleared for hot work?', 'What am I assigned to?', 'Upload a renewed certificate'],
-    intents: [
-      { match: ['expire', 'cert', 'when'], reply: '**Your certifications:** Hot Work — expires in **4 days** ⚠️, Working at Height — valid 6 months, First Aid — valid 1 year.' },
-      { match: ['hot work', 'cleared', 'qualified'], reply: 'You are currently cleared for Hot Work, but it **expires in 4 days**. Renew now to avoid permit blocks.' },
-      { match: ['assigned', 'jobs', 'work'], reply: "You're linked to **WP-1031** (Mechanical) as competent personnel. Competency match: ✅." },
-      { match: ['upload', 'renew', 'renewal'], reply: 'Opening the renewal uploader — attach your renewed certificate; it goes to the Super Admin for verification.' }
-    ],
-    fallback: 'I track your certifications, competency, assignments, and renewals.'
+    fallback: 'I give read-only safety insight: LOTO status, risk, expiries, and observations across all permits.'
   },
   supervisor: {
-    chips: ["Who's on shift for LOTO?", 'Assign LOTO for WP-1044', 'Any blocked permits this shift?', 'Prepare shift handover'],
+    chips: ["Who's on shift right now?", 'Pending LOTO requests', 'Active maintenance tasks', 'Any overdue assignments?'],
     intents: [
-      { match: ['shift', 'loto', 'who', 'roster'], reply: '**Certified & available for LOTO this shift:** A. Singh, P. Rao. (M. Khan hidden — LOTO cert expired.)' },
-      { match: ['assign', 'wp-1044'], reply: 'Opening LOTO assignment for **WP-1044**. Select from the shift roster dropdown; the person is notified instantly.' },
-      { match: ['blocked', 'block', 'issue'], reply: '**2 blocked this shift:** WP-1042 (equipment calibration overdue), WP-1044 (LOTO not yet applied). Both need action before issue.' },
-      { match: ['handover', 'transfer'], reply: 'Preparing handover: **3 open permits** to transfer to next shift, plus 1 active LOTO reservation. Add notes (text or voice) and sign off.' }
+      { match: ['shift', 'who', 'personnel', 'on duty', 'active'], reply: 'Morning Shift (07:00-15:00) — 19 active personnel:\n- Crushing Plant: A. Singh, S. Iyer, P. Rao + 5 others\n- Tank Farm: A. Chatterjee + 4 others\n- Process Unit 2: R. Das (cert expired — flagged) + 5 others\n\nAlert: R. Das should not be assigned to Confined Space tasks.' },
+      { match: ['loto', 'pending', 'request', 'approval'], reply: '1 pending LOTO request:\n- WP-1044: Hydraulic Accumulator H-9, requested by S. Iyer\nEnergy source: Electrical + Hydraulic\nSuggested assignee: P. Rao (certified, on shift)\n\nAction: Approve and assign to proceed with isolation.' },
+      { match: ['maintenance', 'request', 'task'], reply: 'Active maintenance requests:\n- MR-301: Conveyor Belt #7 recalibration (High Priority, submitted 2 days ago)\n- MR-305: MCC-3 Drive Panel inspection (Medium, submitted today)\n- MR-308: Storage Tank T-5 valve check (Low, scheduled next week)\n\n1 overdue: MR-301 needs HOD escalation.' },
+      { match: ['overdue', 'late', 'behind'], reply: 'Overdue items on current shift:\n1. MR-301 — Conveyor Belt #7 calibration (2 days overdue)\n2. WP-1044 — LOTO acknowledgement pending (3h since assignment)\n\nNo overdue checklists. All active permits within SLA.' }
     ],
-    fallback: 'I help you manage the shift: LOTO assignment, blocks, roster, and handover.'
+    fallback: 'I help you manage the shift: roster, maintenance requests, and LOTO approvals.'
   },
-  superadmin: {
-    chips: ['System health check', 'Any integration errors?', 'Users with expired certs', 'How many active permits?'],
+  personnel: {
+    chips: ['My active tasks', 'Certification expiry dates', 'LOTO status for my locks', 'Upcoming shift assignments'],
     intents: [
-      { match: ['health', 'status', 'check'], reply: '**System healthy.** SAP PM ✅, Enablon ✅, OCR engine ⚠️ (elevated latency). 142 active users, 38 open permits.' },
-      { match: ['integration', 'error', 'sync'], reply: '**1 issue:** OCR engine returned 3 low-confidence extractions in the last hour (field-mapping review suggested). SAP PM and Enablon syncing normally.' },
-      { match: ['expired', 'cert', 'user'], reply: '**2 users with expired certifications:** R. Das (Confined Space), M. Khan (LOTO). Permits linking them are auto-blocked.' },
-      { match: ['active permits', 'how many', 'count'], reply: '**38 active permits:** 12 draft, 9 awaiting approval, 6 approved, 8 in execution, 3 due closure.' }
+      { match: ['task', 'my', 'active', 'assigned'], reply: 'Your active tasks:\n1. WP-1031 — Mechanical, MCC-3 Drive Panel (Issued, Crushing Plant, Morning Shift)\nChecklist: 4/6 items complete\n2. WP-1037 — Confined Space request (Awaiting Approval)\n\nNo LOTO tasks currently assigned to you.' },
+      { match: ['cert', 'certification', 'expiry', 'competency'], reply: 'Your certifications:\n- Hot Work: Expires in 4 days ⚠️\n- Working at Height: Valid — 180 days remaining ✓\n- First Aid: Valid — 365 days remaining ✓\n\nAction: Upload renewed Hot Work certificate before expiry to avoid task blocking.' },
+      { match: ['loto', 'lock', 'lockout'], reply: 'No active LOTO locks assigned to you.\n\nPending: WP-1044 LOTO assignment in progress (awaiting Shift Supervisor approval). You may be assigned as LOTO responsible.' },
+      { match: ['shift', 'schedule', 'upcoming'], reply: 'Your shift schedule:\n- Today: Morning Shift (07:00-15:00) — Crushing Plant\n- Tomorrow: Morning Shift (07:00-15:00) — Crushing Plant\n- Day after: Off\n\nNo shift changes pending.' }
     ],
-    fallback: 'I surface system health, integrations, users, master data, and permit stats.'
+    fallback: 'I help you track tasks, certifications, LOTO status, and upcoming shifts.'
   }
 };
 
 export function matchIntent(roleKey, userText) {
   const roleData = aiAssistant[roleKey];
-  if (!roleData) return "I don't have information for this role yet.";
+  if (!roleData) return "I don't have specific data for that query. Try asking about permits, tasks, certifications, or LOTO status.";
   const text = userText.toLowerCase();
   for (const intent of roleData.intents) {
     if (intent.match.some((kw) => text.includes(kw))) {

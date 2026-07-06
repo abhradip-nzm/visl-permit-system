@@ -1,26 +1,18 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext.jsx';
 import RoleLanding from './components/shell/RoleLanding.jsx';
-import SuperAdminApp from './components/superadmin/SuperAdminApp.jsx';
-import RequesterApp from './components/requester/RequesterApp.jsx';
-import ApproverApp from './components/approver/ApproverApp.jsx';
-import ObserverApp from './components/observer/ObserverApp.jsx';
-import IssuerApp from './components/issuer/IssuerApp.jsx';
-import ReceiverApp from './components/receiver/ReceiverApp.jsx';
-import LotoApp from './components/loto/LotoApp.jsx';
-import CompetentApp from './components/competent/CompetentApp.jsx';
+import UserAdminApp from './components/useradmin/UserAdminApp.jsx';
+import HodApp from './components/hod/HodApp.jsx';
+import SafetyOfficerApp from './components/safety/SafetyOfficerApp.jsx';
 import SupervisorApp from './components/supervisor/SupervisorApp.jsx';
+import PersonnelApp from './components/personnel/PersonnelApp.jsx';
 
 const ROLE_APPS = {
-  superadmin: SuperAdminApp,
-  requester: RequesterApp,
-  approver: ApproverApp,
-  observer: ObserverApp,
-  issuer: IssuerApp,
-  receiver: ReceiverApp,
-  loto: LotoApp,
-  competent: CompetentApp,
-  supervisor: SupervisorApp
+  useradmin: UserAdminApp,
+  hod: HodApp,
+  safety: SafetyOfficerApp,
+  supervisor: SupervisorApp,
+  personnel: PersonnelApp
 };
 
 function RootRouter() {

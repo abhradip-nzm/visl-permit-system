@@ -6,8 +6,9 @@ A clickable, sales/demo prototype of the **Vedanta Sesa: NLP – Work Permit Man
 
 ## What's inside
 
-- 9 role personas, switchable at any time from the top bar: Super Admin, Requester, Approver/HoD, Observer/Safety Officer, Permit Issuer, Permit Receiver, LOTO Responsible, Competent Personnel, Shift Supervisor.
-- Mobile roles (Requester, Receiver, LOTO, Competent Personnel) render inside a phone-frame mock. Web roles render full-width.
+- 5 role personas, switchable at any time from the top bar: **User Admin**, **HOD**, **Safety Officer**, **Shift Supervisor**, **Personnel** — consolidated from an earlier 9-role structure so the prototype reads as one connected permit workflow instead of separate siloed demos.
+- A workflow connection strip (Request → Review → Approve → Execute → Monitor) appears on the landing page and on every role's main dashboard, highlighting where that role sits in the lifecycle.
+- Mobile roles (Safety Officer, Personnel) render inside a phone-frame mock, each with a bottom tab bar including a shared Profile screen. Web roles (User Admin, HOD, Shift Supervisor) render full-width with a sidebar.
 - A floating **"Vedanta AI"** assistant on every screen, powered by keyword-matched mock replies (see `src/data/aiAssistantData.js`).
 - Fully faked NLP text-parsing, voice input, OCR scanning, and SAP PM lookups — all driven from mock JSON.
 - Vedanta brand system: primary blue `#0164A9`, dark charcoal `#212529`, green accent `#66CC33`, Noto Sans JP typography.
@@ -42,23 +43,35 @@ npm run preview   # preview the production build locally
 src/
   components/
     shell/         # App shell: sidebar, top bar, mobile chrome, role landing, notifications
-    shared/         Reusable UI primitives (buttons, cards, badges, signature pad, phone frame)
+    shared/         Reusable UI primitives (buttons, cards, badges, signature pad, phone frame,
+                    ShiftCalendar, Profile, WorkflowStrip)
     ai/             Floating "Ask AI" assistant drawer
-    superadmin/      Admin Dashboard, Permission Matrix, Master Data
-    requester/        My Permits, Create Permit (NLP/Voice/OCR/SAP), NLP-Prefilled Form, Permit Detail
-    approver/          Pending Queue, Review & Sign
-    observer/          Safety Dashboard, Monitor Detail + Add Observation
-    issuer/            Issuer Dashboard, Verify → Issue/Close
-    receiver/          My Assigned Permits, Receive & Execute
-    loto/              LOTO Task List, Lock Selection & Reservation
-    competent/         My Competency Dashboard
-    supervisor/        Shift Dashboard, LOTO Assignment
+    useradmin/       Admin Dashboard, User Management, Role & Access, Task Overview,
+                     Shift Calendar, Certifications, Announcements, Master Data
+    hod/             HOD Dashboard (merged approval queue + issuance/closure), Review & Sign,
+                     Verify & Issue, My Team, Task Management, Active Tasks & LOTO,
+                     Compliance, Instruments
+    safety/          Safety Dashboard, Monitor Permit Detail, LOTO Monitor,
+                     Reporting/Alerts/Complaints, Compliance
+    supervisor/       Shift Dashboard, Maintenance Requests, LOTO Approvals
+    personnel/        My Tasks (merged requests + assignments), Task Detail, Request Task
+                     (NLP/Voice/OCR/SAP + personal task/instrument requests), LOTO Task List,
+                     LOTO Execution, Inventory (instruments + certifications)
   context/
-    AppContext.jsx   # Global in-memory state: current role, permits, notifications, toasts
+    AppContext.jsx   # Global in-memory state: current role, permits, tasks, notifications, toasts
   data/
-    mockData.js        Permits, equipment, personnel, locks, notifications, system health
-    aiAssistantData.js  AI assistant chips + keyword-matched intents per role
-    navConfig.js        Sidebar/tab-bar navigation config per role
+    mockData.js          Permits, equipment, personnel, locks, roles, workflow stages, system health
+    usersData.js          User directory (User Management, Access Assignment)
+    tasksData.js           Tasks + maintenance requests
+    certificationsData.js  Certification types + geofence locations
+    instrumentsData.js     Instrument inventory
+    shiftsData.js           2-week shift calendar + active personnel roster
+    announcementsData.js   Announcements
+    complianceData.js       Compliance items, renewal requests, document versions
+    observationsData.js    Safety observations, alerts, complaints
+    lotoData.js             Active LOTO lock sessions + anomalies
+    aiAssistantData.js     AI assistant chips + keyword-matched intents per role
+    navConfig.js            Sidebar/tab-bar navigation config per role
   App.jsx            Role router
   main.jsx           React entry point
   index.css          Tailwind + global styles
@@ -67,5 +80,6 @@ src/
 ## Notes for the demo
 
 - Use the persona cards on the landing screen, or the role switcher in the top bar, to jump between roles.
-- The **Requester → Create Permit → Type** flow (NLP-Prefilled Form) and the **Ask AI** assistant are the two features built with the most polish — start there for client demos.
+- The **Personnel → Request Task → Type** flow (NLP-prefilled form) and the **Vedanta AI** assistant are the two features built with the most polish — start there for client demos.
+- Follow a single permit end-to-end: Personnel requests → Shift Supervisor routes/approves LOTO → HOD approves & issues → Personnel executes → Safety Officer monitors. The workflow strip on each dashboard shows where you are in that chain.
 - Everything is in-memory (React state only); refreshing the page resets all demo data back to its default mock state.

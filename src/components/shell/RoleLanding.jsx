@@ -3,6 +3,7 @@ import * as Icons from 'lucide-react';
 import { ROLES } from '../../data/mockData.js';
 import { useApp } from '../../context/AppContext.jsx';
 import { DemoBadge } from '../shared/Primitives.jsx';
+import WorkflowStrip from '../shared/WorkflowStrip.jsx';
 
 export default function RoleLanding() {
   const { setCurrentRole, pushToast } = useApp();
@@ -58,6 +59,11 @@ export default function RoleLanding() {
               </button>
             );
           })}
+        </div>
+
+        <div className="mt-10 flex flex-col items-center gap-2">
+          <div className="text-[11px] font-bold uppercase tracking-wide text-slate-400">The connected permit workflow</div>
+          <WorkflowStrip />
         </div>
       </main>
 

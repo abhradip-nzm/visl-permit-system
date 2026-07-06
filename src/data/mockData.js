@@ -180,40 +180,30 @@ export const PERMITS = [
 ];
 
 export const NOTIFICATIONS = {
-  requester: [
-    { id: 1, text: 'WP-1042 blocked — equipment calibration overdue.', time: '10m ago', unread: true },
-    { id: 2, text: 'WP-1039 submitted and awaiting approval.', time: '2h ago', unread: true },
-    { id: 3, text: 'WP-1031 issued — receiver notified.', time: '1d ago', unread: false }
+  useradmin: [
+    { id: 1, text: 'OCR engine reporting elevated latency.', time: '25m ago', unread: true },
+    { id: 2, text: '2 users with expired certifications.', time: '3h ago', unread: false },
+    { id: 3, text: 'New announcement scheduled: Plant shutdown 15 Jul.', time: '1d ago', unread: false }
   ],
-  approver: [
+  hod: [
     { id: 1, text: 'WP-1042 re-submitted with corrections.', time: '5m ago', unread: true },
     { id: 2, text: 'WP-1037 aging beyond 24h SLA.', time: '1h ago', unread: true },
-    { id: 3, text: 'WP-1039 awaiting your approval.', time: '3h ago', unread: false }
+    { id: 3, text: 'WP-1031 and WP-1028 ready to issue.', time: '2h ago', unread: false },
+    { id: 4, text: 'Compliance renewal request from R. Das.', time: '3h ago', unread: false }
   ],
-  observer: [
+  safety: [
     { id: 1, text: 'Critical flag: LOTO not applied on WP-1044.', time: '20m ago', unread: true },
     { id: 2, text: 'M. Khan LOTO certification expired.', time: '3h ago', unread: false }
   ],
-  issuer: [
-    { id: 1, text: 'WP-1031 and WP-1028 ready to issue.', time: '15m ago', unread: true },
-    { id: 2, text: 'WP-1019 checklist complete — closure pending.', time: '1h ago', unread: false }
-  ],
-  receiver: [
-    { id: 1, text: 'WP-1031 issued to you — acknowledge to begin.', time: '30m ago', unread: true }
-  ],
-  loto: [
-    { id: 1, text: 'New LOTO assignment: WP-1044.', time: '18h ago', unread: true }
-  ],
-  competent: [
-    { id: 1, text: 'Your Hot Work certification expires in 4 days.', time: '1d ago', unread: true }
-  ],
   supervisor: [
     { id: 1, text: 'WP-1044 needs a LOTO Responsible assignment.', time: '1h ago', unread: true },
-    { id: 2, text: 'M. Khan unavailable for LOTO — certification expired.', time: '2h ago', unread: false }
+    { id: 2, text: 'M. Khan unavailable for LOTO — certification expired.', time: '2h ago', unread: false },
+    { id: 3, text: 'New maintenance request: MR-308 submitted.', time: '4h ago', unread: false }
   ],
-  superadmin: [
-    { id: 1, text: 'OCR engine reporting elevated latency.', time: '25m ago', unread: true },
-    { id: 2, text: '2 users with expired certifications.', time: '3h ago', unread: false }
+  personnel: [
+    { id: 1, text: 'WP-1042 blocked — equipment calibration overdue.', time: '10m ago', unread: true },
+    { id: 2, text: 'WP-1031 issued to you — acknowledge to begin.', time: '30m ago', unread: true },
+    { id: 3, text: 'Your Hot Work certification expires in 4 days.', time: '1d ago', unread: false }
   ]
 };
 
@@ -237,15 +227,20 @@ export const NLP_SAMPLE_PARSE = {
 };
 
 export const ROLES = [
-  { key: 'superadmin', label: 'Super Admin', platform: 'web', description: 'System configuration & governance', icon: 'ShieldCheck' },
-  { key: 'requester', label: 'Requester', platform: 'mobile', description: 'Raises work permits on-site', icon: 'FilePlus2' },
-  { key: 'approver', label: 'Approver / HoD', platform: 'web', description: 'Reviews & signs off permits', icon: 'Stamp' },
-  { key: 'observer', label: 'Observer / Safety Officer', platform: 'web', description: 'Monitors safety across all permits', icon: 'Eye' },
-  { key: 'issuer', label: 'Permit Issuer', platform: 'web', description: 'Verifies, issues & closes permits', icon: 'FileCheck2' },
-  { key: 'receiver', label: 'Permit Receiver', platform: 'mobile', description: 'Executes issued work on-site', icon: 'HardHat' },
-  { key: 'loto', label: 'LOTO Responsible', platform: 'mobile', description: 'Performs lockout / tagout', icon: 'Lock' },
-  { key: 'competent', label: 'Competent Personnel', platform: 'mobile', description: 'Tracks own competency & certs', icon: 'BadgeCheck' },
-  { key: 'supervisor', label: 'Shift Supervisor', platform: 'web', description: 'Oversees shift operations & LOTO assignment', icon: 'Users' }
+  { key: 'useradmin', label: 'User Admin', platform: 'web', description: 'System configuration, users & governance', icon: 'ShieldCheck' },
+  { key: 'hod', label: 'HOD', platform: 'web', description: 'Department tasks, approvals & compliance', icon: 'Stamp' },
+  { key: 'safety', label: 'Safety Officer', platform: 'mobile', description: 'Field safety monitoring & LOTO oversight', icon: 'Eye' },
+  { key: 'supervisor', label: 'Shift Supervisor', platform: 'web', description: 'Shift operations, maintenance & LOTO approval', icon: 'Users' },
+  { key: 'personnel', label: 'Personnel', platform: 'mobile', description: 'Task requests, execution & certifications', icon: 'HardHat' }
+];
+
+// Ordered lifecycle used by the workflow connection strip / breadcrumb indicators.
+export const WORKFLOW_STAGES = [
+  { key: 'request', label: 'Request', role: 'personnel' },
+  { key: 'review', label: 'Review', role: 'supervisor' },
+  { key: 'approve', label: 'Approve', role: 'hod' },
+  { key: 'execute', label: 'Execute', role: 'personnel' },
+  { key: 'monitor', label: 'Monitor', role: 'safety' }
 ];
 
 export const SHIFT_ROSTER = [

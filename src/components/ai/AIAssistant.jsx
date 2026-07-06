@@ -19,31 +19,56 @@ function formatInline(text, keyPrefix = '') {
   });
 }
 
-// Detects inline numbered steps like "1) Do X, 2) Do Y, 3) Do Z" and
-// renders them as an ordered list instead of one dense paragraph.
+// Splits a reply into paragraph / bullet-list / numbered-list blocks from
+// its newlines, so multi-line mock responses render legibly instead of
+// collapsing into one dense line.
 function formatReply(text) {
-  const stepPattern = /\d+\)\s/g;
-  const stepMatches = text.match(stepPattern);
-  if (stepMatches && stepMatches.length >= 2) {
-    const introEnd = text.search(stepPattern);
-    const intro = text.slice(0, introEnd).trim();
-    const stepsBlock = text.slice(introEnd);
-    const steps = stepsBlock
-      .split(/\d+\)\s/)
-      .filter(Boolean)
-      .map((s) => s.replace(/,\s*$/, '').trim());
-    return (
-      <>
-        {intro && <div className="mb-1.5">{formatInline(intro, 'intro')}</div>}
-        <ol className="list-decimal space-y-1 pl-4">
-          {steps.map((s, i) => (
-            <li key={i}>{formatInline(s, `step-${i}`)}</li>
-          ))}
-        </ol>
-      </>
-    );
-  }
-  return <>{formatInline(text)}</>;
+  const lines = text.split('\n').filter((l) => l.trim() !== '');
+  const blocks = [];
+  let currentList = null;
+
+  lines.forEach((line) => {
+    const bulletMatch = line.match(/^-\s+(.*)/);
+    const numberedMatch = line.match(/^\d+[.)]\s+(.*)/);
+    if (bulletMatch) {
+      if (!currentList || currentList.type !== 'ul') {
+        currentList = { type: 'ul', items: [] };
+        blocks.push(currentList);
+      }
+      currentList.items.push(bulletMatch[1]);
+    } else if (numberedMatch) {
+      if (!currentList || currentList.type !== 'ol') {
+        currentList = { type: 'ol', items: [] };
+        blocks.push(currentList);
+      }
+      currentList.items.push(numberedMatch[1]);
+    } else {
+      currentList = null;
+      blocks.push({ type: 'p', text: line });
+    }
+  });
+
+  return (
+    <>
+      {blocks.map((b, i) => {
+        if (b.type === 'p') {
+          return (
+            <div key={i} className="mb-1.5 last:mb-0">
+              {formatInline(b.text, `p${i}`)}
+            </div>
+          );
+        }
+        const ListTag = b.type;
+        return (
+          <ListTag key={i} className={`mb-1.5 last:mb-0 space-y-1 pl-4 ${b.type === 'ol' ? 'list-decimal' : 'list-disc'}`}>
+            {b.items.map((item, j) => (
+              <li key={j}>{formatInline(item, `${i}-${j}`)}</li>
+            ))}
+          </ListTag>
+        );
+      })}
+    </>
+  );
 }
 
 export default function AIAssistant({ contained = false }) {
