@@ -1,7 +1,7 @@
 import React from 'react';
 import * as Icons from 'lucide-react';
 import { NAV_CONFIG, ROLE_LABELS } from '../../data/navConfig.js';
-import { LogOut, HardHat } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { DemoBadge } from '../shared/Primitives.jsx';
 
@@ -12,11 +12,9 @@ export default function Sidebar({ activeScreen, onNavigate }) {
   return (
     <aside className="flex h-screen w-64 flex-shrink-0 flex-col border-r border-nz-border bg-nz-navy text-white">
       <div className="flex items-center gap-2.5 px-5 py-5 border-b border-white/10">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-nz-orange">
-          <HardHat size={18} className="text-white" />
-        </div>
+        <img src="/logo.png" alt="Vedanta" className="h-9 w-9 object-contain" />
         <div>
-          <div className="text-sm font-bold leading-tight">VISL Permits</div>
+          <div className="text-sm font-bold leading-tight">Vedanta Permits</div>
           <div className="text-[10px] text-white/40">NextZen Minds</div>
         </div>
       </div>

@@ -16,11 +16,9 @@ export default function RoleLanding() {
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-nz-navy to-black">
       <header className="flex items-center justify-between px-8 py-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-nz-orange">
-            <Icons.HardHat size={22} className="text-white" />
-          </div>
+          <img src="/logo.png" alt="Vedanta" className="h-10 w-10 object-contain" />
           <div>
-            <div className="text-lg font-bold text-white">VISL Work Permit System</div>
+            <div className="text-lg font-bold text-white">Vedanta Work Permit System</div>
             <div className="text-xs text-white/50">Vedanta Sesa · Digital Work Permit Management System</div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 // ============================================================================
-// MOCK / DEMO DATA — VISL Digital Work Permit Management System
+// MOCK / DEMO DATA — Vedanta Digital Work Permit Management System
 // All data below is fabricated for demonstration purposes only.
 // Nothing in this file represents a real API response.
 // ============================================================================

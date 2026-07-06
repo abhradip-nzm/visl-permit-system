@@ -25,7 +25,7 @@ export default function AppShell({ renderScreen, titleFor }) {
     return (
       <div className="min-h-screen bg-nz-navy/5">
         <PhoneFrame
-          statusLabel="VISL Field App · Demo"
+          statusLabel="Vedanta Field App · Demo"
           overlay={
             <>
               <AIAssistant contained />

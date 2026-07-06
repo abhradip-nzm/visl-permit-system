@@ -1,4 +1,4 @@
-# VISL Work Permit Management System — Interactive Prototype
+# Vedanta Work Permit Management System — Interactive Prototype
 
 A clickable, sales/demo prototype of the **Vedanta Sesa: NLP – Work Permit Management System**, built by NextZen Minds.
 
@@ -8,9 +8,9 @@ A clickable, sales/demo prototype of the **Vedanta Sesa: NLP – Work Permit Man
 
 - 9 role personas, switchable at any time from the top bar: Super Admin, Requester, Approver/HoD, Observer/Safety Officer, Permit Issuer, Permit Receiver, LOTO Responsible, Competent Personnel, Shift Supervisor.
 - Mobile roles (Requester, Receiver, LOTO, Competent Personnel) render inside a phone-frame mock. Web roles render full-width.
-- A floating **"Ask AI"** assistant on every screen, powered by keyword-matched mock replies (see `src/data/aiAssistantData.js`).
+- A floating **"Vedanta AI"** assistant on every screen, powered by keyword-matched mock replies (see `src/data/aiAssistantData.js`).
 - Fully faked NLP text-parsing, voice input, OCR scanning, and SAP PM lookups — all driven from mock JSON.
-- NextZen brand system: primary blue `#1E50A0`, deep navy `#0F2A5F`, orange accent `#F26A21`, Noto Sans JP typography.
+- Vedanta brand system: primary blue `#0164A9`, dark charcoal `#212529`, green accent `#66CC33`, Noto Sans JP typography.
 
 ## Requirements
 

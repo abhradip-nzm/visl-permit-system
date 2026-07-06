@@ -108,7 +108,7 @@ export default function AIAssistant({ contained = false }) {
                   <Bot size={18} />
                 </div>
                 <div>
-                  <div className="text-sm font-bold">NZ Assistant</div>
+                  <div className="text-sm font-bold">Vedanta AI</div>
                   <div className="text-xs text-white/50">{ROLE_LABELS[currentRole]}</div>
                 </div>
               </div>
