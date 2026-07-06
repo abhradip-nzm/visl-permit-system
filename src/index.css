@@ -13,7 +13,7 @@ html, body, #root {
 body {
   font-family: 'Noto Sans JP', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background-color: #F5F7FA;
+  background-color: #EDF7FF;
 }
 
 ::-webkit-scrollbar {
@@ -24,15 +24,15 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #C7CEDA;
+  background: #CCCCCC;
   border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #A9B3C4;
+  background: #A9B3B9;
 }
 
 .focus-ring:focus-visible {
-  outline: 2px solid #1E50A0;
+  outline: 2px solid #0164A9;
   outline-offset: 2px;
 }
 

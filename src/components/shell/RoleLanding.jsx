@@ -13,7 +13,7 @@ export default function RoleLanding() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-b from-nz-navy to-[#0a1d42]">
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-nz-navy to-black">
       <header className="flex items-center justify-between px-8 py-6">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-nz-orange">
