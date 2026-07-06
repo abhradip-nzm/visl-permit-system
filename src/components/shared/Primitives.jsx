@@ -127,8 +127,8 @@ export function ToastHost({ toasts, contained = false }) {
       {toasts.map((t) => (
         <div
           key={t.id}
-          className={`animate-slideUp flex items-center gap-2 rounded-lg px-4 py-2.5 text-center text-sm font-semibold text-white shadow-panel ${
-            t.tone === 'success' ? 'bg-nz-charcoal' : t.tone === 'error' ? 'bg-nz-red' : 'bg-slate-800'
+          className={`animate-slideUp flex items-center gap-2 rounded-lg px-4 py-2.5 text-center text-sm font-semibold shadow-panel ${
+            t.tone === 'success' ? 'bg-nz-charcoal text-nz-navy' : t.tone === 'error' ? 'bg-nz-red text-white' : 'bg-slate-800 text-white'
           }`}
         >
           <CheckCircle2 size={16} className="flex-shrink-0" />

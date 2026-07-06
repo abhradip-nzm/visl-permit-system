@@ -10,12 +10,12 @@ export default function Sidebar({ activeScreen, onNavigate }) {
   const items = NAV_CONFIG[currentRole] || [];
 
   return (
-    <aside className="flex h-screen w-64 flex-shrink-0 flex-col border-r border-nz-border bg-nz-charcoal text-white">
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-white/10">
+    <aside className="flex h-screen w-64 flex-shrink-0 flex-col border-r border-nz-border bg-nz-charcoal text-nz-navy">
+      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-black/10">
         <img src="/logo.png" alt="Vedanta" className="h-9 w-9 object-contain" />
         <div>
           <div className="text-sm font-bold leading-tight">Vedanta Permits</div>
-          <div className="text-[10px] text-white/40">NextZen Minds</div>
+          <div className="text-[10px] text-slate-500">NextZen Minds</div>
         </div>
       </div>
 
@@ -28,7 +28,7 @@ export default function Sidebar({ activeScreen, onNavigate }) {
               key={item.key}
               onClick={() => onNavigate(item.key)}
               className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors focus-ring ${
-                active ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white'
+                active ? 'bg-black/10 text-nz-navy' : 'text-slate-500 hover:bg-black/5 hover:text-nz-navy'
               }`}
             >
               <Icon size={17} className={active ? 'text-nz-orange' : ''} />
@@ -39,10 +39,10 @@ export default function Sidebar({ activeScreen, onNavigate }) {
         })}
       </nav>
 
-      <div className="border-t border-white/10 px-3 py-4">
-        <div className="mb-2 rounded-lg bg-white/5 px-3 py-2 text-[11px] text-white/50">
+      <div className="border-t border-black/10 px-3 py-4">
+        <div className="mb-2 rounded-lg bg-black/5 px-3 py-2 text-[11px] text-slate-500">
           Signed in as<br />
-          <span className="font-semibold text-white">{ROLE_LABELS[currentRole]}</span>
+          <span className="font-semibold text-nz-navy">{ROLE_LABELS[currentRole]}</span>
         </div>
         <div className="mb-2">
           <DemoBadge />
@@ -52,7 +52,7 @@ export default function Sidebar({ activeScreen, onNavigate }) {
             pushToast('Signed out', 'default');
             setCurrentRole(null);
           }}
-          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/60 hover:bg-white/5 hover:text-white focus-ring"
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:bg-black/5 hover:text-nz-navy focus-ring"
         >
           <LogOut size={16} /> Switch Persona
         </button>

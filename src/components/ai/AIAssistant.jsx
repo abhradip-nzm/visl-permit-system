@@ -102,17 +102,17 @@ export default function AIAssistant({ contained = false }) {
             onClick={(e) => e.stopPropagation()}
             className={`flex h-full flex-col bg-white shadow-2xl animate-slideInRight ${contained ? 'w-full' : 'w-full max-w-md'}`}
           >
-            <div className="flex items-center justify-between border-b border-nz-border bg-nz-charcoal px-5 py-4 text-white">
+            <div className="flex items-center justify-between border-b border-nz-border bg-nz-charcoal px-5 py-4 text-nz-navy">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-nz-orange">
-                  <Bot size={18} />
+                  <Bot size={18} className="text-white" />
                 </div>
                 <div>
                   <div className="text-sm font-bold">Vedanta AI</div>
-                  <div className="text-xs text-white/50">{ROLE_LABELS[currentRole]}</div>
+                  <div className="text-xs text-slate-500">{ROLE_LABELS[currentRole]}</div>
                 </div>
               </div>
-              <button onClick={() => setAiOpen(false)} className="rounded-full p-1.5 hover:bg-white/10 focus-ring">
+              <button onClick={() => setAiOpen(false)} className="rounded-full p-1.5 hover:bg-black/5 focus-ring">
                 <X size={18} />
               </button>
             </div>

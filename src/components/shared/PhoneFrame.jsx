@@ -12,7 +12,7 @@ export default function PhoneFrame({ children, statusLabel = '', overlay = null 
         {/* Notch */}
         <div className="absolute left-1/2 top-0 z-20 h-5 w-32 -translate-x-1/2 rounded-b-xl bg-nz-charcoal" />
         {/* Status bar */}
-        <div className="flex items-center justify-between bg-nz-charcoal px-6 pb-1.5 pt-2 text-[11px] font-semibold text-white">
+        <div className="flex items-center justify-between bg-nz-charcoal px-6 pb-1.5 pt-2 text-[11px] font-semibold text-nz-navy">
           <span>9:41</span>
           <div className="flex items-center gap-1.5">
             <Signal size={12} />
@@ -21,7 +21,7 @@ export default function PhoneFrame({ children, statusLabel = '', overlay = null 
           </div>
         </div>
         {statusLabel && (
-          <div className="bg-nz-charcoal px-4 pb-2 text-center text-[10px] font-bold uppercase tracking-wide text-white/70">
+          <div className="bg-nz-charcoal px-4 pb-2 text-center text-[10px] font-bold uppercase tracking-wide text-slate-500">
             {statusLabel}
           </div>
         )}
