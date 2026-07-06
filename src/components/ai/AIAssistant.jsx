@@ -102,7 +102,7 @@ export default function AIAssistant({ contained = false }) {
             onClick={(e) => e.stopPropagation()}
             className={`flex h-full flex-col bg-white shadow-2xl animate-slideInRight ${contained ? 'w-full' : 'w-full max-w-md'}`}
           >
-            <div className="flex items-center justify-between border-b border-nz-border bg-nz-navy px-5 py-4 text-white">
+            <div className="flex items-center justify-between border-b border-nz-border bg-nz-charcoal px-5 py-4 text-white">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-nz-orange">
                   <Bot size={18} />

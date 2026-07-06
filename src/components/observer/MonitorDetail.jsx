@@ -72,7 +72,7 @@ export default function MonitorDetail({ navigate, params }) {
                   key={s}
                   onClick={() => setSeverity(s)}
                   className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                    severity === s ? 'bg-nz-navy text-white' : 'bg-nz-surface text-slate-500'
+                    severity === s ? 'bg-nz-charcoal text-white' : 'bg-nz-surface text-slate-500'
                   }`}
                 >
                   {s}

@@ -128,7 +128,7 @@ export function ToastHost({ toasts, contained = false }) {
         <div
           key={t.id}
           className={`animate-slideUp flex items-center gap-2 rounded-lg px-4 py-2.5 text-center text-sm font-semibold text-white shadow-panel ${
-            t.tone === 'success' ? 'bg-nz-navy' : t.tone === 'error' ? 'bg-nz-red' : 'bg-slate-800'
+            t.tone === 'success' ? 'bg-nz-charcoal' : t.tone === 'error' ? 'bg-nz-red' : 'bg-slate-800'
           }`}
         >
           <CheckCircle2 size={16} className="flex-shrink-0" />

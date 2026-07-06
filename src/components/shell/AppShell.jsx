@@ -23,7 +23,7 @@ export default function AppShell({ renderScreen, titleFor }) {
 
   if (platform === 'mobile') {
     return (
-      <div className="min-h-screen bg-nz-navy/5">
+      <div className="min-h-screen bg-nz-charcoal/5">
         <PhoneFrame
           statusLabel="Vedanta Field App · Demo"
           overlay={

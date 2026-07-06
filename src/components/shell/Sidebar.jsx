@@ -10,7 +10,7 @@ export default function Sidebar({ activeScreen, onNavigate }) {
   const items = NAV_CONFIG[currentRole] || [];
 
   return (
-    <aside className="flex h-screen w-64 flex-shrink-0 flex-col border-r border-nz-border bg-nz-navy text-white">
+    <aside className="flex h-screen w-64 flex-shrink-0 flex-col border-r border-nz-border bg-nz-charcoal text-white">
       <div className="flex items-center gap-2.5 px-5 py-5 border-b border-white/10">
         <img src="/logo.png" alt="Vedanta" className="h-9 w-9 object-contain" />
         <div>
