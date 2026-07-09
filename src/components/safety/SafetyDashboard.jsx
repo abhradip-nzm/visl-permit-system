@@ -5,6 +5,7 @@ import { PERSONNEL } from '../../data/mockData.js';
 import { TASKS } from '../../data/tasksData.js';
 import { Card, StatusBadge, RiskBadge } from '../shared/Primitives.jsx';
 import WorkflowStrip from '../shared/WorkflowStrip.jsx';
+import PTWStepper from '../shared/PTWStepper.jsx';
 
 const PIN_TONE = { 'on track': 'bg-nz-green', attention: 'bg-nz-amber', overdue: 'bg-nz-red' };
 
@@ -80,16 +81,19 @@ export default function SafetyDashboard({ navigate }) {
             <button
               key={p.id}
               onClick={() => navigate('monitor', { id: p.id })}
-              className="flex w-full items-center justify-between rounded-lg border border-nz-border px-3 py-2.5 text-left"
+              className="flex w-full flex-col gap-1.5 rounded-lg border border-nz-border px-3 py-2.5 text-left"
             >
-              <div>
-                <div className="font-bold text-nz-navy">{p.id}</div>
-                <div className="text-xs text-slate-400">{p.type} · {p.location}</div>
+              <div className="flex w-full items-center justify-between">
+                <div>
+                  <div className="font-bold text-nz-navy">{p.id}</div>
+                  <div className="text-xs text-slate-400">{(p.types || [p.type]).join(', ')} · {p.location}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <RiskBadge risk={p.risk} />
+                  <ChevronRight size={14} className="text-slate-300" />
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <RiskBadge risk={p.risk} />
-                <ChevronRight size={14} className="text-slate-300" />
-              </div>
+              <div className="overflow-x-auto"><PTWStepper permit={p} compact /></div>
             </button>
           ))}
         </div>

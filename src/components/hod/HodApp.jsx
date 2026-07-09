@@ -1,6 +1,7 @@
 import React from 'react';
 import AppShell from '../shell/AppShell.jsx';
 import HodDashboard from './HodDashboard.jsx';
+import DepartmentalClearance from './DepartmentalClearance.jsx';
 import ReviewAndSign from './ReviewAndSign.jsx';
 import VerifyIssue from './VerifyIssue.jsx';
 import MyTeam from './MyTeam.jsx';
@@ -12,8 +13,9 @@ import ShiftCalendar from '../shared/ShiftCalendar.jsx';
 
 const TITLES = {
   dashboard: 'HOD Dashboard',
+  clearance: 'Departmental Clearance',
   review: 'Review & Sign',
-  verify: 'Verify & Issue',
+  verify: 'Closure Verification',
   myteam: 'My Team',
   shiftcalendar: 'Shift Calendar',
   taskmanagement: 'Task Management',
@@ -25,6 +27,8 @@ const TITLES = {
 export default function HodApp() {
   function renderScreen(screen, navigate, params) {
     switch (screen) {
+      case 'clearance':
+        return <DepartmentalClearance navigate={navigate} params={params} />;
       case 'review':
         return <ReviewAndSign navigate={navigate} params={params} />;
       case 'verify':

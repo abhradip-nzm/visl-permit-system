@@ -3,15 +3,23 @@ import { AlertTriangle, CheckCircle2, Info, Lock } from 'lucide-react';
 
 export function StatusBadge({ status }) {
   const map = {
+    // PTW 9-step lifecycle statuses
     draft: ['Draft', 'bg-slate-100 text-slate-600 border-slate-200'],
-    'pending-approval': ['Awaiting Approval', 'bg-nz-amber-light text-nz-amber border-nz-amber/30'],
+    'pending-clearance': ['Pending Clearance', 'bg-nz-amber-light text-nz-amber border-nz-amber/30'],
+    'pending-isolation': ['Pending Isolation', 'bg-nz-amber-light text-nz-amber border-nz-amber/30'],
+    'pending-declaration': ['Pending Declaration', 'bg-nz-amber-light text-nz-amber border-nz-amber/30'],
+    'pending-approval': ['Pending Approval', 'bg-nz-amber-light text-nz-amber border-nz-amber/30'],
+    live: ['Live', 'bg-nz-green-light text-nz-green border-nz-green/30'],
+    'pending-closure': ['Pending Closure', 'bg-nz-orange-light text-nz-orange border-nz-orange/30'],
+    closed: ['Closed', 'bg-slate-100 text-slate-500 border-slate-200'],
+    returned: ['Returned', 'bg-nz-red-light text-nz-red border-nz-red/30'],
+    // legacy / non-permit statuses still used elsewhere (e.g. Master Data, user status)
     approved: ['Approved', 'bg-nz-green-light text-nz-green border-nz-green/30'],
     rejected: ['Rejected', 'bg-nz-red-light text-nz-red border-nz-red/30'],
     issued: ['Issued', 'bg-nz-blue-light text-nz-blue border-nz-blue/30'],
     active: ['Active', 'bg-nz-blue-light text-nz-blue border-nz-blue/30'],
     blocked: ['Blocked', 'bg-nz-red-light text-nz-red border-nz-red/30'],
-    'closure-due': ['Closure Due', 'bg-nz-orange-light text-nz-orange border-nz-orange/30'],
-    closed: ['Closed', 'bg-slate-100 text-slate-500 border-slate-200']
+    'closure-due': ['Closure Due', 'bg-nz-orange-light text-nz-orange border-nz-orange/30']
   };
   const [label, cls] = map[status] || [status, 'bg-slate-100 text-slate-600 border-slate-200'];
   return (

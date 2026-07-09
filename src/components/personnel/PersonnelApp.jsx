@@ -3,6 +3,12 @@ import AppShell from '../shell/AppShell.jsx';
 import MyTasks from './MyTasks.jsx';
 import TaskDetail from './TaskDetail.jsx';
 import RequestTask from './RequestTask.jsx';
+import IsolationSetup from './IsolationSetup.jsx';
+import PrecautionsDeclaration from './PrecautionsDeclaration.jsx';
+import CriticalLiftChecklist from './CriticalLiftChecklist.jsx';
+import ConfinedSpaceMonitoring from './ConfinedSpaceMonitoring.jsx';
+import PermitTransfer from './PermitTransfer.jsx';
+import ClosePermit from './ClosePermit.jsx';
 import LotoTaskList from './LotoTaskList.jsx';
 import LotoExecution from './LotoExecution.jsx';
 import Inventory from './Inventory.jsx';
@@ -12,6 +18,12 @@ const TITLES = {
   mytasks: 'My Tasks',
   detail: 'Task Detail',
   create: 'Request Task',
+  isolation: 'Isolation Setup',
+  declare: 'Precautions & Declaration',
+  criticallift: 'Critical Lift Checklist',
+  confinedspace: 'Confined Space Monitoring',
+  transfer: 'Transfer Permit',
+  closepermit: 'Close Permit',
   loto: 'LOTO',
   execution: 'LOTO Execution',
   inventory: 'Inventory',
@@ -25,6 +37,18 @@ export default function PersonnelApp() {
         return <TaskDetail navigate={navigate} params={params} />;
       case 'create':
         return <RequestTask navigate={navigate} />;
+      case 'isolation':
+        return <IsolationSetup navigate={navigate} params={params} />;
+      case 'declare':
+        return <PrecautionsDeclaration navigate={navigate} params={params} />;
+      case 'criticallift':
+        return <CriticalLiftChecklist navigate={navigate} params={params} />;
+      case 'confinedspace':
+        return <ConfinedSpaceMonitoring navigate={navigate} params={params} />;
+      case 'transfer':
+        return <PermitTransfer navigate={navigate} params={params} />;
+      case 'closepermit':
+        return <ClosePermit navigate={navigate} params={params} />;
       case 'loto':
         return <LotoTaskList navigate={navigate} />;
       case 'execution':

@@ -7,7 +7,7 @@ import { Card, StatusBadge, SectionLabel } from '../shared/Primitives.jsx';
 export default function ActiveTasksLoto() {
   const { tasks, permits } = useApp();
   const active = tasks.filter((t) => t.status === 'In Progress' || t.status === 'Overdue');
-  const lotoPermits = permits.filter((p) => p.lotoRequired);
+  const lotoPermits = permits.filter((p) => p.isolationRequired);
 
   return (
     <div>
@@ -36,7 +36,7 @@ export default function ActiveTasksLoto() {
                   <td className="px-4 py-2.5 text-slate-600">{t.assignedTo || 'Unassigned'}</td>
                   <td className="px-4 py-2.5 text-slate-600">{t.equipment}</td>
                   <td className="px-4 py-2.5 text-xs font-semibold">
-                    {t.lotoRequired ? (permit?.lotoStatus === 'complete' ? <span className="text-nz-green">Locked</span> : <span className="text-nz-amber">Pending</span>) : 'N/A'}
+                    {permit?.isolationRequired ? (permit.status !== 'pending-isolation' ? <span className="text-nz-green">Locked</span> : <span className="text-nz-amber">Pending</span>) : 'N/A'}
                   </td>
                   <td className="px-4 py-2.5"><StatusBadge status={t.status === 'Overdue' ? 'blocked' : 'issued'} /></td>
                 </tr>
@@ -64,7 +64,7 @@ export default function ActiveTasksLoto() {
               ) : (
                 <div className="text-xs font-semibold text-nz-amber">Lock not yet reserved</div>
               )}
-              <div className="mt-1 text-xs text-slate-500">Assigned LOTO person: {p.lotoAssignee || 'Not yet assigned'}</div>
+              <div className="mt-1 text-xs text-slate-500">Isolation Officer: {p.isolationDetails?.[0]?.isolationOfficerName || 'Not yet assigned'}</div>
             </Card>
           );
         })}

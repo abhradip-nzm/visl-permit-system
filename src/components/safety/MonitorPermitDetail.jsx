@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ArrowLeft, Camera, Send, Mic } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { Card, SectionLabel, Button, WarningBanner, StatusBadge } from '../shared/Primitives.jsx';
+import PTWStepper from '../shared/PTWStepper.jsx';
+import PermitSummary from '../shared/PermitSummary.jsx';
 
 const SEVERITIES = ['Low', 'Medium', 'High', 'Critical'];
 
@@ -28,10 +30,14 @@ export default function MonitorPermitDetail({ navigate, params }) {
       <div className="mb-4 flex items-center justify-between">
         <div>
           <div className="text-lg font-bold text-nz-navy">{permit.id} <span className="text-xs font-normal text-slate-400">(read-only)</span></div>
-          <div className="text-sm text-slate-500">{permit.type} · {permit.equipment} · {permit.location}</div>
+          <div className="text-sm text-slate-500">{(permit.types || [permit.type]).join(', ')} · {permit.equipment} · {permit.location}</div>
         </div>
         <StatusBadge status={permit.status} />
       </div>
+
+      <div className="mb-4 overflow-x-auto"><PTWStepper permit={permit} compact /></div>
+
+      <PermitSummary permit={permit} />
 
       {permit.warnings?.length > 0 && (
         <Card className="mb-4 p-4">

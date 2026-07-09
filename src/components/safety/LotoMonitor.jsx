@@ -6,7 +6,7 @@ import { Card, SectionLabel } from '../shared/Primitives.jsx';
 
 export default function LotoMonitor() {
   const { permits } = useApp();
-  const lotoPermits = permits.filter((p) => p.lotoRequired);
+  const lotoPermits = permits.filter((p) => p.isolationRequired);
 
   return (
     <div className="px-4 py-4">
@@ -31,7 +31,7 @@ export default function LotoMonitor() {
         {lotoPermits.map((p) => (
           <Card key={p.id} className="p-3">
             <div className="mb-1 font-bold text-nz-navy">{p.id}</div>
-            <div className="text-xs text-slate-500">{p.equipment} · Isolation: {p.lotoStatus === 'complete' ? 'Complete' : 'Pending'}</div>
+            <div className="text-xs text-slate-500">{p.equipment} · Isolation: {p.status !== 'pending-isolation' ? 'Complete' : 'Pending'}</div>
             <div className="text-xs text-slate-400">Energy source: Electrical + Hydraulic</div>
           </Card>
         ))}

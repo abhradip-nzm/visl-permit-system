@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Wrench, ShieldCheck } from 'lucide-react';
+import { ChevronRight, Wrench, ShieldCheck, ArrowLeftRight } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { ACTIVE_PERSONNEL } from '../../data/shiftsData.js';
 import { MAINTENANCE_REQUESTS } from '../../data/tasksData.js';
@@ -8,9 +8,10 @@ import WorkflowStrip from '../shared/WorkflowStrip.jsx';
 
 export default function ShiftDashboard({ navigate }) {
   const { permits, tasks } = useApp();
-  const lotoPermits = permits.filter((p) => p.lotoRequired);
+  const pendingIsolation = permits.filter((p) => p.isolationRequired && p.status === 'pending-isolation');
+  const transferred = permits.filter((p) => p.transfers?.length > 0 && p.status === 'live');
   const shiftTasks = tasks.filter((t) => t.status !== 'Completed');
-  const alerts = permits.filter((p) => p.status === 'blocked').length + lotoPermits.filter((p) => p.lotoStatus !== 'complete').length;
+  const alerts = permits.filter((p) => p.status === 'returned').length + pendingIsolation.length;
 
   return (
     <div>
@@ -21,7 +22,7 @@ export default function ShiftDashboard({ navigate }) {
       <div className="mb-4 grid grid-cols-4 gap-4">
         <Stat label="Active Personnel" value={ACTIVE_PERSONNEL.length} />
         <Stat label="Pending Requests" value={MAINTENANCE_REQUESTS.length} tone="amber" />
-        <Stat label="Active LOTO" value={lotoPermits.length} tone="blue" />
+        <Stat label="Pending Isolation" value={pendingIsolation.length} tone="blue" />
         <Stat label="Shift Alerts" value={alerts} tone="red" />
       </div>
 
@@ -65,11 +66,29 @@ export default function ShiftDashboard({ navigate }) {
                     <div className="text-xs text-slate-400">{t.assignedTo || 'Unassigned'} · {t.equipment}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {t.lotoRequired && <span className="text-xs font-semibold text-nz-amber">LOTO</span>}
+                    {t.lotoRequired && <span className="text-xs font-semibold text-nz-amber">Isolation</span>}
                     <StatusBadge status={t.status === 'Overdue' ? 'blocked' : t.status === 'Completed' ? 'closed' : 'issued'} />
                   </div>
                 </div>
               ))}
+            </div>
+          </Card>
+
+          <Card>
+            <div className="border-b border-nz-border px-4 py-3 text-sm font-bold text-nz-navy"><ArrowLeftRight size={13} className="mr-1.5 inline" /> Active Permit Transfers</div>
+            <div className="divide-y divide-nz-border/60">
+              {transferred.map((p) => (
+                <div key={p.id} className="flex items-center justify-between px-4 py-3 text-sm">
+                  <div>
+                    <div className="font-semibold text-nz-navy">{p.id} — {p.equipment}</div>
+                    <div className="text-xs text-slate-400">
+                      {p.transfers.map((t) => t.transferredTo).join(' → ')}
+                    </div>
+                  </div>
+                  <StatusBadge status={p.status} />
+                </div>
+              ))}
+              {transferred.length === 0 && <div className="px-4 py-6 text-center text-xs text-slate-400">No active transfers this shift.</div>}
             </div>
           </Card>
         </div>
@@ -81,17 +100,17 @@ export default function ShiftDashboard({ navigate }) {
               <Wrench size={15} /> Request Maintenance
             </Button>
             <Button variant="primary" className="w-full" onClick={() => navigate('lotoapprovals')}>
-              <ShieldCheck size={15} /> Approve LOTO
+              <ShieldCheck size={15} /> Verify Isolation
             </Button>
           </div>
           <div className="mt-4 space-y-2">
-            {lotoPermits.map((p) => (
+            {pendingIsolation.map((p) => (
               <button
                 key={p.id}
                 onClick={() => navigate('lotoapprovals', { id: p.id })}
                 className="flex w-full items-center justify-between rounded-lg border border-nz-border px-3 py-2 text-left text-xs"
               >
-                <span className="font-semibold text-nz-navy">{p.id} needs LOTO</span>
+                <span className="font-semibold text-nz-navy">{p.id} needs isolation verification</span>
                 <ChevronRight size={12} className="text-slate-300" />
               </button>
             ))}
