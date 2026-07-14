@@ -32,7 +32,8 @@ export const EQUIPMENT = [
   { id: 'EQ-1102', name: 'Reactor Vessel R-12', location: 'Process Unit 2', calibrationStatus: 'valid', calibrationDate: '2027-01-10', inspectionStatus: 'valid' },
   { id: 'EQ-4410', name: 'MCC-3 Drive Panel', location: 'Crushing Plant', calibrationStatus: 'valid', calibrationDate: '2026-11-02', inspectionStatus: 'valid' },
   { id: 'EQ-2209', name: 'Hydraulic Accumulator H-9', location: 'Crushing Plant', calibrationStatus: 'valid', calibrationDate: '2026-09-18', inspectionStatus: 'valid' },
-  { id: 'EQ-5501', name: 'Storage Tank T-5', location: 'Tank Farm', calibrationStatus: 'valid', calibrationDate: '2026-12-05', inspectionStatus: 'valid' }
+  { id: 'EQ-5501', name: 'Storage Tank T-5', location: 'Tank Farm', calibrationStatus: 'valid', calibrationDate: '2026-12-05', inspectionStatus: 'valid' },
+  { id: 'EQ-6203', name: 'Pump P-204', location: 'Utility Block', calibrationStatus: 'valid', calibrationDate: '2026-10-20', inspectionStatus: 'valid' }
 ];
 
 export const LOCKS = [

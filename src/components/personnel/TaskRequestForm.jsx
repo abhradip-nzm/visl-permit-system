@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Sparkles, CheckCircle2, AlertTriangle } from 'lucide-react';
-import { NLP_SAMPLE_PARSE, OCR_SAMPLE_EXTRACTION, emptyDeptClearances, emptyClosure } from '../../data/mockData.js';
-import { PERMIT_TYPES, TOOLS_EQUIPMENT, HAZARDS_IDENTIFIED, RISK_CONTROL_GROUPS, PPE_FIRE_PROTECTION } from '../../data/ptwFormData.js';
+import { ArrowLeft, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { EQUIPMENT, SHIFT_ROSTER, emptyDeptClearances, emptyClosure } from '../../data/mockData.js';
+import { PERMIT_TYPES, TOOLS_EQUIPMENT, HAZARDS_IDENTIFIED, RISK_CONTROL_GROUPS, PPE_FIRE_PROTECTION, PLANT_AREAS } from '../../data/ptwFormData.js';
+import { DEPARTMENTS } from '../../data/departmentsData.js';
 import { Button, Card, SectionLabel } from '../shared/Primitives.jsx';
 import { CheckboxGrid, Accordion } from '../shared/ChecklistGrid.jsx';
 import { useApp } from '../../context/AppContext.jsx';
 
-const SOURCE_LABEL = { nlp: 'Parsed from natural language input', voice: 'Transcribed from voice input', ocr: 'Extracted via OCR from scanned permit', sap: 'Auto-populated from SAP PM order' };
+// Phase 2: the certified form (FRMT/MR/26 Rev 4) has one entry path — this
+// fixed checkbox/dropdown wizard. "source" only ever distinguishes a blank
+// form from one seeded by a real system-of-record lookup (SAP PM order);
+// there is no free-text/AI-parsed prefill path anymore.
+const SOURCE_LABEL = { sap: 'Auto-populated from SAP PM order' };
 
 const SHIFT_TIMES = { Morning: ['06:00', '14:00'], Afternoon: ['14:00', '22:00'], Night: ['22:00', '06:00'] };
 
@@ -16,23 +21,16 @@ function toggleItem(list, item) {
   return list.includes(item) ? list.filter((i) => i !== item) : [...list, item];
 }
 
-export default function TaskRequestForm({ source, navigate, onBack }) {
+export default function TaskRequestForm({ source, prefillData, navigate, onBack }) {
   const { currentUser, pushToast, setPermits } = useApp();
-  const base = source === 'ocr' ? {
-    permitType: OCR_SAMPLE_EXTRACTION.permitType, equipment: OCR_SAMPLE_EXTRACTION.equipment,
-    location: OCR_SAMPLE_EXTRACTION.location, date: OCR_SAMPLE_EXTRACTION.date, shift: OCR_SAMPLE_EXTRACTION.shift
-  } : {
-    permitType: NLP_SAMPLE_PARSE.permitType, equipment: NLP_SAMPLE_PARSE.equipment,
-    location: NLP_SAMPLE_PARSE.location, date: NLP_SAMPLE_PARSE.date, shift: NLP_SAMPLE_PARSE.shift
-  };
-  const [fromTime, toTime] = SHIFT_TIMES[base.shift] || SHIFT_TIMES.Morning;
+  const base = prefillData || {};
 
   const [step, setStep] = useState('form'); // form | review
-  const [types, setTypes] = useState([base.permitType]);
+  const [types, setTypes] = useState(base.permitType ? [base.permitType] : []);
   const [jobDetails, setJobDetails] = useState({
-    area: base.location, location: base.equipment, dateFrom: base.date, dateTill: base.date,
-    fromTime, toTime, jobDescription: `${base.permitType} work — ${base.equipment}`,
-    wiNo: '', ownerDepartment: 'Mechanical', contractor: ''
+    area: base.area || '', location: base.equipment || '', dateFrom: base.date || '', dateTill: base.date || '',
+    fromTime: (SHIFT_TIMES[base.shift] || SHIFT_TIMES.Morning)[0], toTime: (SHIFT_TIMES[base.shift] || SHIFT_TIMES.Morning)[1],
+    jobDescription: '', wiNo: '', ownerDepartment: base.ownerDepartment || '', contractor: ''
   });
   const [toolsEquipment, setToolsEquipment] = useState([]);
   const [otherTool, setOtherTool] = useState('');
@@ -43,12 +41,13 @@ export default function TaskRequestForm({ source, navigate, onBack }) {
 
   const isHighRisk = types.some((t) => HIGH_RISK_TYPES.includes(t));
   const isolationRequired = types.includes('Isolation & Electrical');
+  const certifiedRoster = SHIFT_ROSTER.filter((p) => p.certified);
 
   function updateJobDetail(key, value) {
     setJobDetails((f) => ({ ...f, [key]: value }));
   }
 
-  const sectionsComplete = types.length > 0 && jobDetails.area && jobDetails.jobDescription && ppeFireProtection.length > 0;
+  const sectionsComplete = types.length > 0 && jobDetails.area && jobDetails.ownerDepartment && jobDetails.jobDescription.trim() && ppeFireProtection.length > 0;
 
   function submit() {
     const newId = `WP-${1045 + Math.floor(Math.random() * 900)}`;
@@ -131,9 +130,11 @@ export default function TaskRequestForm({ source, navigate, onBack }) {
         <ArrowLeft size={15} /> Back
       </button>
 
-      <div className="mb-4 flex items-center gap-2 rounded-lg bg-nz-blue-light px-3 py-2 text-xs font-medium text-nz-blue-dark">
-        <Sparkles size={14} /> {SOURCE_LABEL[source] || 'Manually entered'}
-      </div>
+      {SOURCE_LABEL[source] && (
+        <div className="mb-4 rounded-lg bg-nz-blue-light px-3 py-2 text-xs font-medium text-nz-blue-dark">
+          {SOURCE_LABEL[source]} — verify every section before submitting.
+        </div>
+      )}
 
       {/* Section A */}
       <Card className="mb-3 p-4">
@@ -146,8 +147,8 @@ export default function TaskRequestForm({ source, navigate, onBack }) {
       <Card className="mb-3 p-4">
         <SectionLabel>B. Job Details</SectionLabel>
         <div className="space-y-3">
-          <Field label="Area" value={jobDetails.area} onChange={(v) => updateJobDetail('area', v)} />
-          <Field label="Location" value={jobDetails.location} onChange={(v) => updateJobDetail('location', v)} />
+          <SelectField label="Area" value={jobDetails.area} onChange={(v) => updateJobDetail('area', v)} options={PLANT_AREAS} />
+          <SelectField label="Equipment / Location" value={jobDetails.location} onChange={(v) => updateJobDetail('location', v)} options={EQUIPMENT.map((e) => e.name)} />
           <div className="grid grid-cols-2 gap-3">
             <Field label="Date From" type="date" value={jobDetails.dateFrom} onChange={(v) => updateJobDetail('dateFrom', v)} />
             <Field label="Date Till" type="date" value={jobDetails.dateTill} onChange={(v) => updateJobDetail('dateTill', v)} />
@@ -158,14 +159,14 @@ export default function TaskRequestForm({ source, navigate, onBack }) {
           </div>
           <label className="block">
             <span className="mb-1 block text-xs font-semibold text-slate-500">Job Description</span>
-            <textarea rows={2} value={jobDetails.jobDescription} onChange={(e) => updateJobDetail('jobDescription', e.target.value)} className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white" />
+            <textarea rows={2} value={jobDetails.jobDescription} onChange={(e) => updateJobDetail('jobDescription', e.target.value)} placeholder="Describe the job scope…" className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white" />
           </label>
           <label className="block">
             <span className="mb-1 block text-xs font-semibold text-slate-500">WI No (Work Instruction)</span>
             <input value={jobDetails.wiNo} onChange={(e) => updateJobDetail('wiNo', e.target.value)} placeholder="e.g. WI-4108" className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white" />
             {!jobDetails.wiNo && <span className="mt-1 block text-[11px] text-nz-amber">If not available, prepare JSA and get HOD/Plant Head & Safety approval.</span>}
           </label>
-          <Field label="Owner Department" value={jobDetails.ownerDepartment} onChange={(v) => updateJobDetail('ownerDepartment', v)} />
+          <SelectField label="Owner Department" value={jobDetails.ownerDepartment} onChange={(v) => updateJobDetail('ownerDepartment', v)} options={DEPARTMENTS.map((d) => d.key)} />
           <Field label="Contractor (if external)" value={jobDetails.contractor} onChange={(v) => updateJobDetail('contractor', v)} />
           <div className="rounded-lg bg-nz-surface px-3 py-2 text-xs text-slate-500">Permit Requestor: <span className="font-semibold text-nz-navy">{currentUser.name}</span> (auto-filled from login)</div>
         </div>
@@ -204,8 +205,8 @@ export default function TaskRequestForm({ source, navigate, onBack }) {
         <div className="mt-3 rounded-lg border border-nz-border bg-nz-surface p-3">
           <div className="mb-2 text-xs font-bold uppercase text-slate-400">Rescue Provisions (mandatory for high-risk jobs)</div>
           <div className="space-y-2">
-            <Field label="Name of Rescuer" value={rescue.nameOfRescuer} onChange={(v) => setRescue((r) => ({ ...r, nameOfRescuer: v }))} />
-            <Field label="Name of First Aider" value={rescue.nameOfFirstAider} onChange={(v) => setRescue((r) => ({ ...r, nameOfFirstAider: v }))} />
+            <SelectField label="Name of Rescuer" value={rescue.nameOfRescuer} onChange={(v) => setRescue((r) => ({ ...r, nameOfRescuer: v }))} options={certifiedRoster.map((p) => p.name)} placeholder="Select a certified rescuer…" />
+            <SelectField label="Name of First Aider" value={rescue.nameOfFirstAider} onChange={(v) => setRescue((r) => ({ ...r, nameOfFirstAider: v }))} options={certifiedRoster.map((p) => p.name)} placeholder="Select a certified first aider…" />
             <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">
               <input type="checkbox" checked={rescue.procedureAvailable} onChange={(e) => setRescue((r) => ({ ...r, procedureAvailable: e.target.checked }))} />
               Rescue Procedure Available for this job?
@@ -249,6 +250,22 @@ function Field({ label, value, onChange, type = 'text' }) {
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm font-medium text-nz-navy focus-ring focus:bg-white"
       />
+    </label>
+  );
+}
+
+function SelectField({ label, value, onChange, options, placeholder = 'Select…' }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-semibold text-slate-500">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm font-medium text-nz-navy focus-ring focus:bg-white"
+      >
+        <option value="">{placeholder}</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
     </label>
   );
 }

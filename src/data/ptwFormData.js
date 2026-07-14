@@ -3,6 +3,10 @@
 // Sections A, C, D, E, F checkbox options + Section G department list.
 // ============================================================================
 
+// Section B — plant area (fixed list; free text is not permitted on the
+// certified form for a controlled-vocabulary field like this).
+export const PLANT_AREAS = ['Crushing Plant', 'Tank Farm', 'Process Unit 2', 'Utility Block', 'Head Office'];
+
 // Section A — Type of Permit (multi-select)
 export const PERMIT_TYPES = [
   'Cold/General',
