@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle2, RotateCcw } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, RotateCcw, ShieldAlert } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
+import { isOwnPermit } from '../../utils/segregationOfDuties.js';
 import { Card, SectionLabel, Button, WarningBanner, SignaturePad, StatusBadge } from '../shared/Primitives.jsx';
 import PermitSummary from '../shared/PermitSummary.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
@@ -12,6 +13,7 @@ export default function ReviewAndSign({ navigate, params }) {
   const [signed, setSigned] = useState(null);
   const [returnOpen, setReturnOpen] = useState(false);
   const [reason, setReason] = useState('');
+  const blocked = isOwnPermit(permit, currentUser);
 
   function approve() {
     const now = { name: currentUser.name, timestamp: 'Just now' };
@@ -46,6 +48,15 @@ export default function ReviewAndSign({ navigate, params }) {
       </div>
 
       <div className="mb-4"><PTWStepper permit={permit} /></div>
+
+      {blocked && (
+        <Card className="mb-4 border-nz-red/30 bg-nz-red-light p-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-nz-red">
+            <ShieldAlert size={16} /> You raised this permit — you cannot approve your own request.
+          </div>
+          <p className="mt-1 text-xs text-nz-red/80">Reassign to another Approver in this department to complete on-ground verification.</p>
+        </Card>
+      )}
 
       {permit.warnings?.length > 0 && (
         <Card className="mb-4 p-4">
@@ -83,11 +94,11 @@ export default function ReviewAndSign({ navigate, params }) {
           "I have personally inspected and checked all requirements and approve the permit, same has been communicated to respective area in charge / workers / supervisors."
         </div>
         <label className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-600">
-          <input type="checkbox" checked={verified} onChange={(e) => setVerified(e.target.checked)} />
+          <input type="checkbox" checked={verified} disabled={blocked} onChange={(e) => setVerified(e.target.checked)} />
           I have personally inspected the site and verified the above
         </label>
         <div className="mb-3 text-xs text-slate-400">Approver: <span className="font-semibold text-nz-navy">{currentUser.name}</span> · Date/Time: auto-filled on sign</div>
-        <SignaturePad signed={signed} onSign={() => {}} label="Sign to approve" />
+        <SignaturePad signed={signed} onSign={() => {}} label={blocked ? 'Blocked — self-approval not permitted' : 'Sign to approve'} />
       </Card>
 
       {returnOpen && (
@@ -104,15 +115,15 @@ export default function ReviewAndSign({ navigate, params }) {
       )}
 
       <div className="flex gap-3">
-        <Button variant="success" className="flex-1" disabled={!verified || !!signed} onClick={approve}>
+        <Button variant="success" className="flex-1" disabled={blocked || !verified || !!signed} onClick={approve}>
           <CheckCircle2 size={16} /> Approve — Permit is Now LIVE
         </Button>
         {!returnOpen ? (
-          <Button variant="danger" className="flex-1" onClick={() => setReturnOpen(true)}>
+          <Button variant="danger" className="flex-1" disabled={blocked} onClick={() => setReturnOpen(true)}>
             <RotateCcw size={16} /> Return to Requester
           </Button>
         ) : (
-          <Button variant="danger" className="flex-1" disabled={!reason.trim()} onClick={returnToRequester}>
+          <Button variant="danger" className="flex-1" disabled={blocked || !reason.trim()} onClick={returnToRequester}>
             <RotateCcw size={16} /> Confirm Return
           </Button>
         )}

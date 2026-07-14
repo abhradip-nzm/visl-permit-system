@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle2, XCircle, FileCheck2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, FileCheck2, ShieldAlert } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
+import { isOwnPermit } from '../../utils/segregationOfDuties.js';
 import { Card, SectionLabel, Button, StatusBadge } from '../shared/Primitives.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
 
@@ -21,6 +22,8 @@ export default function VerifyIssue({ navigate, params }) {
   const [signed, setSigned] = useState(null);
 
   const allOk = Object.values(checklist).every(Boolean);
+  const awaitingDeIsolation = permit.isolationRequired && !permit.deIsolation;
+  const blocked = isOwnPermit(permit, currentUser);
 
   function confirmClosure() {
     const now = { name: currentUser.name, timestamp: 'Just now' };
@@ -65,6 +68,21 @@ export default function VerifyIssue({ navigate, params }) {
         </div>
       </Card>
 
+      {blocked && (
+        <Card className="mb-4 border-nz-red/30 bg-nz-red-light p-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-nz-red">
+            <ShieldAlert size={16} /> You raised this permit — you cannot verify its own closure.
+          </div>
+          <p className="mt-1 text-xs text-nz-red/80">Another Approver must complete final site verification.</p>
+        </Card>
+      )}
+
+      {awaitingDeIsolation && (
+        <Card className="mb-4 border-nz-amber/30 bg-nz-amber-light p-4 text-sm font-semibold text-nz-amber">
+          Awaiting Isolation Officer de-isolation — the equipment lock must be confirmed released before this permit can be closed.
+        </Card>
+      )}
+
       <Card className="mb-4 p-4">
         <SectionLabel>Approver Final Site Verification</SectionLabel>
         <div className="space-y-2">
@@ -81,10 +99,10 @@ export default function VerifyIssue({ navigate, params }) {
         </label>
       </Card>
 
-      <Button variant="primary" size="lg" className="w-full" disabled={!allOk || !!signed} onClick={confirmClosure}>
+      <Button variant="primary" size="lg" className="w-full" disabled={blocked || !allOk || !!signed || awaitingDeIsolation} onClick={confirmClosure}>
         <FileCheck2 size={16} /> Confirm Closure — Permit Closed
       </Button>
-      {!allOk && <div className="mt-2 text-center text-xs text-slate-400">Resolve the flagged item(s) above before closing.</div>}
+      {!blocked && !allOk && !awaitingDeIsolation && <div className="mt-2 text-center text-xs text-slate-400">Resolve the flagged item(s) above before closing.</div>}
     </div>
   );
 }

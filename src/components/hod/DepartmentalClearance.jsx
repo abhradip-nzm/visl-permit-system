@@ -1,22 +1,32 @@
 import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle2, Ban } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Ban, ShieldAlert } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
+import { isOwnPermit } from '../../utils/segregationOfDuties.js';
 import { CLEARANCE_DEPARTMENTS } from '../../data/ptwFormData.js';
 import { Card, SectionLabel, Button, StatusBadge } from '../shared/Primitives.jsx';
 import PermitSummary from '../shared/PermitSummary.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
 
 export default function DepartmentalClearance({ navigate, params }) {
-  const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
+  const { currentUser, currentDepartment, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [clearances, setClearances] = useState(permit.deptClearances);
   const [itApproval, setItApproval] = useState(clearances.itApproval);
   const [ohcInformed, setOhcInformed] = useState(clearances.ohcInformed);
+  const blocked = isOwnPermit(permit, currentUser);
 
   const allResolved = CLEARANCE_DEPARTMENTS.every((d) => clearances[d]?.status !== 'pending');
 
+  // C-4: each department's grant is its own Approver's action and must
+  // persist immediately — it can no longer wait on the bundled "Continue"
+  // click, since that click may never come from an Approver who isn't
+  // scoped to every outstanding department on this permit.
   function setDeptStatus(dept, status) {
-    setClearances((c) => ({ ...c, [dept]: { status, name: currentUser.name, datetime: 'Just now' } }));
+    const updated = { ...clearances, [dept]: { status, name: currentUser.name, datetime: 'Just now' } };
+    setClearances(updated);
+    updatePermit(permit.id, { deptClearances: { ...updated, itApproval, ohcInformed } });
+    addTimelineEvent(permit.id, `${dept} clearance ${status === 'cleared' ? 'granted' : 'marked not applicable'}`, `${currentUser.name} (Approver · ${dept})`);
+    pushToast(`${dept} clearance recorded for ${permit.id}`);
   }
 
   function advance() {
@@ -25,7 +35,7 @@ export default function DepartmentalClearance({ navigate, params }) {
       deptClearances: merged,
       status: permit.isolationRequired ? 'pending-isolation' : 'pending-declaration'
     });
-    addTimelineEvent(permit.id, 'Departmental Clearance granted', `${currentUser.name} (Approver)`);
+    addTimelineEvent(permit.id, 'Departmental Clearance complete — all departments resolved', `${currentUser.name} (Approver)`);
     addTimelineEvent(permit.id, permit.isolationRequired ? 'Awaiting Isolation Setup' : 'Awaiting Precautions & Declaration', 'System');
     pushToast(`${permit.id} cleared — ${permit.isolationRequired ? 'routed to Isolation Setup' : 'routed to Declaration'}`);
     setTimeout(() => navigate('dashboard'), 900);
@@ -46,6 +56,15 @@ export default function DepartmentalClearance({ navigate, params }) {
       </div>
 
       <div className="mb-4"><PTWStepper permit={permit} /></div>
+
+      {blocked && (
+        <Card className="mb-4 border-nz-red/30 bg-nz-red-light p-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-nz-red">
+            <ShieldAlert size={16} /> You raised this permit — you cannot grant clearance on your own request.
+          </div>
+          <p className="mt-1 text-xs text-nz-red/80">Another Approver in this department must action this row.</p>
+        </Card>
+      )}
 
       <PermitSummary permit={permit} defaultOpen />
 
@@ -71,11 +90,17 @@ export default function DepartmentalClearance({ navigate, params }) {
                   <td className="py-2.5 text-slate-500">{c.name || '—'}</td>
                   <td className="py-2.5 text-slate-500">{c.datetime || '—'}</td>
                   <td className="py-2.5">
-                    {c.status === 'pending' && (
+                    {c.status === 'pending' && dept === currentDepartment && !blocked && (
                       <div className="flex gap-2">
                         <Button variant="success" size="sm" onClick={() => setDeptStatus(dept, 'cleared')}><CheckCircle2 size={13} /> Grant</Button>
                         <Button variant="outline" size="sm" onClick={() => setDeptStatus(dept, 'not-applicable')}><Ban size={13} /> N/A</Button>
                       </div>
+                    )}
+                    {c.status === 'pending' && dept === currentDepartment && blocked && (
+                      <span className="text-xs italic text-nz-red">Blocked — your own permit</span>
+                    )}
+                    {c.status === 'pending' && dept !== currentDepartment && (
+                      <span className="text-xs italic text-slate-400">Awaiting {dept} Approver</span>
                     )}
                   </td>
                 </tr>
@@ -102,10 +127,10 @@ export default function DepartmentalClearance({ navigate, params }) {
         </div>
       </Card>
 
-      <Button variant="success" size="lg" className="w-full" disabled={!allResolved} onClick={advance}>
+      <Button variant="success" size="lg" className="w-full" disabled={blocked || !allResolved} onClick={advance}>
         <CheckCircle2 size={16} /> Confirm Clearance & Continue →
       </Button>
-      {!allResolved && <div className="mt-2 text-center text-xs text-slate-400">Resolve every department row (Grant or mark Not Applicable) to continue.</div>}
+      {!blocked && !allResolved && <div className="mt-2 text-center text-xs text-slate-400">Resolve every department row (Grant or mark Not Applicable) to continue.</div>}
     </div>
   );
 }

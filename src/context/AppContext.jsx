@@ -49,12 +49,23 @@ export function AppProvider({ children }) {
     setCurrentDepartment(null);
   }, []);
 
-  const reserveLock = useCallback((lockId, permitId) => {
-    setLockRegister((prev) => prev.map((l) => (l.id === lockId ? { ...l, state: 'in-use', permitId } : l)));
-  }, []);
+  // C-3: reserveLock is the single write path that can move a lock to
+  // in-use, and it refuses to double-book a lock that's already reserved
+  // elsewhere — the dept-scoped dropdowns only ever offer available locks,
+  // but this guard keeps the register itself the source of truth even if a
+  // stale selection is submitted.
+  const reserveLock = useCallback(
+    (lockId, permitId) => {
+      const target = lockRegister.find((l) => l.id === lockId);
+      if (!target || target.state !== 'available') return false;
+      setLockRegister((prev) => prev.map((l) => (l.id === lockId ? { ...l, state: 'in-use', permitId } : l)));
+      return true;
+    },
+    [lockRegister]
+  );
 
   const releaseLock = useCallback((lockId) => {
-    setLockRegister((prev) => prev.map((l) => (l.id === lockId ? { ...l, state: 'available', permitId: null } : l)));
+    setLockRegister((prev) => prev.map((l) => (l.id === lockId && l.state === 'in-use' ? { ...l, state: 'available', permitId: null } : l)));
   }, []);
 
   const pushToast = useCallback((message, tone = 'success') => {

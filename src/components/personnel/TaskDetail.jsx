@@ -106,13 +106,9 @@ function StatusAction({ navigate, permit, updatePermit, pushToast }) {
   }
 
   if (permit.status === 'pending-isolation') {
-    const initiated = permit.isolationDetails?.some((d) => d.isolationPermitNo);
     return (
       <Card className="mb-4 border-nz-amber/30 bg-nz-amber-light p-4">
-        <div className="mb-2 text-sm font-semibold text-nz-amber">Isolation setup required before this permit can proceed.</div>
-        <Button variant="orange" className="w-full" onClick={() => navigate('isolation', { id: permit.id })}>
-          {initiated ? 'View Isolation Setup' : 'Set Up Isolation Details'} <ArrowRight size={15} />
-        </Button>
+        <div className="text-sm font-semibold text-nz-amber">Awaiting Isolation Officer — equipment isolation is performed and verified independently. You'll be notified once it's confirmed.</div>
       </Card>
     );
   }

@@ -10,7 +10,7 @@ const STATUS_TAB_MAP = {
   'pending-declaration': 'Pending Declaration', 'pending-approval': 'Pending Approval', live: 'Live',
   'pending-closure': 'Pending Closure', closed: 'Closed', returned: 'Returned'
 };
-const ACTION_STATUSES = ['draft', 'pending-isolation', 'pending-declaration', 'live', 'returned'];
+const ACTION_STATUSES = ['draft', 'pending-declaration', 'live', 'returned'];
 
 export default function MyTasks({ navigate }) {
   const { currentUser, permits } = useApp();
