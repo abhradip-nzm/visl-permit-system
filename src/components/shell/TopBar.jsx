@@ -1,18 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Bell, ChevronDown, Globe, User, Check } from 'lucide-react';
+import { Search, Bell, ChevronDown, Globe, User, Check, LogOut } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
-import { ROLES } from '../../data/mockData.js';
 import { ROLE_LABELS } from '../../data/navConfig.js';
 import NotificationsPanel from './NotificationsPanel.jsx';
 
 const LANGUAGES = ['English', 'Hindi', 'Odia'];
 
 export default function TopBar({ title }) {
-  const { currentRole, setCurrentRole, language, setLanguage, notifications, pushToast } = useApp();
+  const { currentRole, currentDepartment, currentUser, selectRole, logout, language, setLanguage, notifications, pushToast } = useApp();
   const [showLang, setShowLang] = useState(false);
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
   const ref = useRef(null);
+  const hasMultipleRoles = (currentUser?.roles?.length || 0) > 1;
 
   useEffect(() => {
     function onClick(e) {
@@ -88,7 +88,8 @@ export default function TopBar({ title }) {
           {showNotifs && <NotificationsPanel onClose={() => setShowNotifs(false)} />}
         </div>
 
-        {/* Role switcher */}
+        {/* Account menu — shows the signed-in user's identity; role-switching
+            is limited to their own granted role-capabilities (see usersData.js) */}
         <div className="relative">
           <button
             onClick={() => setShowRoleMenu((s) => !s)}
@@ -97,30 +98,42 @@ export default function TopBar({ title }) {
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-nz-blue-light text-nz-blue">
               <User size={15} />
             </div>
-            <span className="text-sm font-semibold text-slate-700">{ROLE_LABELS[currentRole]}</span>
+            <span className="text-sm font-semibold text-slate-700">{currentUser?.name}</span>
             <ChevronDown size={14} className="text-slate-400" />
           </button>
           {showRoleMenu && (
             <div className="absolute right-0 z-30 mt-2 w-64 rounded-lg border border-nz-border bg-white p-1 shadow-panel animate-fadeIn">
               <div className="px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                Switch Persona (Demo)
+                {currentUser?.name} · {ROLE_LABELS[currentRole]}{currentDepartment ? ` (${currentDepartment})` : ''}
               </div>
-              {ROLES.map((r) => (
-                <button
-                  key={r.key}
-                  onClick={() => {
-                    setCurrentRole(r.key);
-                    setShowRoleMenu(false);
-                    pushToast(`Switched to ${r.label}`);
-                  }}
-                  className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-nz-surface ${
-                    currentRole === r.key ? 'font-semibold text-nz-blue' : 'text-slate-600'
-                  }`}
-                >
-                  {r.label}
-                  {currentRole === r.key && <Check size={14} />}
-                </button>
-              ))}
+              {hasMultipleRoles && (
+                <>
+                  <div className="px-3 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-300">Switch role</div>
+                  {currentUser.roles.map((r, i) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        selectRole(r.role, r.department);
+                        setShowRoleMenu(false);
+                        pushToast(`Acting as ${ROLE_LABELS[r.role]}${r.department ? ` · ${r.department}` : ''}`);
+                      }}
+                      className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-nz-surface ${
+                        r.role === currentRole && r.department === currentDepartment ? 'font-semibold text-nz-blue' : 'text-slate-600'
+                      }`}
+                    >
+                      {ROLE_LABELS[r.role]}{r.department ? ` · ${r.department}` : ''}
+                      {r.role === currentRole && r.department === currentDepartment && <Check size={14} />}
+                    </button>
+                  ))}
+                  <div className="my-1 border-t border-nz-border" />
+                </>
+              )}
+              <button
+                onClick={() => { setShowRoleMenu(false); logout(); }}
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-nz-surface"
+              >
+                <LogOut size={14} /> Log Out
+              </button>
             </div>
           )}
         </div>

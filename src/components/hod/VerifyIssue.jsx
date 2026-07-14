@@ -14,7 +14,7 @@ const APPROVER_ITEMS = [
 ];
 
 export default function VerifyIssue({ navigate, params }) {
-  const { permits, updatePermit, addTimelineEvent, pushToast } = useApp();
+  const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [checklist, setChecklist] = useState(permit.closure?.approverChecklist || { controlsRestored: false, siteNormalized: false, materialsRemoved: false });
   const [deviation, setDeviation] = useState('');
@@ -23,13 +23,13 @@ export default function VerifyIssue({ navigate, params }) {
   const allOk = Object.values(checklist).every(Boolean);
 
   function confirmClosure() {
-    const now = { name: 'D. Fernandes', timestamp: 'Just now' };
+    const now = { name: currentUser.name, timestamp: 'Just now' };
     setSigned(now);
     updatePermit(permit.id, {
       status: 'closed',
       closure: { ...permit.closure, approverChecklist: checklist, deviationDetails: deviation, approverSigned: now, approverDate: 'Today', approverTime: 'Just now' }
     });
-    addTimelineEvent(permit.id, 'Closure verified — Permit Closed', 'D. Fernandes (HOD)');
+    addTimelineEvent(permit.id, 'Closure verified — Permit Closed', `${currentUser.name} (Approver)`);
     pushToast(`${permit.id} closed`);
     setTimeout(() => navigate('dashboard'), 900);
   }

@@ -6,7 +6,7 @@ import PermitSummary from '../shared/PermitSummary.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
 
 export default function ReviewAndSign({ navigate, params }) {
-  const { permits, updatePermit, addTimelineEvent, pushToast } = useApp();
+  const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [verified, setVerified] = useState(false);
   const [signed, setSigned] = useState(null);
@@ -14,10 +14,10 @@ export default function ReviewAndSign({ navigate, params }) {
   const [reason, setReason] = useState('');
 
   function approve() {
-    const now = { name: 'D. Fernandes', timestamp: 'Just now' };
+    const now = { name: currentUser.name, timestamp: 'Just now' };
     setSigned(now);
-    updatePermit(permit.id, { status: 'live', approval: { approverName: 'D. Fernandes', date: 'Today', time: 'Just now', onGroundVerified: true, signed: now, rejectionReason: '' } });
-    addTimelineEvent(permit.id, 'Approved — Permit is LIVE', 'D. Fernandes (HOD)');
+    updatePermit(permit.id, { status: 'live', approval: { approverName: currentUser.name, date: 'Today', time: 'Just now', onGroundVerified: true, signed: now, rejectionReason: '' } });
+    addTimelineEvent(permit.id, 'Approved — Permit is LIVE', `${currentUser.name} (Approver)`);
     addTimelineEvent(permit.id, 'Job Execution started', 'System');
     pushToast(`${permit.id} approved — Permit is now LIVE`);
     setTimeout(() => navigate('dashboard'), 900);
@@ -25,8 +25,8 @@ export default function ReviewAndSign({ navigate, params }) {
 
   function returnToRequester() {
     if (!reason.trim()) return;
-    updatePermit(permit.id, { status: 'returned', approval: { ...permit.approval, rejectionReason: reason, approverName: 'D. Fernandes', date: 'Today', time: 'Just now' } });
-    addTimelineEvent(permit.id, `Returned to Requester — ${reason}`, 'D. Fernandes (HOD)');
+    updatePermit(permit.id, { status: 'returned', approval: { ...permit.approval, rejectionReason: reason, approverName: currentUser.name, date: 'Today', time: 'Just now' } });
+    addTimelineEvent(permit.id, `Returned to Requester — ${reason}`, `${currentUser.name} (Approver)`);
     pushToast(`${permit.id} returned to requester`, 'error');
     setTimeout(() => navigate('dashboard'), 900);
   }
@@ -86,7 +86,7 @@ export default function ReviewAndSign({ navigate, params }) {
           <input type="checkbox" checked={verified} onChange={(e) => setVerified(e.target.checked)} />
           I have personally inspected the site and verified the above
         </label>
-        <div className="mb-3 text-xs text-slate-400">Approver: <span className="font-semibold text-nz-navy">D. Fernandes</span> · Date/Time: auto-filled on sign</div>
+        <div className="mb-3 text-xs text-slate-400">Approver: <span className="font-semibold text-nz-navy">{currentUser.name}</span> · Date/Time: auto-filled on sign</div>
         <SignaturePad signed={signed} onSign={() => {}} label="Sign to approve" />
       </Card>
 

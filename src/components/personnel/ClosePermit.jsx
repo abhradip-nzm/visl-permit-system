@@ -11,7 +11,7 @@ const CHECKLIST_ITEMS = [
 ];
 
 export default function ClosePermit({ navigate, params }) {
-  const { permits, updatePermit, addTimelineEvent, pushToast } = useApp();
+  const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [checklist, setChecklist] = useState(permit.closure?.requesterChecklist || { controlsBack: false, interlocksRestored: false, guardsInPlace: false, permitsSurrendered: false });
   const [tbtRef, setTbtRef] = useState('');
@@ -20,14 +20,14 @@ export default function ClosePermit({ navigate, params }) {
   const allChecked = Object.values(checklist).every(Boolean);
 
   function submit() {
-    const now = { name: 'S. Iyer', timestamp: 'Just now' };
+    const now = { name: currentUser.name, timestamp: 'Just now' };
     setSigned(now);
     updatePermit(permit.id, {
       status: 'pending-closure',
       closure: { ...permit.closure, requesterChecklist: checklist, toolboxTalkRefNo: tbtRef, requesterSigned: now, requesterDate: 'Today', requesterTime: 'Just now' }
     });
-    addTimelineEvent(permit.id, 'Job Execution completed', 'S. Iyer');
-    addTimelineEvent(permit.id, 'Closure submitted — awaiting Approver verification', 'S. Iyer');
+    addTimelineEvent(permit.id, 'Job Execution completed', currentUser.name);
+    addTimelineEvent(permit.id, 'Closure submitted — awaiting Approver verification', currentUser.name);
     pushToast(`${permit.id} closure submitted for Approver verification`);
     setTimeout(() => navigate('mytasks'), 900);
   }

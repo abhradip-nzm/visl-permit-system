@@ -1,0 +1,34 @@
+// ============================================================================
+// MOCK DATA — Department model (Phase 0 foundation)
+// Departments are first-class entities: each owns its own Approvers and
+// Isolation Officers (see usersData.js role-capability `department` field)
+// and its own lock register (see lockRegisterData.js).
+//
+// Department-specific dashboards/queues and cross-department mandatory-
+// clearance enforcement are Phase 1/3 work (C-4, H-5) — this file only
+// establishes the data both phases build on.
+// ============================================================================
+export const DEPARTMENTS = [
+  { key: 'Mechanical', label: 'Mechanical' },
+  { key: 'E&I', label: 'Electrical & Instrumentation (E&I)' },
+  { key: 'Production', label: 'Production' }
+];
+
+// Which department(s) a permit requires clearance/isolation/approval from,
+// derived from its selected Section A permit type(s).
+export const PERMIT_TYPE_DEPARTMENTS = {
+  'Cold/General': ['Mechanical'],
+  'Hot Work': ['Mechanical'],
+  Excavation: ['Mechanical', 'Production'],
+  'Isolation & Electrical': ['E&I'],
+  'Crane & Lifting': ['Mechanical'],
+  'Height Work': ['Mechanical'],
+  'Confined Space': ['Mechanical', 'Production'],
+  Project: ['Mechanical', 'E&I', 'Production']
+};
+
+export function departmentsForTypes(types = []) {
+  const set = new Set();
+  types.forEach((t) => (PERMIT_TYPE_DEPARTMENTS[t] || []).forEach((d) => set.add(d)));
+  return [...set];
+}

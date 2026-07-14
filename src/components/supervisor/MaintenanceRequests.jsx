@@ -6,7 +6,7 @@ import { useApp } from '../../context/AppContext.jsx';
 import { Card, Button, SectionLabel } from '../shared/Primitives.jsx';
 
 export default function MaintenanceRequests() {
-  const { pushToast } = useApp();
+  const { currentUser, pushToast } = useApp();
   const [requests, setRequests] = useState(MAINTENANCE_REQUESTS);
   const [form, setForm] = useState({ type: 'Maintenance', description: '', equipment: EQUIPMENT[0].name, priority: 'Medium', instrument: '', loto: false, assignTo: SHIFT_ROSTER[0].name });
 
@@ -18,14 +18,14 @@ export default function MaintenanceRequests() {
       equipment: form.equipment,
       location: EQUIPMENT.find((e) => e.name === form.equipment)?.location || '—',
       priority: form.priority,
-      status: 'Submitted — awaiting HOD approval',
-      submittedBy: 'Shift Supervisor',
+      status: 'Submitted — awaiting Approver approval',
+      submittedBy: currentUser.name,
       submittedAt: 'just now',
       lotoRequired: form.loto,
       assignedTo: form.assignTo
     };
     setRequests((prev) => [next, ...prev]);
-    pushToast('Request routed to HOD for approval');
+    pushToast('Request routed to Approver for review');
     setForm((f) => ({ ...f, description: '' }));
   }
 

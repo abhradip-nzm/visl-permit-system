@@ -7,7 +7,7 @@ import PermitSummary from '../shared/PermitSummary.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
 
 export default function DepartmentalClearance({ navigate, params }) {
-  const { permits, updatePermit, addTimelineEvent, pushToast } = useApp();
+  const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [clearances, setClearances] = useState(permit.deptClearances);
   const [itApproval, setItApproval] = useState(clearances.itApproval);
@@ -16,7 +16,7 @@ export default function DepartmentalClearance({ navigate, params }) {
   const allResolved = CLEARANCE_DEPARTMENTS.every((d) => clearances[d]?.status !== 'pending');
 
   function setDeptStatus(dept, status) {
-    setClearances((c) => ({ ...c, [dept]: { status, name: 'D. Fernandes', datetime: 'Just now' } }));
+    setClearances((c) => ({ ...c, [dept]: { status, name: currentUser.name, datetime: 'Just now' } }));
   }
 
   function advance() {
@@ -25,7 +25,7 @@ export default function DepartmentalClearance({ navigate, params }) {
       deptClearances: merged,
       status: permit.isolationRequired ? 'pending-isolation' : 'pending-declaration'
     });
-    addTimelineEvent(permit.id, 'Departmental Clearance granted', 'D. Fernandes (HOD)');
+    addTimelineEvent(permit.id, 'Departmental Clearance granted', `${currentUser.name} (Approver)`);
     addTimelineEvent(permit.id, permit.isolationRequired ? 'Awaiting Isolation Setup' : 'Awaiting Precautions & Declaration', 'System');
     pushToast(`${permit.id} cleared — ${permit.isolationRequired ? 'routed to Isolation Setup' : 'routed to Declaration'}`);
     setTimeout(() => navigate('dashboard'), 900);

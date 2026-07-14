@@ -4,21 +4,21 @@ import { useApp } from '../../context/AppContext.jsx';
 import { Card, SectionLabel, Button, SignaturePad } from '../shared/Primitives.jsx';
 
 export default function PrecautionsDeclaration({ navigate, params }) {
-  const { permits, updatePermit, addTimelineEvent, pushToast } = useApp();
+  const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [precautions, setPrecautions] = useState(permit.additionalPrecautions || '');
   const [confirmed, setConfirmed] = useState(false);
   const [signed, setSigned] = useState(null);
 
   function submit() {
-    const now = { name: 'S. Iyer', timestamp: 'Just now' };
+    const now = { name: currentUser.name, timestamp: 'Just now' };
     setSigned(now);
     updatePermit(permit.id, {
       additionalPrecautions: precautions,
-      declaration: { requestorName: 'S. Iyer', date: 'Today', time: 'Just now', toolboxTalkConfirmed: true, signed: now },
+      declaration: { requestorName: currentUser.name, date: 'Today', time: 'Just now', toolboxTalkConfirmed: true, signed: now },
       status: 'pending-approval'
     });
-    addTimelineEvent(permit.id, 'Precautions & Declaration signed', 'S. Iyer');
+    addTimelineEvent(permit.id, 'Precautions & Declaration signed', currentUser.name);
     addTimelineEvent(permit.id, 'Awaiting Approval', 'System');
     pushToast(`${permit.id} submitted for Approval`);
     setTimeout(() => navigate('mytasks'), 900);

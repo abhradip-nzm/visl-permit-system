@@ -144,7 +144,7 @@ function StatusAction({ navigate, permit, updatePermit, pushToast }) {
 }
 
 function ExecutionAction({ navigate, permit, pushToast }) {
-  const { updatePermit } = useApp();
+  const { currentUser, updatePermit } = useApp();
   const [acknowledged, setAcknowledged] = useState(!!permit.declaration?.signed);
   const [signed, setSigned] = useState(permit.declaration?.signed || null);
   const [checklist, setChecklist] = useState(permit.checklist);
@@ -167,7 +167,7 @@ function ExecutionAction({ navigate, permit, pushToast }) {
         <Card className="mb-4 p-4">
           <SectionLabel>Acknowledge Safety Briefing</SectionLabel>
           <p className="mb-3 text-sm text-slate-500">Confirm you understand the hazards, controls, and PPE requirements.</p>
-          <SignaturePad signed={signed} onSign={() => { setSigned({ name: 'S. Iyer', timestamp: 'Just now' }); setAcknowledged(true); pushToast('Receipt acknowledged'); }} label="Sign to acknowledge" />
+          <SignaturePad signed={signed} onSign={() => { setSigned({ name: currentUser.name, timestamp: 'Just now' }); setAcknowledged(true); pushToast('Receipt acknowledged'); }} label="Sign to acknowledge" />
         </Card>
       ) : (
         <>

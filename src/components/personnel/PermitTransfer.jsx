@@ -5,7 +5,7 @@ import { SHIFT_ROSTER } from '../../data/mockData.js';
 import { Card, SectionLabel, Button } from '../shared/Primitives.jsx';
 
 export default function PermitTransfer({ navigate, params }) {
-  const { permits, updatePermit, addTimelineEvent, pushToast } = useApp();
+  const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [transferTo, setTransferTo] = useState('');
   const [confirmed, setConfirmed] = useState(false);
@@ -16,7 +16,7 @@ export default function PermitTransfer({ navigate, params }) {
     if (!transferTo) return;
     const record = { transferredTo: transferTo, signed: true, fromDateTime: 'Just now' };
     updatePermit(permit.id, { transfers: [...(permit.transfers || []), record] });
-    addTimelineEvent(permit.id, `Permit transferred to ${transferTo}`, 'S. Iyer');
+    addTimelineEvent(permit.id, `Permit transferred to ${transferTo}`, currentUser.name);
     pushToast(`${permit.id} transferred to ${transferTo} — they've been notified`);
     setTimeout(() => navigate('detail', { id: permit.id }), 900);
   }

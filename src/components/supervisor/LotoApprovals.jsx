@@ -5,24 +5,30 @@ import { Card, SectionLabel, Button, StatusBadge } from '../shared/Primitives.js
 import PTWStepper from '../shared/PTWStepper.jsx';
 
 export default function LotoApprovals({ params }) {
-  const { permits, updatePermit, addTimelineEvent, pushToast } = useApp();
+  const { permits, updatePermit, addTimelineEvent, pushToast, currentUser, currentDepartment, lockRegister, reserveLock } = useApp();
   const pending = permits.filter((p) => p.isolationRequired && p.status === 'pending-isolation');
   const verified = permits.filter((p) => p.isolationRequired && p.isolationDetails?.[0]?.lotoIdNo);
   const [permitId, setPermitId] = useState(params?.id || pending[0]?.id);
   const permit = permits.find((p) => p.id === permitId) || pending[0] || permits[0];
-  const [form, setForm] = useState({ isolationPermitNo: '', isolationOfficerName: 'J. Mehta', lotoIdNo: '', deptLockNo: '' });
+  const [form, setForm] = useState({ isolationPermitNo: '', lotoIdNo: '', deptLockNo: '' });
   const [confirmed, setConfirmed] = useState(false);
+
+  // Phase 0 (C-3 foundation): lock IDs are always a dropdown drawn from the
+  // live register, scoped to this Isolation Officer's own department, and a
+  // lock already in-use on another permit is never offered here.
+  const availableLocks = lockRegister.filter((l) => l.state === 'available' && (!currentDepartment || l.department === currentDepartment));
 
   const submittedByRequester = permit?.isolationDetails?.some((d) => d.typeOfIsolation);
 
   function verifyIsolation() {
     if (!permit) return;
-    const details = (permit.isolationDetails || []).map((d) => ({ ...d, ...form }));
+    const details = (permit.isolationDetails || []).map((d) => ({ ...d, ...form, isolationOfficerName: currentUser.name }));
     updatePermit(permit.id, { isolationDetails: details, status: 'pending-declaration' });
-    addTimelineEvent(permit.id, `Isolation confirmed — ${form.deptLockNo}, ${form.lotoIdNo}`, `${form.isolationOfficerName} (Isolation Officer)`);
+    reserveLock(form.deptLockNo, permit.id);
+    addTimelineEvent(permit.id, `Isolation confirmed — ${form.deptLockNo}, ${form.lotoIdNo}`, `${currentUser.name} (Isolation Officer)`);
     addTimelineEvent(permit.id, 'Awaiting Precautions & Declaration', 'System');
     setConfirmed(true);
-    pushToast(`${permit.id} isolation verified — requester can proceed to Declaration`);
+    pushToast(`${permit.id} isolation verified — requester notified to proceed`);
   }
 
   return (
@@ -46,7 +52,7 @@ export default function LotoApprovals({ params }) {
                   <td className="px-4 py-2.5 text-slate-600">{p.equipment}</td>
                   <td className="px-4 py-2.5 text-slate-600">{p.requester}</td>
                   <td className="px-4 py-2.5">
-                    <button onClick={() => { setPermitId(p.id); setConfirmed(false); }} className="text-xs font-semibold text-nz-blue hover:underline">Select</button>
+                    <button onClick={() => { setPermitId(p.id); setConfirmed(false); setForm({ isolationPermitNo: '', lotoIdNo: '', deptLockNo: '' }); }} className="text-xs font-semibold text-nz-blue hover:underline">Select</button>
                   </td>
                 </tr>
               ))}
@@ -92,9 +98,25 @@ export default function LotoApprovals({ params }) {
 
             <div className="space-y-2 text-sm">
               <Field label="Isolation Permit No" value={form.isolationPermitNo} onChange={(v) => setForm((f) => ({ ...f, isolationPermitNo: v }))} />
-              <Field label="Isolation Officer Name" value={form.isolationOfficerName} onChange={(v) => setForm((f) => ({ ...f, isolationOfficerName: v }))} />
+              <div className="rounded-lg bg-nz-surface px-3 py-2">
+                <div className="text-xs font-semibold text-slate-500">Isolation Officer Name</div>
+                <div className="text-sm font-medium text-nz-navy">{currentUser?.name} <span className="text-xs font-normal text-slate-400">(auto-filled from login)</span></div>
+              </div>
               <Field label="Isolation Officer LOTO ID No" value={form.lotoIdNo} onChange={(v) => setForm((f) => ({ ...f, lotoIdNo: v }))} />
-              <Field label="Dept. Lock No" value={form.deptLockNo} onChange={(v) => setForm((f) => ({ ...f, deptLockNo: v }))} />
+              <label className="block">
+                <span className="mb-1 block text-xs font-semibold text-slate-500">Dept. Lock No</span>
+                <select
+                  value={form.deptLockNo}
+                  onChange={(e) => setForm((f) => ({ ...f, deptLockNo: e.target.value }))}
+                  className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring"
+                >
+                  <option value="">Select an available lock…</option>
+                  {availableLocks.map((l) => (
+                    <option key={l.id} value={l.id}>{l.id} — {l.type} ({l.department})</option>
+                  ))}
+                </select>
+                {availableLocks.length === 0 && <span className="mt-1 block text-[11px] text-nz-red">No available locks for this department right now.</span>}
+              </label>
             </div>
           </Card>
 

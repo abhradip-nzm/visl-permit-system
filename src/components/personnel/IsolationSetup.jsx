@@ -6,10 +6,10 @@ import { Card, SectionLabel, Button, StatusBadge } from '../shared/Primitives.js
 const ISOLATION_TYPES = ['Electrical', 'Mechanical', 'Production', 'Other'];
 
 export default function IsolationSetup({ navigate, params }) {
-  const { permits, updatePermit, addTimelineEvent, pushToast } = useApp();
+  const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [rows, setRows] = useState(permit.isolationDetails?.length ? permit.isolationDetails : [{ equipment: permit.equipment, typeOfIsolation: '', isolationPermitNo: '', isolationOfficerName: '', lotoIdNo: '', deptLockNo: '' }]);
-  const [toolbox, setToolbox] = useState(permit.toolboxRecord?.length ? permit.toolboxRecord : [{ name: '', company: 'Vedanta', personalLockId: '', signed: false }]);
+  const [toolbox, setToolbox] = useState(permit.toolboxRecord?.length ? permit.toolboxRecord : [{ name: currentUser.name, company: 'Vedanta', personalLockId: '', signed: false }]);
   const [topics, setTopics] = useState(permit.isolationTopicsCovered || '');
   const alreadySubmitted = permit.status !== 'pending-isolation';
 
@@ -22,7 +22,7 @@ export default function IsolationSetup({ navigate, params }) {
 
   function submit() {
     updatePermit(permit.id, { isolationDetails: rows, toolboxRecord: toolbox, isolationTopicsCovered: topics });
-    addTimelineEvent(permit.id, 'Isolation details submitted — awaiting Isolation Officer verification', 'S. Iyer');
+    addTimelineEvent(permit.id, 'Isolation details submitted — awaiting Isolation Officer verification', currentUser.name);
     pushToast('Isolation details submitted for verification');
     setTimeout(() => navigate('detail', { id: permit.id }), 900);
   }

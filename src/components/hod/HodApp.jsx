@@ -12,7 +12,7 @@ import Instruments from './Instruments.jsx';
 import ShiftCalendar from '../shared/ShiftCalendar.jsx';
 
 const TITLES = {
-  dashboard: 'HOD Dashboard',
+  dashboard: 'Approver Dashboard',
   clearance: 'Departmental Clearance',
   review: 'Review & Sign',
   verify: 'Closure Verification',
@@ -49,5 +49,5 @@ export default function HodApp() {
         return <HodDashboard navigate={navigate} />;
     }
   }
-  return <AppShell renderScreen={renderScreen} titleFor={(s) => TITLES[s] || 'HOD Dashboard'} />;
+  return <AppShell renderScreen={renderScreen} titleFor={(s) => TITLES[s] || 'Approver Dashboard'} />;
 }

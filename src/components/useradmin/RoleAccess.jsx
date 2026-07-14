@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Check, Plus, X } from 'lucide-react';
 import { Card, Button, SectionLabel } from '../shared/Primitives.jsx';
 import { USERS } from '../../data/usersData.js';
+import { ROLE_LABELS } from '../../data/navConfig.js';
 import { useApp } from '../../context/AppContext.jsx';
 
 const MODULES = ['Permits', 'Personnel', 'Equipment', 'LOTO', 'Safety', 'Compliance', 'Documents', 'Reports', 'Integrations', 'System Settings'];
 const PERMS = ['view', 'create', 'edit', 'approve', 'delete', 'configure', 'export'];
-const ROLE_OPTIONS = ['User Admin', 'HOD', 'Safety Officer', 'Shift Supervisor', 'Personnel'];
+const ROLE_OPTIONS = Object.values(ROLE_LABELS);
 const TABS = ['Permission Matrix', 'Access Assignment'];
 
 function defaultGrid() {
@@ -112,7 +113,15 @@ export default function RoleAccess() {
               {USERS.slice(0, 8).map((u) => (
                 <tr key={u.id} className="border-b border-nz-border/60 last:border-0 hover:bg-nz-surface">
                   <td className="px-4 py-2.5 font-semibold text-nz-navy">{u.name}</td>
-                  <td className="px-4 py-2.5 text-slate-600">{u.role}</td>
+                  <td className="px-4 py-2.5 text-slate-600">
+                    <div className="flex flex-wrap gap-1">
+                      {u.roles.map((r, i) => (
+                        <span key={i} className="rounded-full bg-nz-blue-light px-2 py-0.5 text-[11px] font-semibold text-nz-blue-dark">
+                          {ROLE_LABELS[r.role]}{r.department ? ` · ${r.department}` : ''}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
                   <td className="px-4 py-2.5 text-slate-500">2026-07-01</td>
                   <td className="px-4 py-2.5">
                     <button onClick={() => pushToast(`Access re-mapped for ${u.name}`)} className="text-sm font-semibold text-nz-blue hover:underline">

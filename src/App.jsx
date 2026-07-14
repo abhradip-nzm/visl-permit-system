@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext.jsx';
-import RoleLanding from './components/shell/RoleLanding.jsx';
+import LoginScreen from './components/shell/LoginScreen.jsx';
+import RoleSelector from './components/shell/RoleSelector.jsx';
 import UserAdminApp from './components/useradmin/UserAdminApp.jsx';
 import HodApp from './components/hod/HodApp.jsx';
 import SafetyOfficerApp from './components/safety/SafetyOfficerApp.jsx';
@@ -16,12 +17,13 @@ const ROLE_APPS = {
 };
 
 function RootRouter() {
-  const { currentRole } = useApp();
-  if (!currentRole) return <RoleLanding />;
+  const { currentUser, currentRole, currentDepartment } = useApp();
+  if (!currentUser) return <LoginScreen />;
+  if (!currentRole) return <RoleSelector />;
   const RoleApp = ROLE_APPS[currentRole];
-  if (!RoleApp) return <RoleLanding />;
-  // key forces a clean remount of internal screen state when switching roles
-  return <RoleApp key={currentRole} />;
+  if (!RoleApp) return <RoleSelector />;
+  // key forces a clean remount of internal screen state when switching roles/departments
+  return <RoleApp key={`${currentRole}-${currentDepartment || ''}`} />;
 }
 
 export default function App() {

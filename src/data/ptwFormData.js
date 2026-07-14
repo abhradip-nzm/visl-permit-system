@@ -134,7 +134,9 @@ export const PPE_FIRE_PROTECTION = [
   'Face Shield', 'First Aid Kit', 'Full body Suit'
 ];
 
-// Section G — Concerned departments for clearance
+// Section G — Concerned departments for clearance (re-exported from the
+// department model in departmentsData.js so there's a single source of truth)
+export { DEPARTMENTS } from './departmentsData.js';
 export const CLEARANCE_DEPARTMENTS = ['Mechanical', 'E&I', 'Production'];
 
 // The 9-step lifecycle used by the WorkflowStepper component.

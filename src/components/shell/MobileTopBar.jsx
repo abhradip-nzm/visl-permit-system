@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { Bell, ChevronDown, Menu, Wifi, WifiOff, Globe, User, Check } from 'lucide-react';
+import { Bell, ChevronDown, Wifi, WifiOff, Globe, User, Check, LogOut } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { ROLE_LABELS } from '../../data/navConfig.js';
-import { ROLES } from '../../data/mockData.js';
 import NotificationsPanel from './NotificationsPanel.jsx';
 import { DemoBadge } from '../shared/Primitives.jsx';
 
 const LANGUAGES = ['English', 'Hindi', 'Odia'];
 
 export default function MobileTopBar({ title }) {
-  const { currentRole, setCurrentRole, notifications, pushToast, language, setLanguage } = useApp();
+  const { currentRole, currentDepartment, currentUser, selectRole, logout, notifications, pushToast, language, setLanguage } = useApp();
   const [showNotifs, setShowNotifs] = useState(false);
-  const [showRoles, setShowRoles] = useState(false);
+  const [showAccount, setShowAccount] = useState(false);
   const [showLang, setShowLang] = useState(false);
   const [online, setOnline] = useState(true);
   const unreadCount = (notifications[currentRole] || []).filter((n) => n.unread).length;
+  const hasMultipleRoles = (currentUser?.roles?.length || 0) > 1;
 
   return (
     <div className="sticky top-0 z-20 border-b border-nz-border bg-white">
@@ -27,10 +27,10 @@ export default function MobileTopBar({ title }) {
       <div className="flex items-center justify-between px-4 py-3">
         <div>
           <button
-            onClick={() => setShowRoles((s) => !s)}
+            onClick={() => setShowAccount((s) => !s)}
             className="flex items-center gap-1 text-xs font-semibold text-nz-blue"
           >
-            {ROLE_LABELS[currentRole]} <ChevronDown size={12} />
+            {currentUser?.name} · {ROLE_LABELS[currentRole]} <ChevronDown size={12} />
           </button>
           <h2 className="text-base font-bold text-nz-navy">{title}</h2>
         </div>
@@ -85,23 +85,36 @@ export default function MobileTopBar({ title }) {
           </div>
         </div>
       </div>
-      {showRoles && (
-        <div className="max-h-56 overflow-y-auto border-t border-nz-border bg-white px-2 py-2">
-          {ROLES.map((r) => (
-            <button
-              key={r.key}
-              onClick={() => {
-                setCurrentRole(r.key);
-                setShowRoles(false);
-                pushToast(`Switched to ${r.label}`);
-              }}
-              className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm ${
-                currentRole === r.key ? 'font-semibold text-nz-blue' : 'text-slate-600'
-              }`}
-            >
-              {r.label}
-            </button>
-          ))}
+      {showAccount && (
+        <div className="max-h-64 overflow-y-auto border-t border-nz-border bg-white px-2 py-2">
+          {hasMultipleRoles && (
+            <>
+              <div className="px-3 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-400">Switch role</div>
+              {currentUser.roles.map((r, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    selectRole(r.role, r.department);
+                    setShowAccount(false);
+                    pushToast(`Acting as ${ROLE_LABELS[r.role]}${r.department ? ` · ${r.department}` : ''}`);
+                  }}
+                  className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm ${
+                    r.role === currentRole && r.department === currentDepartment ? 'font-semibold text-nz-blue' : 'text-slate-600'
+                  }`}
+                >
+                  {ROLE_LABELS[r.role]}{r.department ? ` · ${r.department}` : ''}
+                  {r.role === currentRole && r.department === currentDepartment && <Check size={13} />}
+                </button>
+              ))}
+              <div className="my-1 border-t border-nz-border" />
+            </>
+          )}
+          <button
+            onClick={() => { setShowAccount(false); logout(); }}
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-600"
+          >
+            <LogOut size={14} /> Log Out
+          </button>
         </div>
       )}
     </div>

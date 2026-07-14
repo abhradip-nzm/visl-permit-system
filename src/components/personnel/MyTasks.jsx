@@ -4,7 +4,6 @@ import { useApp } from '../../context/AppContext.jsx';
 import { StatusBadge } from '../shared/Primitives.jsx';
 import WorkflowStrip from '../shared/WorkflowStrip.jsx';
 
-const MY_NAME_POOL = ['S. Iyer', 'A. Chatterjee'];
 const STATUS_TABS = ['All', 'Draft', 'Pending Clearance', 'Pending Isolation', 'Pending Declaration', 'Pending Approval', 'Live', 'Pending Closure', 'Closed', 'Returned'];
 const STATUS_TAB_MAP = {
   draft: 'Draft', 'pending-clearance': 'Pending Clearance', 'pending-isolation': 'Pending Isolation',
@@ -14,14 +13,14 @@ const STATUS_TAB_MAP = {
 const ACTION_STATUSES = ['draft', 'pending-isolation', 'pending-declaration', 'live', 'returned'];
 
 export default function MyTasks({ navigate }) {
-  const { permits } = useApp();
+  const { currentUser, permits } = useApp();
   const [tab, setTab] = useState('All');
 
-  const mine = permits.filter((p) => MY_NAME_POOL.includes(p.requester));
+  const mine = permits.filter((p) => p.requester === currentUser.name);
   const filtered = tab === 'All' ? mine : mine.filter((p) => STATUS_TAB_MAP[p.status] === tab);
   const myActionCount = mine.filter((p) => ACTION_STATUSES.includes(p.status)).length;
   const closureCount = mine.filter((p) => p.status === 'pending-closure').length;
-  const transferredToMe = permits.filter((p) => p.transfers?.some((t) => t.transferredTo === 'S. Iyer') && p.status === 'live');
+  const transferredToMe = permits.filter((p) => p.transfers?.some((t) => t.transferredTo === currentUser.name) && p.status === 'live');
 
   return (
     <div className="px-4 py-4">

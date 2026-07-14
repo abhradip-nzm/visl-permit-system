@@ -5,7 +5,7 @@ import { LOCKS } from '../../data/mockData.js';
 import { Card, SectionLabel, Button, SignaturePad } from '../shared/Primitives.jsx';
 
 export default function LotoExecution({ navigate, params }) {
-  const { permits, updatePermit, addTimelineEvent, pushToast } = useApp();
+  const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [selectedLock, setSelectedLock] = useState(null);
   const [photo, setPhoto] = useState(false);
@@ -16,15 +16,15 @@ export default function LotoExecution({ navigate, params }) {
   const isComplete = permit.lotoStatus === 'complete';
 
   function acknowledgeLockout() {
-    setSigned({ name: 'A. Singh', timestamp: 'Just now' });
+    setSigned({ name: currentUser.name, timestamp: 'Just now' });
     updatePermit(permit.id, { lotoStatus: 'complete' });
-    addTimelineEvent(permit.id, `LOTO applied — ${selectedLock.id}`, 'A. Singh (Personnel)');
+    addTimelineEvent(permit.id, `LOTO applied — ${selectedLock.id}`, currentUser.name);
     pushToast('Lock reserved system-wide — LOTO acknowledged');
   }
 
   function releaseLock() {
     updatePermit(permit.id, { lotoStatus: 'released' });
-    addTimelineEvent(permit.id, `LOTO released — ${selectedLock?.id || 'lock'}`, 'A. Singh (Personnel)');
+    addTimelineEvent(permit.id, `LOTO released — ${selectedLock?.id || 'lock'}`, currentUser.name);
     setReleased(true);
     pushToast('Lock released — reservation lifted');
   }

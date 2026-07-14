@@ -33,7 +33,8 @@ export default function Inventory({ navigate }) {
 }
 
 function MyInstruments({ navigate }) {
-  const mine = INSTRUMENTS.filter((i) => i.assignedTo === 'A. Singh' || i.assignedTo === 'S. Iyer');
+  const { currentUser } = useApp();
+  const mine = INSTRUMENTS.filter((i) => i.assignedTo === currentUser.name);
   return (
     <div>
       <button

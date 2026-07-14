@@ -10,7 +10,7 @@ export const NAV_CONFIG = {
     { key: 'masterdata', label: 'Master Data', icon: 'Database' }
   ],
   hod: [
-    { key: 'dashboard', label: 'HOD Dashboard', icon: 'LayoutDashboard' },
+    { key: 'dashboard', label: 'Approver Dashboard', icon: 'LayoutDashboard' },
     { key: 'myteam', label: 'My Team', icon: 'Users' },
     { key: 'shiftcalendar', label: 'Shift Calendar', icon: 'CalendarDays' },
     { key: 'taskmanagement', label: 'Task Management', icon: 'ListChecks' },
@@ -38,12 +38,14 @@ export const NAV_CONFIG = {
   ]
 };
 
+// Phase 0 role model: display labels renamed to match the target role model
+// (internal keys unchanged — see usersData.js header comment for why).
 export const ROLE_LABELS = {
-  useradmin: 'User Admin',
-  hod: 'HOD',
+  useradmin: 'Super Admin',
+  hod: 'Approver',
   safety: 'Safety Officer',
-  supervisor: 'Shift Supervisor',
-  personnel: 'Personnel'
+  supervisor: 'Isolation Officer',
+  personnel: 'Requester'
 };
 
 export const ROLE_PLATFORM = {

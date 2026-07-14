@@ -429,12 +429,14 @@ export const NLP_SAMPLE_PARSE = {
   shift: 'Morning'
 };
 
+// Phase 0 role model — label/description match ROLE_LABELS in navConfig.js
+// (internal keys unchanged; see usersData.js header comment for why).
 export const ROLES = [
-  { key: 'useradmin', label: 'User Admin', platform: 'web', description: 'System configuration, users & governance', icon: 'ShieldCheck' },
-  { key: 'hod', label: 'HOD', platform: 'web', description: 'Department tasks, approvals & compliance', icon: 'Stamp' },
-  { key: 'safety', label: 'Safety Officer', platform: 'mobile', description: 'Field safety monitoring & LOTO oversight', icon: 'Eye' },
-  { key: 'supervisor', label: 'Shift Supervisor', platform: 'web', description: 'Shift operations, maintenance & LOTO approval', icon: 'Users' },
-  { key: 'personnel', label: 'Personnel', platform: 'mobile', description: 'Task requests, execution & certifications', icon: 'HardHat' }
+  { key: 'useradmin', label: 'Super Admin', platform: 'web', description: 'Back-office: users, RBAC, lock register & departments', icon: 'ShieldCheck' },
+  { key: 'hod', label: 'Approver', platform: 'web', description: 'Departmental clearance & final on-ground approval', icon: 'Stamp' },
+  { key: 'safety', label: 'Safety Officer', platform: 'mobile', description: 'On-ground approval, live monitoring & closure verification', icon: 'Eye' },
+  { key: 'supervisor', label: 'Isolation Officer', platform: 'web', description: 'Independently isolates equipment & manages the lock register', icon: 'Users' },
+  { key: 'personnel', label: 'Requester', platform: 'mobile', description: 'Raises permits, runs risk assessment & executes the job', icon: 'HardHat' }
 ];
 
 // Ordered lifecycle used by the workflow connection strip / breadcrumb indicators.

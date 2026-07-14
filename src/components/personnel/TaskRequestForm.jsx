@@ -17,7 +17,7 @@ function toggleItem(list, item) {
 }
 
 export default function TaskRequestForm({ source, navigate, onBack }) {
-  const { pushToast, setPermits } = useApp();
+  const { currentUser, pushToast, setPermits } = useApp();
   const base = source === 'ocr' ? {
     permitType: OCR_SAMPLE_EXTRACTION.permitType, equipment: OCR_SAMPLE_EXTRACTION.equipment,
     location: OCR_SAMPLE_EXTRACTION.location, date: OCR_SAMPLE_EXTRACTION.date, shift: OCR_SAMPLE_EXTRACTION.shift
@@ -55,7 +55,7 @@ export default function TaskRequestForm({ source, navigate, onBack }) {
     setPermits((prev) => [
       {
         id: newId, types, type: types[0], equipment: jobDetails.location, location: jobDetails.area,
-        area: jobDetails.area, shift: base.shift, requester: 'S. Iyer', requestor: 'S. Iyer',
+        area: jobDetails.area, shift: base.shift, requester: currentUser.name, requestor: currentUser.name,
         status: 'pending-clearance', createdAt: jobDetails.dateFrom,
         dateFrom: jobDetails.dateFrom, dateTill: jobDetails.dateTill, fromTime: jobDetails.fromTime, toTime: jobDetails.toTime,
         jobDescription: jobDetails.jobDescription, wiNo: jobDetails.wiNo, ownerDepartment: jobDetails.ownerDepartment, contractor: jobDetails.contractor,
@@ -72,7 +72,7 @@ export default function TaskRequestForm({ source, navigate, onBack }) {
         transfers: [], closure: emptyClosure(),
         checklist: [{ id: 1, label: 'Pre-job briefing', done: false }],
         timeline: [
-          { stage: 'Created — Request & Risk Assessment', at: 'Just now', by: 'S. Iyer' },
+          { stage: 'Created — Request & Risk Assessment', at: 'Just now', by: currentUser.name },
           { stage: 'Submitted for Departmental Clearance', at: 'Just now', by: 'System' }
         ]
       },
@@ -167,7 +167,7 @@ export default function TaskRequestForm({ source, navigate, onBack }) {
           </label>
           <Field label="Owner Department" value={jobDetails.ownerDepartment} onChange={(v) => updateJobDetail('ownerDepartment', v)} />
           <Field label="Contractor (if external)" value={jobDetails.contractor} onChange={(v) => updateJobDetail('contractor', v)} />
-          <div className="rounded-lg bg-nz-surface px-3 py-2 text-xs text-slate-500">Permit Requestor: <span className="font-semibold text-nz-navy">S. Iyer</span> (auto-filled)</div>
+          <div className="rounded-lg bg-nz-surface px-3 py-2 text-xs text-slate-500">Permit Requestor: <span className="font-semibold text-nz-navy">{currentUser.name}</span> (auto-filled from login)</div>
         </div>
       </Card>
 
