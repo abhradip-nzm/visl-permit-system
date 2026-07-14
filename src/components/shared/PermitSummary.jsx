@@ -43,6 +43,7 @@ export default function PermitSummary({ permit, defaultOpen = false }) {
             <div>{permit.dateFrom} {permit.fromTime} → {permit.dateTill} {permit.toTime}</div>
             <div>WI No: {permit.wiNo || '— (JSA required)'} · Owner Dept: {permit.ownerDepartment}</div>
             {permit.contractor && <div>Contractor: {permit.contractor}</div>}
+            {permit.preferredApprover && <div>Preferred Approver: {permit.preferredApprover}</div>}
             <div className="mt-1">{permit.jobDescription}</div>
           </div>
           <div>

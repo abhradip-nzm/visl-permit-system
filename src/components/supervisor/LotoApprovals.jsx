@@ -68,7 +68,7 @@ export default function LotoApprovals({ params }) {
       isolationTopicsCovered: form.topics,
       status: 'pending-declaration'
     });
-    addTimelineEvent(permit.id, `Isolation confirmed — ${form.deptLockNo}, ${form.lotoIdNo}`, `${currentUser.name} (Isolation Officer)`);
+    addTimelineEvent(permit.id, `Isolation confirmed — ${form.deptLockNo}, ${form.lotoIdNo}${form.topics.trim() ? ` — "${form.topics.trim()}"` : ''}`, `${currentUser.name} (Isolation Officer)`);
     addTimelineEvent(permit.id, 'Awaiting Precautions & Declaration', 'System');
     setConfirmed(true);
     pushToast(`${permit.id} isolation verified — requester notified to proceed`);
@@ -235,12 +235,14 @@ export default function LotoApprovals({ params }) {
 function DeIsolationSection() {
   const { permits, updatePermit, addTimelineEvent, pushToast, currentUser, releaseLock } = useApp();
   const pendingDeIsolation = permits.filter((p) => p.isolationRequired && p.status === 'pending-closure' && !p.deIsolation);
+  const [comments, setComments] = useState({});
 
   function confirm(p) {
     const lockId = p.isolationDetails?.[0]?.deptLockNo;
+    const comment = comments[p.id]?.trim();
     if (lockId) releaseLock(lockId);
-    updatePermit(p.id, { deIsolation: { by: currentUser.name, at: 'Just now' } });
-    addTimelineEvent(p.id, `De-isolation confirmed — lock ${lockId || '—'} released`, `${currentUser.name} (Isolation Officer)`);
+    updatePermit(p.id, { deIsolation: { by: currentUser.name, at: 'Just now', comment: comment || '' } });
+    addTimelineEvent(p.id, `De-isolation confirmed — lock ${lockId || '—'} released${comment ? ` — "${comment}"` : ''}`, `${currentUser.name} (Isolation Officer)`);
     pushToast(`${p.id} de-isolated — lock released back to register`);
   }
 
@@ -252,7 +254,7 @@ function DeIsolationSection() {
           {pendingDeIsolation.map((p) => {
             const blocked = isOwnPermit(p, currentUser);
             return (
-              <div key={p.id} className="flex items-center justify-between px-4 py-3 text-sm">
+              <div key={p.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                 <div>
                   <div className="font-semibold text-nz-navy">
                     {p.id} — {p.equipment}
@@ -263,7 +265,15 @@ function DeIsolationSection() {
                 {blocked ? (
                   <span className="text-xs italic text-nz-red">Blocked — your own permit</span>
                 ) : (
-                  <Button variant="outline" onClick={() => confirm(p)}>Confirm De-isolation</Button>
+                  <div className="flex items-center gap-2">
+                    <input
+                      value={comments[p.id] || ''}
+                      onChange={(e) => setComments((prev) => ({ ...prev, [p.id]: e.target.value }))}
+                      placeholder="Comment (optional)"
+                      className="w-36 rounded-lg border border-nz-border bg-white px-2 py-1.5 text-xs focus-ring"
+                    />
+                    <Button variant="outline" onClick={() => confirm(p)}>Confirm De-isolation</Button>
+                  </div>
                 )}
               </div>
             );

@@ -70,15 +70,28 @@ export const HAZARD_CONTROL_LIBRARY = {
 // ---- PERMITS (Vedanta PTW form FRMT/MR/26 Rev 4 — 9-step Maker-Checker lifecycle) -----
 // Status enum: draft | pending-clearance | pending-isolation | pending-declaration |
 //              pending-approval | live | pending-closure | closed | returned
-export function emptyDeptClearances(overrides = {}) {
-  return {
+// H-5: when requiredDepartments is passed (derived from the permit's
+// selected types via departmentsForTypes), any department NOT in that list
+// auto-seeds as not-applicable instead of sitting as a manually-clearable
+// "pending" row — an Approver should never have to N/A a department that
+// was never relevant to begin with. Existing callers that omit it keep the
+// old all-pending behavior.
+export function emptyDeptClearances(overrides = {}, requiredDepartments = null) {
+  const base = {
     Mechanical: { status: 'pending', name: '', datetime: '' },
     'E&I': { status: 'pending', name: '', datetime: '' },
     Production: { status: 'pending', name: '', datetime: '' },
     itApproval: { required: false, granted: false, name: '' },
-    ohcInformed: false,
-    ...overrides
+    ohcInformed: false
   };
+  if (requiredDepartments) {
+    ['Mechanical', 'E&I', 'Production'].forEach((d) => {
+      if (!requiredDepartments.includes(d)) {
+        base[d] = { status: 'not-applicable', name: 'System', datetime: 'Not required for selected permit type(s)' };
+      }
+    });
+  }
+  return { ...base, ...overrides };
 }
 
 export function emptyClosure(overrides = {}) {

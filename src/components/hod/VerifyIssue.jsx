@@ -32,7 +32,7 @@ export default function VerifyIssue({ navigate, params }) {
       status: 'closed',
       closure: { ...permit.closure, approverChecklist: checklist, deviationDetails: deviation, approverSigned: now, approverDate: 'Today', approverTime: 'Just now' }
     });
-    addTimelineEvent(permit.id, 'Closure verified — Permit Closed', `${currentUser.name} (Approver)`);
+    addTimelineEvent(permit.id, `Closure verified — Permit Closed${deviation.trim() ? ` — "${deviation.trim()}"` : ''}`, `${currentUser.name} (Approver)`);
     pushToast(`${permit.id} closed`);
     setTimeout(() => navigate('dashboard'), 900);
   }

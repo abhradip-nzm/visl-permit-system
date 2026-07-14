@@ -13,13 +13,14 @@ export default function ReviewAndSign({ navigate, params }) {
   const [signed, setSigned] = useState(null);
   const [returnOpen, setReturnOpen] = useState(false);
   const [reason, setReason] = useState('');
+  const [comment, setComment] = useState('');
   const blocked = isOwnPermit(permit, currentUser);
 
   function approve() {
     const now = { name: currentUser.name, timestamp: 'Just now' };
     setSigned(now);
-    updatePermit(permit.id, { status: 'live', approval: { approverName: currentUser.name, date: 'Today', time: 'Just now', onGroundVerified: true, signed: now, rejectionReason: '' } });
-    addTimelineEvent(permit.id, 'Approved — Permit is LIVE', `${currentUser.name} (Approver)`);
+    updatePermit(permit.id, { status: 'live', approval: { approverName: currentUser.name, date: 'Today', time: 'Just now', onGroundVerified: true, signed: now, rejectionReason: '', comment: comment.trim() } });
+    addTimelineEvent(permit.id, `Approved — Permit is LIVE${comment.trim() ? ` — "${comment.trim()}"` : ''}`, `${currentUser.name} (Approver)`);
     addTimelineEvent(permit.id, 'Job Execution started', 'System');
     pushToast(`${permit.id} approved — Permit is now LIVE`);
     setTimeout(() => navigate('dashboard'), 900);
@@ -98,6 +99,17 @@ export default function ReviewAndSign({ navigate, params }) {
           I have personally inspected the site and verified the above
         </label>
         <div className="mb-3 text-xs text-slate-400">Approver: <span className="font-semibold text-nz-navy">{currentUser.name}</span> · Date/Time: auto-filled on sign</div>
+        <label className="mb-3 block">
+          <span className="mb-1 block text-xs font-semibold text-slate-500">Comments (optional)</span>
+          <textarea
+            rows={2}
+            value={comment}
+            disabled={blocked}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Any notes for the record…"
+            className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white disabled:opacity-60"
+          />
+        </label>
         <SignaturePad signed={signed} onSign={() => {}} label={blocked ? 'Blocked — self-approval not permitted' : 'Sign to approve'} />
       </Card>
 

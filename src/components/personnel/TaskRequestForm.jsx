@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { EQUIPMENT, SHIFT_ROSTER, emptyDeptClearances, emptyClosure } from '../../data/mockData.js';
 import { PERMIT_TYPES, TOOLS_EQUIPMENT, HAZARDS_IDENTIFIED, RISK_CONTROL_GROUPS, PPE_FIRE_PROTECTION, PLANT_AREAS } from '../../data/ptwFormData.js';
-import { DEPARTMENTS } from '../../data/departmentsData.js';
+import { DEPARTMENTS, departmentsForTypes } from '../../data/departmentsData.js';
+import { USERS } from '../../data/usersData.js';
 import { Button, Card, SectionLabel } from '../shared/Primitives.jsx';
 import { CheckboxGrid, Accordion } from '../shared/ChecklistGrid.jsx';
 import { useApp } from '../../context/AppContext.jsx';
@@ -30,7 +31,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
   const [jobDetails, setJobDetails] = useState({
     area: base.area || '', location: base.equipment || '', dateFrom: base.date || '', dateTill: base.date || '',
     fromTime: (SHIFT_TIMES[base.shift] || SHIFT_TIMES.Morning)[0], toTime: (SHIFT_TIMES[base.shift] || SHIFT_TIMES.Morning)[1],
-    jobDescription: '', wiNo: '', ownerDepartment: base.ownerDepartment || '', contractor: ''
+    jobDescription: '', wiNo: '', ownerDepartment: base.ownerDepartment || '', contractor: '', preferredApprover: ''
   });
   const [toolsEquipment, setToolsEquipment] = useState([]);
   const [otherTool, setOtherTool] = useState('');
@@ -42,6 +43,17 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
   const isHighRisk = types.some((t) => HIGH_RISK_TYPES.includes(t));
   const isolationRequired = types.includes('Isolation & Electrical');
   const certifiedRoster = SHIFT_ROSTER.filter((p) => p.certified);
+
+  // H-3: dynamic assignee selection — the preferred-Approver list is derived
+  // live from USERS' role-capability grants (Super Admin manages that list
+  // in User Management), not a hardcoded roster, and always excludes the
+  // requester themselves (ties into the C-5 self-approval guard). This is a
+  // preference only — routing still lands in the department's shared
+  // clearance queue for any qualified Approver, matching how Approver
+  // dashboards already work (C-4).
+  const availableApprovers = USERS.filter(
+    (u) => u.status === 'active' && u.name !== currentUser.name && u.roles.some((r) => r.role === 'hod' && r.department === jobDetails.ownerDepartment)
+  );
 
   function updateJobDetail(key, value) {
     setJobDetails((f) => ({ ...f, [key]: value }));
@@ -58,11 +70,12 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
         status: 'pending-clearance', createdAt: jobDetails.dateFrom,
         dateFrom: jobDetails.dateFrom, dateTill: jobDetails.dateTill, fromTime: jobDetails.fromTime, toTime: jobDetails.toTime,
         jobDescription: jobDetails.jobDescription, wiNo: jobDetails.wiNo, ownerDepartment: jobDetails.ownerDepartment, contractor: jobDetails.contractor,
+        preferredApprover: jobDetails.preferredApprover,
         hazards: hazardsIdentified, ppe: ppeFireProtection, controls: riskControlMeasures,
         warnings: [], ageHours: 0, risk: isHighRisk ? 'high' : 'medium',
         toolsEquipment: otherTool ? [...toolsEquipment, otherTool] : toolsEquipment,
         hazardsIdentified, riskControlMeasures, rescue, ppeFireProtection,
-        deptClearances: emptyDeptClearances(), isolationRequired, isolationDetails: isolationRequired ? [{ equipment: jobDetails.location, typeOfIsolation: '', isolationPermitNo: '', isolationOfficerName: '', lotoIdNo: '', deptLockNo: '' }] : [],
+        deptClearances: emptyDeptClearances({}, departmentsForTypes(types)), isolationRequired, isolationDetails: isolationRequired ? [{ equipment: jobDetails.location, typeOfIsolation: '', isolationPermitNo: '', isolationOfficerName: '', lotoIdNo: '', deptLockNo: '' }] : [],
         toolboxRecord: [], isolationTopicsCovered: '',
         additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
         approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
@@ -97,6 +110,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
           <div>{jobDetails.dateFrom} {jobDetails.fromTime} → {jobDetails.dateTill} {jobDetails.toTime}</div>
           <div>WI No: {jobDetails.wiNo || '— (JSA required, see HOD/Plant Head)'}</div>
           <div>Owner Dept: {jobDetails.ownerDepartment}{jobDetails.contractor && ` · Contractor: ${jobDetails.contractor}`}</div>
+          {jobDetails.preferredApprover && <div>Preferred Approver: {jobDetails.preferredApprover}</div>}
           <div className="mt-1">{jobDetails.jobDescription}</div>
         </Card>
         <SummaryCard title="C. Tools & Equipment" items={toolsEquipment.concat(otherTool ? [otherTool] : [])} />
@@ -110,6 +124,11 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
           </Card>
         )}
         <SummaryCard title="F. PPE & Fire Protection" items={ppeFireProtection} tone="blue" />
+
+        <div className="mb-3 rounded-lg bg-nz-surface px-3 py-2.5 text-xs text-slate-600">
+          <span className="font-bold text-nz-navy">Departments required to clear this permit: </span>
+          {departmentsForTypes(types).length ? departmentsForTypes(types).join(', ') : 'None — select a permit type to determine this'}
+        </div>
 
         {isolationRequired && (
           <div className="mb-3 rounded-lg bg-nz-blue-light px-3 py-2.5 text-xs font-medium text-nz-blue-dark">
@@ -166,7 +185,19 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
             <input value={jobDetails.wiNo} onChange={(e) => updateJobDetail('wiNo', e.target.value)} placeholder="e.g. WI-4108" className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white" />
             {!jobDetails.wiNo && <span className="mt-1 block text-[11px] text-nz-amber">If not available, prepare JSA and get HOD/Plant Head & Safety approval.</span>}
           </label>
-          <SelectField label="Owner Department" value={jobDetails.ownerDepartment} onChange={(v) => updateJobDetail('ownerDepartment', v)} options={DEPARTMENTS.map((d) => d.key)} />
+          <SelectField
+            label="Owner Department"
+            value={jobDetails.ownerDepartment}
+            onChange={(v) => setJobDetails((f) => ({ ...f, ownerDepartment: v, preferredApprover: '' }))}
+            options={DEPARTMENTS.map((d) => d.key)}
+          />
+          <SelectField
+            label="Preferred Approver (optional)"
+            value={jobDetails.preferredApprover}
+            onChange={(v) => updateJobDetail('preferredApprover', v)}
+            options={availableApprovers.map((u) => u.name)}
+            placeholder={jobDetails.ownerDepartment ? 'No preference — route to department queue' : 'Select Owner Department first'}
+          />
           <Field label="Contractor (if external)" value={jobDetails.contractor} onChange={(v) => updateJobDetail('contractor', v)} />
           <div className="rounded-lg bg-nz-surface px-3 py-2 text-xs text-slate-500">Permit Requestor: <span className="font-semibold text-nz-navy">{currentUser.name}</span> (auto-filled from login)</div>
         </div>

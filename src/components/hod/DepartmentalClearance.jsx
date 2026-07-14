@@ -13,19 +13,27 @@ export default function DepartmentalClearance({ navigate, params }) {
   const [clearances, setClearances] = useState(permit.deptClearances);
   const [itApproval, setItApproval] = useState(clearances.itApproval);
   const [ohcInformed, setOhcInformed] = useState(clearances.ohcInformed);
+  const [comments, setComments] = useState({});
   const blocked = isOwnPermit(permit, currentUser);
 
   const allResolved = CLEARANCE_DEPARTMENTS.every((d) => clearances[d]?.status !== 'pending');
 
+  // H-2: every clearance/approval touchpoint can carry an optional comment,
+  // not just the Return-to-Requester path — it's persisted on the
+  // department's own clearance record and echoed into the timeline so the
+  // requester and other Approvers can see it without opening this screen.
+  //
   // C-4: each department's grant is its own Approver's action and must
   // persist immediately — it can no longer wait on the bundled "Continue"
   // click, since that click may never come from an Approver who isn't
   // scoped to every outstanding department on this permit.
   function setDeptStatus(dept, status) {
-    const updated = { ...clearances, [dept]: { status, name: currentUser.name, datetime: 'Just now' } };
+    const comment = comments[dept]?.trim();
+    const updated = { ...clearances, [dept]: { status, name: currentUser.name, datetime: 'Just now', comment: comment || '' } };
     setClearances(updated);
     updatePermit(permit.id, { deptClearances: { ...updated, itApproval, ohcInformed } });
-    addTimelineEvent(permit.id, `${dept} clearance ${status === 'cleared' ? 'granted' : 'marked not applicable'}`, `${currentUser.name} (Approver · ${dept})`);
+    const verb = status === 'cleared' ? 'granted' : 'marked not applicable';
+    addTimelineEvent(permit.id, `${dept} clearance ${verb}${comment ? ` — "${comment}"` : ''}`, `${currentUser.name} (Approver · ${dept})`);
     pushToast(`${dept} clearance recorded for ${permit.id}`);
   }
 
@@ -79,21 +87,31 @@ export default function DepartmentalClearance({ navigate, params }) {
           <tbody>
             {CLEARANCE_DEPARTMENTS.map((dept) => {
               const c = clearances[dept];
+              const actionable = c.status === 'pending' && dept === currentDepartment && !blocked;
               return (
-                <tr key={dept} className="border-b border-nz-border/60 last:border-0">
+                <tr key={dept} className="border-b border-nz-border/60 last:border-0 align-top">
                   <td className="py-2.5 font-semibold text-nz-navy">{dept}</td>
                   <td className="py-2.5">
                     <span className={c.status === 'cleared' ? 'font-semibold text-nz-green' : c.status === 'not-applicable' ? 'text-slate-400' : 'font-semibold text-nz-amber'}>
                       {c.status === 'cleared' ? 'Cleared' : c.status === 'not-applicable' ? 'Not Applicable' : 'Pending'}
                     </span>
+                    {c.comment && <div className="mt-0.5 max-w-[14rem] text-[11px] italic text-slate-400">"{c.comment}"</div>}
                   </td>
                   <td className="py-2.5 text-slate-500">{c.name || '—'}</td>
                   <td className="py-2.5 text-slate-500">{c.datetime || '—'}</td>
                   <td className="py-2.5">
-                    {c.status === 'pending' && dept === currentDepartment && !blocked && (
-                      <div className="flex gap-2">
-                        <Button variant="success" size="sm" onClick={() => setDeptStatus(dept, 'cleared')}><CheckCircle2 size={13} /> Grant</Button>
-                        <Button variant="outline" size="sm" onClick={() => setDeptStatus(dept, 'not-applicable')}><Ban size={13} /> N/A</Button>
+                    {actionable && (
+                      <div className="space-y-1.5">
+                        <input
+                          value={comments[dept] || ''}
+                          onChange={(e) => setComments((prev) => ({ ...prev, [dept]: e.target.value }))}
+                          placeholder="Comment (optional)"
+                          className="w-40 rounded-lg border border-nz-border bg-white px-2 py-1 text-xs focus-ring"
+                        />
+                        <div className="flex gap-2">
+                          <Button variant="success" size="sm" onClick={() => setDeptStatus(dept, 'cleared')}><CheckCircle2 size={13} /> Grant</Button>
+                          <Button variant="outline" size="sm" onClick={() => setDeptStatus(dept, 'not-applicable')}><Ban size={13} /> N/A</Button>
+                        </div>
                       </div>
                     )}
                     {c.status === 'pending' && dept === currentDepartment && blocked && (

@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import { EQUIPMENT, SHIFT_ROSTER } from '../../data/mockData.js';
+import { EQUIPMENT } from '../../data/mockData.js';
+import { USERS } from '../../data/usersData.js';
 import { INSTRUMENTS } from '../../data/instrumentsData.js';
 import { MAINTENANCE_REQUESTS } from '../../data/tasksData.js';
 import { useApp } from '../../context/AppContext.jsx';
 import { Card, Button, SectionLabel } from '../shared/Primitives.jsx';
 
+// H-3: assignable personnel are derived live from USERS' role grants
+// (Super Admin manages that list) instead of the old static, disconnected
+// SHIFT_ROSTER array.
+const ASSIGNABLE = USERS.filter((u) => u.status === 'active' && u.roles.some((r) => r.role === 'personnel'));
+
 export default function MaintenanceRequests() {
   const { currentUser, pushToast } = useApp();
   const [requests, setRequests] = useState(MAINTENANCE_REQUESTS);
-  const [form, setForm] = useState({ type: 'Maintenance', description: '', equipment: EQUIPMENT[0].name, priority: 'Medium', instrument: '', loto: false, assignTo: SHIFT_ROSTER[0].name });
+  const [form, setForm] = useState({ type: 'Maintenance', description: '', equipment: EQUIPMENT[0].name, priority: 'Medium', instrument: '', loto: false, assignTo: ASSIGNABLE[0]?.name || '' });
 
   function submit() {
     const next = {
@@ -95,7 +101,7 @@ export default function MaintenanceRequests() {
           <label className="block">
             <span className="mb-1 block text-xs font-semibold text-slate-500">Assign To</span>
             <select value={form.assignTo} onChange={(e) => setForm((f) => ({ ...f, assignTo: e.target.value }))} className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring">
-              {SHIFT_ROSTER.map((r) => <option key={r.id}>{r.name}</option>)}
+              {ASSIGNABLE.map((u) => <option key={u.id}>{u.name}</option>)}
             </select>
           </label>
           <Button variant="primary" className="w-full" onClick={submit}>Submit Request</Button>
