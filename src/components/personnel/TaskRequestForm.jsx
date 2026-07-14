@@ -36,9 +36,20 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
   const [toolsEquipment, setToolsEquipment] = useState([]);
   const [otherTool, setOtherTool] = useState('');
   const [hazardsIdentified, setHazardsIdentified] = useState([]);
+  // M-5: a checked hazard box alone doesn't explain how it's controlled —
+  // the requester must justify the specific mitigation whenever any hazard
+  // is identified, on top of the general Section E control-measure grid.
+  const [hazardJustification, setHazardJustification] = useState('');
   const [riskControlMeasures, setRiskControlMeasures] = useState([]);
   const [rescue, setRescue] = useState({ nameOfRescuer: '', nameOfFirstAider: '', procedureAvailable: false, intimationProvided: false });
   const [ppeFireProtection, setPpeFireProtection] = useState([]);
+  // M-4: IT Approval-required and OHC-informed are facts about the job that
+  // only the Requester can know at request time — they now declare both
+  // here instead of an Approver filling them in during clearance. Whether
+  // IT Approval was actually *granted* remains an Approver-owned action on
+  // the Departmental Clearance screen.
+  const [itApprovalRequired, setItApprovalRequired] = useState(false);
+  const [ohcInformed, setOhcInformed] = useState(false);
 
   const isHighRisk = types.some((t) => HIGH_RISK_TYPES.includes(t));
   const isolationRequired = types.includes('Isolation & Electrical');
@@ -59,7 +70,9 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
     setJobDetails((f) => ({ ...f, [key]: value }));
   }
 
-  const sectionsComplete = types.length > 0 && jobDetails.area && jobDetails.ownerDepartment && jobDetails.jobDescription.trim() && ppeFireProtection.length > 0;
+  const sectionsComplete =
+    types.length > 0 && jobDetails.area && jobDetails.ownerDepartment && jobDetails.jobDescription.trim() &&
+    ppeFireProtection.length > 0 && (hazardsIdentified.length === 0 || hazardJustification.trim());
 
   function submit() {
     const newId = `WP-${1045 + Math.floor(Math.random() * 900)}`;
@@ -74,8 +87,12 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
         hazards: hazardsIdentified, ppe: ppeFireProtection, controls: riskControlMeasures,
         warnings: [], ageHours: 0, risk: isHighRisk ? 'high' : 'medium',
         toolsEquipment: otherTool ? [...toolsEquipment, otherTool] : toolsEquipment,
-        hazardsIdentified, riskControlMeasures, rescue, ppeFireProtection,
-        deptClearances: emptyDeptClearances({}, departmentsForTypes(types)), isolationRequired, isolationDetails: isolationRequired ? [{ equipment: jobDetails.location, typeOfIsolation: '', isolationPermitNo: '', isolationOfficerName: '', lotoIdNo: '', deptLockNo: '' }] : [],
+        hazardsIdentified, hazardJustification, riskControlMeasures, rescue, ppeFireProtection,
+        deptClearances: emptyDeptClearances(
+          { itApproval: { required: itApprovalRequired, granted: false, name: '' }, ohcInformed },
+          departmentsForTypes(types)
+        ),
+        isolationRequired, isolationDetails: isolationRequired ? [{ equipment: jobDetails.location, typeOfIsolation: '', isolationPermitNo: '', isolationOfficerName: '', lotoIdNo: '', deptLockNo: '' }] : [],
         toolboxRecord: [], isolationTopicsCovered: '',
         additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
         approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
@@ -111,10 +128,17 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
           <div>WI No: {jobDetails.wiNo || '— (JSA required, see HOD/Plant Head)'}</div>
           <div>Owner Dept: {jobDetails.ownerDepartment}{jobDetails.contractor && ` · Contractor: ${jobDetails.contractor}`}</div>
           {jobDetails.preferredApprover && <div>Preferred Approver: {jobDetails.preferredApprover}</div>}
+          <div>IT Approval required: {itApprovalRequired ? 'Yes' : 'No'} · OHC informed: {ohcInformed ? 'Yes' : 'No'}</div>
           <div className="mt-1">{jobDetails.jobDescription}</div>
         </Card>
         <SummaryCard title="C. Tools & Equipment" items={toolsEquipment.concat(otherTool ? [otherTool] : [])} />
         <SummaryCard title="D. Hazards Identified" items={hazardsIdentified} tone="red" />
+        {hazardJustification.trim() && (
+          <Card className="mb-3 p-3 text-xs text-slate-600">
+            <div className="mb-1 font-bold text-nz-navy">Hazard Justification</div>
+            <div>{hazardJustification}</div>
+          </Card>
+        )}
         <SummaryCard title="E. Risk Control Measures" items={riskControlMeasures} tone="green" />
         {(rescue.nameOfRescuer || rescue.nameOfFirstAider) && (
           <Card className="mb-3 p-3 text-xs text-slate-600">
@@ -199,6 +223,14 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
             placeholder={jobDetails.ownerDepartment ? 'No preference — route to department queue' : 'Select Owner Department first'}
           />
           <Field label="Contractor (if external)" value={jobDetails.contractor} onChange={(v) => updateJobDetail('contractor', v)} />
+          <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+            <input type="checkbox" checked={itApprovalRequired} onChange={(e) => setItApprovalRequired(e.target.checked)} />
+            IT Approval required for this job?
+          </label>
+          <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+            <input type="checkbox" checked={ohcInformed} onChange={(e) => setOhcInformed(e.target.checked)} />
+            OHC informed (road blockage)?
+          </label>
           <div className="rounded-lg bg-nz-surface px-3 py-2 text-xs text-slate-500">Permit Requestor: <span className="font-semibold text-nz-navy">{currentUser.name}</span> (auto-filled from login)</div>
         </div>
       </Card>
@@ -217,6 +249,20 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
       <Card className="mb-3 p-4">
         <SectionLabel>D. Hazards Identified</SectionLabel>
         <CheckboxGrid items={HAZARDS_IDENTIFIED} selected={hazardsIdentified} onToggle={(h) => setHazardsIdentified((prev) => toggleItem(prev, h))} />
+        {hazardsIdentified.length > 0 && (
+          <label className="mt-3 block">
+            <span className="mb-1 block text-xs font-semibold text-slate-500">
+              Hazard Justification — how will {hazardsIdentified.join(', ')} be controlled beyond Section E?
+            </span>
+            <textarea
+              rows={2}
+              value={hazardJustification}
+              onChange={(e) => setHazardJustification(e.target.value)}
+              placeholder="Explain the specific mitigation for the hazards identified above…"
+              className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white"
+            />
+          </label>
+        )}
       </Card>
 
       {/* Section E */}
@@ -266,7 +312,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
       <Button variant="orange" size="lg" className="w-full" disabled={!sectionsComplete} onClick={() => setStep('review')}>
         Review & Continue →
       </Button>
-      {!sectionsComplete && <div className="mt-2 text-center text-xs text-slate-400">Select at least one permit type, fill job details, and choose PPE to continue.</div>}
+      {!sectionsComplete && <div className="mt-2 text-center text-xs text-slate-400">Select at least one permit type, fill job details, choose PPE, and justify any identified hazards to continue.</div>}
     </div>
   );
 }

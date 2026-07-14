@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
-import { SHIFT_ROSTER } from '../../data/mockData.js';
+import { USERS } from '../../data/usersData.js';
 import { Card, SectionLabel, Button } from '../shared/Primitives.jsx';
+
+// H-3 consistency: transfer recipients are derived live from USERS' role
+// grants instead of a static roster, same fix applied to MaintenanceRequests.
+const TRANSFER_CANDIDATES = USERS.filter((u) => u.status === 'active' && u.roles.some((r) => r.role === 'personnel'));
 
 export default function PermitTransfer({ navigate, params }) {
   const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
@@ -39,7 +43,7 @@ export default function PermitTransfer({ navigate, params }) {
           <span className="mb-1 block text-xs font-semibold text-slate-500">Transferring to</span>
           <select value={transferTo} onChange={(e) => setTransferTo(e.target.value)} className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring">
             <option value="">Select…</option>
-            {SHIFT_ROSTER.filter((r) => r.certified).map((r) => <option key={r.id}>{r.name}</option>)}
+            {TRANSFER_CANDIDATES.filter((u) => u.name !== currentUser.name).map((u) => <option key={u.id}>{u.name}</option>)}
           </select>
         </label>
       </Card>

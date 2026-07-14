@@ -11,9 +11,9 @@ export default function DepartmentalClearance({ navigate, params }) {
   const { currentUser, currentDepartment, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [clearances, setClearances] = useState(permit.deptClearances);
-  const [itApproval, setItApproval] = useState(clearances.itApproval);
-  const [ohcInformed, setOhcInformed] = useState(clearances.ohcInformed);
   const [comments, setComments] = useState({});
+  const itApproval = clearances.itApproval;
+  const ohcInformed = clearances.ohcInformed;
   const blocked = isOwnPermit(permit, currentUser);
 
   const allResolved = CLEARANCE_DEPARTMENTS.every((d) => clearances[d]?.status !== 'pending');
@@ -31,16 +31,26 @@ export default function DepartmentalClearance({ navigate, params }) {
     const comment = comments[dept]?.trim();
     const updated = { ...clearances, [dept]: { status, name: currentUser.name, datetime: 'Just now', comment: comment || '' } };
     setClearances(updated);
-    updatePermit(permit.id, { deptClearances: { ...updated, itApproval, ohcInformed } });
+    updatePermit(permit.id, { deptClearances: updated });
     const verb = status === 'cleared' ? 'granted' : 'marked not applicable';
     addTimelineEvent(permit.id, `${dept} clearance ${verb}${comment ? ` — "${comment}"` : ''}`, `${currentUser.name} (Approver · ${dept})`);
     pushToast(`${dept} clearance recorded for ${permit.id}`);
   }
 
+  // M-4: IT Approval "required?" is now a Requester-declared fact set at
+  // submission — this screen only grants it, and persists immediately like
+  // department grants do.
+  function grantItApproval() {
+    const updated = { ...clearances, itApproval: { ...clearances.itApproval, granted: true, name: currentUser.name } };
+    setClearances(updated);
+    updatePermit(permit.id, { deptClearances: updated });
+    addTimelineEvent(permit.id, 'IT Approval granted', `${currentUser.name} (Approver)`);
+    pushToast(`IT Approval recorded for ${permit.id}`);
+  }
+
   function advance() {
-    const merged = { ...clearances, itApproval, ohcInformed };
     updatePermit(permit.id, {
-      deptClearances: merged,
+      deptClearances: clearances,
       status: permit.isolationRequired ? 'pending-isolation' : 'pending-declaration'
     });
     addTimelineEvent(permit.id, 'Departmental Clearance complete — all departments resolved', `${currentUser.name} (Approver)`);
@@ -128,20 +138,24 @@ export default function DepartmentalClearance({ navigate, params }) {
         </table>
 
         <div className="mt-4 space-y-2 border-t border-nz-border pt-3">
-          <label className="flex items-center justify-between text-sm">
-            <span className="font-semibold text-slate-600">IT Approval required?</span>
-            <input type="checkbox" checked={itApproval.required} onChange={(e) => setItApproval((i) => ({ ...i, required: e.target.checked }))} />
-          </label>
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-semibold text-slate-600">IT Approval required? <span className="font-normal text-slate-400">(declared by requester)</span></span>
+            <span className={`text-xs font-bold ${itApproval.required ? 'text-nz-amber' : 'text-slate-400'}`}>{itApproval.required ? 'Yes' : 'No'}</span>
+          </div>
           {itApproval.required && (
-            <label className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm">
               <span className="font-semibold text-slate-600">IT Approval granted</span>
-              <input type="checkbox" checked={itApproval.granted} onChange={(e) => setItApproval((i) => ({ ...i, granted: e.target.checked }))} />
-            </label>
+              {itApproval.granted ? (
+                <span className="text-xs font-bold text-nz-green">Granted — {itApproval.name}</span>
+              ) : (
+                <Button variant="success" size="sm" disabled={blocked} onClick={grantItApproval}>Grant</Button>
+              )}
+            </div>
           )}
-          <label className="flex items-center justify-between text-sm">
-            <span className="font-semibold text-slate-600">Informed to OHC (road blockage)</span>
-            <input type="checkbox" checked={ohcInformed} onChange={(e) => setOhcInformed(e.target.checked)} />
-          </label>
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-semibold text-slate-600">Informed to OHC (road blockage) <span className="font-normal text-slate-400">(declared by requester)</span></span>
+            <span className={`text-xs font-bold ${ohcInformed ? 'text-nz-green' : 'text-slate-400'}`}>{ohcInformed ? 'Yes' : 'No'}</span>
+          </div>
         </div>
       </Card>
 

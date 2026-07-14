@@ -53,6 +53,7 @@ export default function PermitSummary({ permit, defaultOpen = false }) {
           <div>
             <div className="mb-1 text-xs font-bold text-nz-navy">D. Hazards Identified</div>
             <Tags items={permit.hazardsIdentified || permit.hazards} tone="red" />
+            {permit.hazardJustification && <div className="mt-1 text-xs text-slate-500">Justification: {permit.hazardJustification}</div>}
           </div>
           <div>
             <div className="mb-1 text-xs font-bold text-nz-navy">E. Risk Control Measures</div>
