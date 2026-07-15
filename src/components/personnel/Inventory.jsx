@@ -97,7 +97,7 @@ function MyCertifications() {
         <SectionLabel>Renewal</SectionLabel>
         {uploaded ? (
           <div className="rounded-lg bg-nz-green-light px-3 py-2.5 text-sm font-semibold text-nz-green">
-            Renewal submitted for User Admin verification.
+            Renewal submitted for Super Admin verification.
           </div>
         ) : (
           <div className="space-y-2">

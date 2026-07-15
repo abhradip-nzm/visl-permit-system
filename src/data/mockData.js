@@ -180,7 +180,7 @@ export const PERMITS = [
     checklist: [{ id: 1, label: 'Voltage test to zero', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '05 Jul, 07:30', by: 'S. Iyer' },
-      { stage: 'Departmental Clearance granted', at: '05 Jul, 08:12', by: 'D. Fernandes (HOD)' },
+      { stage: 'Departmental Clearance granted', at: '05 Jul, 08:12', by: 'D. Fernandes (Approver)' },
       { stage: 'Awaiting Isolation Setup', at: '05 Jul, 08:13', by: 'System' }
     ]
   },
@@ -220,7 +220,7 @@ export const PERMITS = [
     checklist: [{ id: 1, label: 'Atmosphere monitoring active', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '05 Jul, 14:00', by: 'A. Chatterjee' },
-      { stage: 'Departmental Clearance granted', at: '05 Jul, 15:11', by: 'D. Fernandes (HOD)' },
+      { stage: 'Departmental Clearance granted', at: '05 Jul, 15:11', by: 'D. Fernandes (Approver)' },
       { stage: 'Isolation confirmed — LK-198, LOTO-014', at: '05 Jul, 15:40', by: 'J. Mehta (Isolation Officer)' },
       { stage: 'Awaiting Precautions & Declaration', at: '05 Jul, 15:41', by: 'System' }
     ]
@@ -250,7 +250,7 @@ export const PERMITS = [
     checklist: [{ id: 1, label: 'Pre-job briefing', done: true }, { id: 2, label: 'Isolation confirmed', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '01 Jul, 07:50', by: 'T. Roy' },
-      { stage: 'Departmental Clearance granted', at: '01 Jul, 08:25', by: 'D. Fernandes (HOD)' },
+      { stage: 'Departmental Clearance granted', at: '01 Jul, 08:25', by: 'D. Fernandes (Approver)' },
       { stage: 'Precautions & Declaration signed', at: '01 Jul, 09:00', by: 'T. Roy' },
       { stage: 'Awaiting Approval', at: '01 Jul, 09:01', by: 'System' }
     ]
@@ -289,9 +289,9 @@ export const PERMITS = [
     ],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '02 Jul, 08:00', by: 'S. Iyer' },
-      { stage: 'Departmental Clearance granted', at: '02 Jul, 08:20', by: 'D. Fernandes (HOD)' },
+      { stage: 'Departmental Clearance granted', at: '02 Jul, 08:20', by: 'D. Fernandes (Approver)' },
       { stage: 'Precautions & Declaration signed', at: '02 Jul, 08:40', by: 'S. Iyer' },
-      { stage: 'Approved — Permit is LIVE', at: '02 Jul, 08:45', by: 'D. Fernandes (HOD)' },
+      { stage: 'Approved — Permit is LIVE', at: '02 Jul, 08:45', by: 'D. Fernandes (Approver)' },
       { stage: 'Job Execution started', at: '02 Jul, 09:20', by: 'System' }
     ]
   },
@@ -329,8 +329,8 @@ export const PERMITS = [
     ],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '28 Jun, 08:10', by: 'K. Verma' },
-      { stage: 'Departmental Clearance granted', at: '28 Jun, 08:30', by: 'D. Fernandes (HOD)' },
-      { stage: 'Approved — Permit is LIVE', at: '28 Jun, 09:40', by: 'D. Fernandes (HOD)' },
+      { stage: 'Departmental Clearance granted', at: '28 Jun, 08:30', by: 'D. Fernandes (Approver)' },
+      { stage: 'Approved — Permit is LIVE', at: '28 Jun, 09:40', by: 'D. Fernandes (Approver)' },
       { stage: 'Job Execution completed', at: '05 Jul, 15:45', by: 'K. Verma' },
       { stage: 'Closure submitted — awaiting Approver verification', at: '05 Jul, 16:00', by: 'K. Verma' }
     ]
@@ -359,10 +359,10 @@ export const PERMITS = [
     checklist: [{ id: 1, label: 'Final closure sign-off', done: true }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '20 Jun, 08:00', by: 'K. Verma' },
-      { stage: 'Departmental Clearance granted', at: '20 Jun, 08:15', by: 'D. Fernandes (HOD)' },
-      { stage: 'Approved — Permit is LIVE', at: '20 Jun, 09:00', by: 'D. Fernandes (HOD)' },
+      { stage: 'Departmental Clearance granted', at: '20 Jun, 08:15', by: 'D. Fernandes (Approver)' },
+      { stage: 'Approved — Permit is LIVE', at: '20 Jun, 09:00', by: 'D. Fernandes (Approver)' },
       { stage: 'Closure submitted', at: '21 Jun, 15:30', by: 'K. Verma' },
-      { stage: 'Closure verified — Permit Closed', at: '21 Jun, 16:10', by: 'D. Fernandes (HOD)' }
+      { stage: 'Closure verified — Permit Closed', at: '21 Jun, 16:10', by: 'D. Fernandes (Approver)' }
     ]
   },
   {
@@ -386,12 +386,12 @@ export const PERMITS = [
     deptClearances: emptyDeptClearances(),
     isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '', additionalPrecautions: '',
     declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
-    approval: { approverName: 'D. Fernandes', date: '06 Jul', time: '06:50', onGroundVerified: false, signed: null, rejectionReason: 'Equipment calibration is overdue — resolve with Shift Supervisor before resubmission.' },
+    approval: { approverName: 'D. Fernandes', date: '06 Jul', time: '06:50', onGroundVerified: false, signed: null, rejectionReason: 'Equipment calibration is overdue — resolve with the Isolation Officer before resubmission.' },
     criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
     checklist: [{ id: 1, label: 'Gas test before start', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '06 Jul, 06:40', by: 'S. Iyer' },
-      { stage: 'Returned to Requester — equipment calibration overdue', at: '06 Jul, 06:50', by: 'D. Fernandes (HOD)' }
+      { stage: 'Returned to Requester — equipment calibration overdue', at: '06 Jul, 06:50', by: 'D. Fernandes (Approver)' }
     ]
   }
 ];

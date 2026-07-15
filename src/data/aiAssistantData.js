@@ -41,7 +41,7 @@ export const aiAssistant = {
     intents: [
       { match: ['shift', 'who', 'personnel', 'on duty', 'active'], reply: 'Morning Shift (07:00-15:00) — 19 active personnel:\n- Crushing Plant: A. Singh, S. Iyer, P. Rao + 5 others\n- Tank Farm: A. Chatterjee + 4 others\n- Process Unit 2: R. Das (cert expired — flagged) + 5 others\n\nAlert: R. Das should not be assigned to Confined Space tasks.' },
       { match: ['loto', 'pending', 'request', 'approval'], reply: '1 pending LOTO request:\n- WP-1044: Hydraulic Accumulator H-9, requested by S. Iyer\nEnergy source: Electrical + Hydraulic\nSuggested assignee: P. Rao (certified, on shift)\n\nAction: Approve and assign to proceed with isolation.' },
-      { match: ['maintenance', 'request', 'task'], reply: 'Active maintenance requests:\n- MR-301: Conveyor Belt #7 recalibration (High Priority, submitted 2 days ago)\n- MR-305: MCC-3 Drive Panel inspection (Medium, submitted today)\n- MR-308: Storage Tank T-5 valve check (Low, scheduled next week)\n\n1 overdue: MR-301 needs HOD escalation.' },
+      { match: ['maintenance', 'request', 'task'], reply: 'Active maintenance requests:\n- MR-301: Conveyor Belt #7 recalibration (High Priority, submitted 2 days ago)\n- MR-305: MCC-3 Drive Panel inspection (Medium, submitted today)\n- MR-308: Storage Tank T-5 valve check (Low, scheduled next week)\n\n1 overdue: MR-301 needs Approver escalation.' },
       { match: ['overdue', 'late', 'behind'], reply: 'Overdue items on current shift:\n1. MR-301 — Conveyor Belt #7 calibration (2 days overdue)\n2. WP-1044 — LOTO acknowledgement pending (3h since assignment)\n\nNo overdue checklists. All active permits within SLA.' }
     ],
     fallback: 'I help you manage the shift: roster, maintenance requests, and LOTO approvals.'
@@ -51,7 +51,7 @@ export const aiAssistant = {
     intents: [
       { match: ['task', 'my', 'active', 'assigned'], reply: 'Your active tasks:\n1. WP-1031 — Mechanical, MCC-3 Drive Panel (Issued, Crushing Plant, Morning Shift)\nChecklist: 4/6 items complete\n2. WP-1037 — Confined Space request (Awaiting Approval)\n\nNo LOTO tasks currently assigned to you.' },
       { match: ['cert', 'certification', 'expiry', 'competency'], reply: 'Your certifications:\n- Hot Work: Expires in 4 days ⚠️\n- Working at Height: Valid — 180 days remaining ✓\n- First Aid: Valid — 365 days remaining ✓\n\nAction: Upload renewed Hot Work certificate before expiry to avoid task blocking.' },
-      { match: ['loto', 'lock', 'lockout'], reply: 'No active LOTO locks assigned to you.\n\nPending: WP-1044 LOTO assignment in progress (awaiting Shift Supervisor approval). You may be assigned as LOTO responsible.' },
+      { match: ['loto', 'lock', 'lockout'], reply: 'No active LOTO locks assigned to you.\n\nPending: WP-1044 isolation in progress (awaiting Isolation Officer verification). You may be assigned as LOTO responsible.' },
       { match: ['shift', 'schedule', 'upcoming'], reply: 'Your shift schedule:\n- Today: Morning Shift (07:00-15:00) — Crushing Plant\n- Tomorrow: Morning Shift (07:00-15:00) — Crushing Plant\n- Day after: Off\n\nNo shift changes pending.' }
     ],
     fallback: 'I help you track tasks, certifications, LOTO status, and upcoming shifts.'

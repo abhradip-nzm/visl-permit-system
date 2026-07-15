@@ -10,7 +10,7 @@ const certLookup = (name) => {
   return person.certifications.some((c) => c.status === 'expired') ? 'expired' : 'valid';
 };
 
-// Reused by User Admin (site-wide) and HOD (department-scoped) — pass a
+// Reused by Super Admin (site-wide) and Approver (department-scoped) — pass a
 // `scopeLabel` to reflect which slice of the roster is being viewed.
 export default function ShiftCalendar({ scopeLabel = 'All Departments' }) {
   const [weekOffset, setWeekOffset] = useState(0);

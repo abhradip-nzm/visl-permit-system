@@ -119,6 +119,14 @@ function SAPInputStep({ onParsed }) {
 
 function PersonalTaskForm({ onBack, navigate }) {
   const { pushToast } = useApp();
+  const [form, setForm] = useState({ type: 'Maintenance', description: '', equipment: '', priority: 'Medium', preferredDate: '' });
+  const canSubmit = form.description.trim();
+
+  function submit() {
+    pushToast(`Personal task submitted: ${form.type} — "${form.description}"${form.equipment ? ` · ${form.equipment}` : ''} · ${form.priority} priority`);
+    navigate('mytasks');
+  }
+
   return (
     <div className="px-4 py-4">
       <button onClick={onBack} className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-slate-500">
@@ -127,13 +135,13 @@ function PersonalTaskForm({ onBack, navigate }) {
       <Card className="p-4">
         <div className="mb-3 text-sm font-bold text-nz-navy">Personal Task Request</div>
         <div className="space-y-3 text-sm">
-          <SelectField label="Type" options={['Maintenance', 'Inspection', 'Emergency Repair']} />
-          <Field label="Description" placeholder="Describe the task" />
-          <Field label="Equipment needed" placeholder="e.g. Torque Wrench TW-9" />
-          <SelectField label="Priority" options={['Low', 'Medium', 'High', 'Critical']} />
-          <Field label="Preferred Date / Shift" placeholder="e.g. 2026-07-08, Morning" />
+          <SelectField label="Type" value={form.type} onChange={(v) => setForm((f) => ({ ...f, type: v }))} options={['Maintenance', 'Inspection', 'Emergency Repair']} />
+          <Field label="Description" value={form.description} onChange={(v) => setForm((f) => ({ ...f, description: v }))} placeholder="Describe the task" />
+          <Field label="Equipment needed" value={form.equipment} onChange={(v) => setForm((f) => ({ ...f, equipment: v }))} placeholder="e.g. Torque Wrench TW-9" />
+          <SelectField label="Priority" value={form.priority} onChange={(v) => setForm((f) => ({ ...f, priority: v }))} options={['Low', 'Medium', 'High', 'Critical']} />
+          <Field label="Preferred Date / Shift" value={form.preferredDate} onChange={(v) => setForm((f) => ({ ...f, preferredDate: v }))} placeholder="e.g. 2026-07-08, Morning" />
         </div>
-        <Button variant="orange" className="mt-4 w-full" onClick={() => { pushToast('Personal task request submitted'); navigate('mytasks'); }}>
+        <Button variant="orange" className="mt-4 w-full" disabled={!canSubmit} onClick={submit}>
           Submit Request
         </Button>
       </Card>
@@ -143,6 +151,14 @@ function PersonalTaskForm({ onBack, navigate }) {
 
 function PersonalInstrumentForm({ onBack, navigate }) {
   const { pushToast } = useApp();
+  const [form, setForm] = useState({ type: 'Atmosphere Monitor', reason: '', duration: '' });
+  const canSubmit = form.reason.trim();
+
+  function submit() {
+    pushToast(`Instrument request sent to Isolation Officer: ${form.type} — "${form.reason}"${form.duration ? ` · ${form.duration}` : ''}`);
+    navigate('inventory');
+  }
+
   return (
     <div className="px-4 py-4">
       <button onClick={onBack} className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-slate-500">
@@ -151,11 +167,11 @@ function PersonalInstrumentForm({ onBack, navigate }) {
       <Card className="p-4">
         <div className="mb-3 text-sm font-bold text-nz-navy">Personal Instrument Request</div>
         <div className="space-y-3 text-sm">
-          <SelectField label="Instrument Type" options={['Atmosphere Monitor', 'Mechanical Tool', 'Electrical Test Equipment', 'Mechanical Diagnostic', 'Fall Protection', 'Inspection Equipment']} />
-          <Field label="Reason" placeholder="Why do you need it?" />
-          <Field label="Duration needed" placeholder="e.g. 3 days" />
+          <SelectField label="Instrument Type" value={form.type} onChange={(v) => setForm((f) => ({ ...f, type: v }))} options={['Atmosphere Monitor', 'Mechanical Tool', 'Electrical Test Equipment', 'Mechanical Diagnostic', 'Fall Protection', 'Inspection Equipment']} />
+          <Field label="Reason" value={form.reason} onChange={(v) => setForm((f) => ({ ...f, reason: v }))} placeholder="Why do you need it?" />
+          <Field label="Duration needed" value={form.duration} onChange={(v) => setForm((f) => ({ ...f, duration: v }))} placeholder="e.g. 3 days" />
         </div>
-        <Button variant="orange" className="mt-4 w-full" onClick={() => { pushToast('Instrument request sent to Shift Supervisor'); navigate('inventory'); }}>
+        <Button variant="orange" className="mt-4 w-full" disabled={!canSubmit} onClick={submit}>
           Submit Request
         </Button>
       </Card>
@@ -163,20 +179,20 @@ function PersonalInstrumentForm({ onBack, navigate }) {
   );
 }
 
-function Field({ label, placeholder }) {
+function Field({ label, value, onChange, placeholder }) {
   return (
     <label className="block">
       <span className="mb-1 block text-xs font-semibold text-slate-500">{label}</span>
-      <input placeholder={placeholder} className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white" />
+      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white" />
     </label>
   );
 }
 
-function SelectField({ label, options }) {
+function SelectField({ label, value, onChange, options }) {
   return (
     <label className="block">
       <span className="mb-1 block text-xs font-semibold text-slate-500">{label}</span>
-      <select className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white">
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white">
         {options.map((o) => <option key={o}>{o}</option>)}
       </select>
     </label>
