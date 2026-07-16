@@ -7,6 +7,24 @@
 // certified form for a controlled-vocabulary field like this).
 export const PLANT_AREAS = ['Crushing Plant', 'Tank Farm', 'Process Unit 2', 'Utility Block', 'Head Office'];
 
+// Section B — Work Instruction numbers (fixed list). "Not available" keeps
+// the existing JSA-required fallback path for jobs with no WI yet.
+export const WI_NUMBERS = ['WI-4108', 'WI-4111', 'WI-4523', 'WI-4890', 'WI-5012', 'WI-5104', 'Not available (JSA required)'];
+
+// Section B — approved contractor list. "N/A" covers in-house work with no
+// external contractor.
+export const CONTRACTORS = ['N/A', 'L&T Construction', 'Voltas Ltd', 'Thermax Engineering', 'Local Contractor — Other'];
+
+// Isolation Officer LOTO ID register (fixed list, matches the format already
+// used in seed data e.g. LOTO-014).
+export const LOTO_IDS = ['LOTO-011', 'LOTO-012', 'LOTO-013', 'LOTO-014', 'LOTO-015', 'LOTO-016'];
+
+// Personal (individual) locks used in group lockout toolbox records —
+// distinct from the departmental lock register, which tracks equipment
+// isolation locks with live uniqueness enforcement. Personal locks aren't
+// shared/contended so they don't need that same state tracking.
+export const PERSONAL_LOCKS = ['PL-001', 'PL-002', 'PL-003', 'PL-004', 'PL-005', 'PL-006', 'PL-011', 'PL-012'];
+
 // Section A — Type of Permit (multi-select)
 export const PERMIT_TYPES = [
   'Cold/General',

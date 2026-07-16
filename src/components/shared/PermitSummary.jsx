@@ -58,9 +58,9 @@ export default function PermitSummary({ permit, defaultOpen = false }) {
           <div>
             <div className="mb-1 text-xs font-bold text-nz-navy">E. Risk Control Measures</div>
             <Tags items={permit.riskControlMeasures || permit.controls} tone="green" />
-            {permit.rescue && (permit.rescue.nameOfRescuer || permit.rescue.nameOfFirstAider) && (
+            {permit.rescue && (permit.rescue.rescuers?.length > 0 || permit.rescue.firstAiders?.length > 0) && (
               <div className="mt-1.5 text-xs text-slate-500">
-                Rescuer: {permit.rescue.nameOfRescuer || '—'} · First Aider: {permit.rescue.nameOfFirstAider || '—'} ·
+                Rescuer(s): {permit.rescue.rescuers?.length ? permit.rescue.rescuers.join(', ') : '—'} · First Aider(s): {permit.rescue.firstAiders?.length ? permit.rescue.firstAiders.join(', ') : '—'} ·
                 Procedure available: {permit.rescue.procedureAvailable ? 'Yes' : 'No'}
               </div>
             )}

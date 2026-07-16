@@ -14,7 +14,9 @@ export default function ClosePermit({ navigate, params }) {
   const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [checklist, setChecklist] = useState(permit.closure?.requesterChecklist || { controlsBack: false, interlocksRestored: false, guardsInPlace: false, permitsSurrendered: false });
-  const [tbtRef, setTbtRef] = useState('');
+  // 6b-3: auto-generated instead of free text, still editable if a specific
+  // reference number was assigned elsewhere.
+  const [tbtRef, setTbtRef] = useState(() => permit.closure?.toolboxTalkRefNo || `TBT-${1000 + Math.floor(Math.random() * 9000)}`);
   const [signed, setSigned] = useState(null);
 
   const allChecked = Object.values(checklist).every(Boolean);

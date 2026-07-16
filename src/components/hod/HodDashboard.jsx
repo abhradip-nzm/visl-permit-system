@@ -34,13 +34,13 @@ export default function HodDashboard({ navigate }) {
         <StatCard label="Compliance Alerts" value={compliance} tone="red" />
       </div>
 
-      <div className="mb-2 text-sm font-bold text-nz-navy">Pending My Approval (Step 6 — On-Ground Verification)</div>
+      <div className="mb-2 text-sm font-bold text-nz-navy">Pending My Approval — On-Ground Verification</div>
       <PermitQueue permits={pendingApproval} navigate={navigate} target="review" action="Review" />
 
-      <div className="mb-2 mt-6 text-sm font-bold text-nz-navy">Pending Departmental Clearance (Step 2)</div>
+      <div className="mb-2 mt-6 text-sm font-bold text-nz-navy">Pending Departmental Clearance</div>
       <PermitQueue permits={pendingClearance} navigate={navigate} target="clearance" action="Clear" />
 
-      <div className="mb-2 mt-6 text-sm font-bold text-nz-navy">Pending Closure Verification (Step 9)</div>
+      <div className="mb-2 mt-6 text-sm font-bold text-nz-navy">Pending Closure Verification</div>
       <PermitQueue permits={pendingClosureVerification} navigate={navigate} target="verify" action="Verify" />
 
       {returned.length > 0 && (

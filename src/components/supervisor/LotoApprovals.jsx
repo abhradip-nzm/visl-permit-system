@@ -2,15 +2,32 @@ import React, { useState } from 'react';
 import { CheckCircle2, Lock, LockOpen, Plus, Trash2, ShieldAlert } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { isOwnPermit } from '../../utils/segregationOfDuties.js';
+import { LOTO_IDS, PERSONAL_LOCKS } from '../../data/ptwFormData.js';
+import { USERS } from '../../data/usersData.js';
 import { Card, SectionLabel, Button, StatusBadge } from '../shared/Primitives.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
 
 const ISOLATION_TYPES = ['Electrical', 'Mechanical', 'Production', 'Other'];
 
+// 6b-1: Type of Isolation auto-derives from the permit's own declared work
+// types instead of asking the Isolation Officer to re-pick it from scratch —
+// still editable if it's wrong for this specific job.
+function deriveIsolationType(permit) {
+  const types = permit?.types || [permit?.type].filter(Boolean);
+  if (types.some((t) => t?.includes('Isolation') || t?.includes('Electrical'))) return 'Electrical';
+  if (types.some((t) => ['Confined Space', 'Excavation'].includes(t))) return 'Production';
+  if (types.some((t) => t)) return 'Mechanical';
+  return '';
+}
+
+function generateIsolationPermitNo() {
+  return `ISO-${1000 + Math.floor(Math.random() * 9000)}`;
+}
+
 function emptyForm(permit) {
   return {
-    isolationPermitNo: '',
-    typeOfIsolation: '',
+    isolationPermitNo: generateIsolationPermitNo(),
+    typeOfIsolation: deriveIsolationType(permit),
     lotoIdNo: '',
     deptLockNo: '',
     rows: [{ name: '', personalLockId: '' }],
@@ -36,6 +53,7 @@ export default function LotoApprovals({ params }) {
   // live register, scoped to this Isolation Officer's own department, and a
   // lock already in-use on another permit is never offered here.
   const availableLocks = lockRegister.filter((l) => l.state === 'available' && (!currentDepartment || l.department === currentDepartment));
+  const personnelRoster = USERS.filter((u) => u.status === 'active' && u.roles.some((r) => r.role === 'personnel'));
 
   function updateRow(i, key, value) {
     setForm((f) => ({ ...f, rows: f.rows.map((r, idx) => (idx === i ? { ...r, [key]: value } : r)) }));
@@ -159,7 +177,13 @@ export default function LotoApprovals({ params }) {
                 <div className="text-xs font-semibold text-slate-500">Isolation Officer Name</div>
                 <div className="text-sm font-medium text-nz-navy">{currentUser?.name} <span className="text-xs font-normal text-slate-400">(auto-filled from login)</span></div>
               </div>
-              <Field label="Isolation Officer LOTO ID No" value={form.lotoIdNo} onChange={(v) => setForm((f) => ({ ...f, lotoIdNo: v }))} />
+              <label className="block">
+                <span className="mb-1 block text-xs font-semibold text-slate-500">Isolation Officer LOTO ID No</span>
+                <select value={form.lotoIdNo} onChange={(e) => setForm((f) => ({ ...f, lotoIdNo: e.target.value }))} className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring">
+                  <option value="">Select…</option>
+                  {LOTO_IDS.map((id) => <option key={id}>{id}</option>)}
+                </select>
+              </label>
               <label className="block">
                 <span className="mb-1 block text-xs font-semibold text-slate-500">Dept. Lock No</span>
                 <select
@@ -191,8 +215,20 @@ export default function LotoApprovals({ params }) {
                     )}
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <Field label="Name" value={r.name} onChange={(v) => updateRow(i, 'name', v)} />
-                    <Field label="Personal Lock ID" value={r.personalLockId} onChange={(v) => updateRow(i, 'personalLockId', v)} />
+                    <label className="block">
+                      <span className="mb-1 block text-xs font-semibold text-slate-500">Name</span>
+                      <select value={r.name} onChange={(e) => updateRow(i, 'name', e.target.value)} className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring">
+                        <option value="">Select…</option>
+                        {personnelRoster.map((u) => <option key={u.id} value={u.name}>{u.name}</option>)}
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="mb-1 block text-xs font-semibold text-slate-500">Personal Lock ID</span>
+                      <select value={r.personalLockId} onChange={(e) => updateRow(i, 'personalLockId', e.target.value)} className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring">
+                        <option value="">Select…</option>
+                        {PERSONAL_LOCKS.map((id) => <option key={id}>{id}</option>)}
+                      </select>
+                    </label>
                   </div>
                 </div>
               ))}

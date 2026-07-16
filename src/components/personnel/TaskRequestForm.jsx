@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertTriangle, Plus, Trash2, X } from 'lucide-react';
 import { EQUIPMENT, SHIFT_ROSTER, emptyDeptClearances, emptyClosure } from '../../data/mockData.js';
-import { PERMIT_TYPES, TOOLS_EQUIPMENT, HAZARDS_IDENTIFIED, RISK_CONTROL_GROUPS, PPE_FIRE_PROTECTION, PLANT_AREAS } from '../../data/ptwFormData.js';
+import { PERMIT_TYPES, TOOLS_EQUIPMENT, HAZARDS_IDENTIFIED, RISK_CONTROL_GROUPS, PPE_FIRE_PROTECTION, PLANT_AREAS, WI_NUMBERS, CONTRACTORS } from '../../data/ptwFormData.js';
 import { DEPARTMENTS, departmentsForTypes } from '../../data/departmentsData.js';
 import { USERS } from '../../data/usersData.js';
 import { Button, Card, SectionLabel } from '../shared/Primitives.jsx';
@@ -31,7 +31,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
   const [jobDetails, setJobDetails] = useState({
     area: base.area || '', location: base.equipment || '', dateFrom: base.date || '', dateTill: base.date || '',
     fromTime: (SHIFT_TIMES[base.shift] || SHIFT_TIMES.Morning)[0], toTime: (SHIFT_TIMES[base.shift] || SHIFT_TIMES.Morning)[1],
-    jobDescription: '', wiNo: '', ownerDepartment: base.ownerDepartment || '', contractor: '', preferredApprover: ''
+    jobDescription: '', wiNo: '', ownerDepartment: base.ownerDepartment || '', contractor: '', approver: '', isolationOfficer: ''
   });
   const [toolsEquipment, setToolsEquipment] = useState([]);
   const [otherTool, setOtherTool] = useState('');
@@ -41,7 +41,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
   // is identified, on top of the general Section E control-measure grid.
   const [hazardJustification, setHazardJustification] = useState('');
   const [riskControlMeasures, setRiskControlMeasures] = useState([]);
-  const [rescue, setRescue] = useState({ nameOfRescuer: '', nameOfFirstAider: '', procedureAvailable: false, intimationProvided: false });
+  const [rescue, setRescue] = useState({ rescuers: [''], firstAiders: [''], procedureAvailable: false, intimationProvided: false });
   const [ppeFireProtection, setPpeFireProtection] = useState([]);
   // M-4: IT Approval-required and OHC-informed are facts about the job that
   // only the Requester can know at request time — they now declare both
@@ -50,29 +50,54 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
   // the Departmental Clearance screen.
   const [itApprovalRequired, setItApprovalRequired] = useState(false);
   const [ohcInformed, setOhcInformed] = useState(false);
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+  const [showMissingPopup, setShowMissingPopup] = useState(false);
 
   const isHighRisk = types.some((t) => HIGH_RISK_TYPES.includes(t));
   const isolationRequired = types.includes('Isolation & Electrical');
   const certifiedRoster = SHIFT_ROSTER.filter((p) => p.certified);
 
-  // H-3: dynamic assignee selection — the preferred-Approver list is derived
-  // live from USERS' role-capability grants (Super Admin manages that list
-  // in User Management), not a hardcoded roster, and always excludes the
-  // requester themselves (ties into the C-5 self-approval guard). This is a
-  // preference only — routing still lands in the department's shared
-  // clearance queue for any qualified Approver, matching how Approver
-  // dashboards already work (C-4).
+  // H-3: dynamic assignee selection — the Approver list is derived live from
+  // USERS' role-capability grants (Super Admin manages that list in User
+  // Management), not a hardcoded roster, and always excludes the requester
+  // themselves (ties into the C-5 self-approval guard). Naming an Approver
+  // is now mandatory (a required point of contact) but is not an exclusive
+  // assignment — routing still lands in the department's shared clearance
+  // queue for any qualified Approver, matching how Approver dashboards
+  // already work (C-4).
   const availableApprovers = USERS.filter(
     (u) => u.status === 'active' && u.name !== currentUser.name && u.roles.some((r) => r.role === 'hod' && r.department === jobDetails.ownerDepartment)
+  );
+  const availableIsolationOfficers = USERS.filter(
+    (u) => u.status === 'active' && u.name !== currentUser.name && u.roles.some((r) => r.role === 'supervisor' && r.department === jobDetails.ownerDepartment)
   );
 
   function updateJobDetail(key, value) {
     setJobDetails((f) => ({ ...f, [key]: value }));
   }
 
-  const sectionsComplete =
-    types.length > 0 && jobDetails.area && jobDetails.ownerDepartment && jobDetails.jobDescription.trim() &&
-    ppeFireProtection.length > 0 && (hazardsIdentified.length === 0 || hazardJustification.trim());
+  // 6a-5: per-field validation so failing fields can be highlighted
+  // individually, instead of one silent boolean gating the button.
+  const missingFields = {
+    types: types.length === 0,
+    area: !jobDetails.area,
+    ownerDepartment: !jobDetails.ownerDepartment,
+    approver: !jobDetails.approver,
+    isolationOfficer: isolationRequired && !jobDetails.isolationOfficer,
+    jobDescription: !jobDetails.jobDescription.trim(),
+    ppeFireProtection: ppeFireProtection.length === 0,
+    hazardJustification: hazardsIdentified.length > 0 && !hazardJustification.trim()
+  };
+  const sectionsComplete = !Object.values(missingFields).some(Boolean);
+
+  function tryContinue() {
+    setAttemptedSubmit(true);
+    if (sectionsComplete) {
+      setStep('review');
+    } else {
+      setShowMissingPopup(true);
+    }
+  }
 
   function submit() {
     const newId = `WP-${1045 + Math.floor(Math.random() * 900)}`;
@@ -83,7 +108,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
         status: 'pending-clearance', createdAt: jobDetails.dateFrom,
         dateFrom: jobDetails.dateFrom, dateTill: jobDetails.dateTill, fromTime: jobDetails.fromTime, toTime: jobDetails.toTime,
         jobDescription: jobDetails.jobDescription, wiNo: jobDetails.wiNo, ownerDepartment: jobDetails.ownerDepartment, contractor: jobDetails.contractor,
-        preferredApprover: jobDetails.preferredApprover,
+        approver: jobDetails.approver, isolationOfficer: jobDetails.isolationOfficer,
         hazards: hazardsIdentified, ppe: ppeFireProtection, controls: riskControlMeasures,
         warnings: [], ageHours: 0, risk: isHighRisk ? 'high' : 'medium',
         toolsEquipment: otherTool ? [...toolsEquipment, otherTool] : toolsEquipment,
@@ -97,7 +122,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
         additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
         approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
         criticalLift: types.includes('Crane & Lifting') ? {} : null,
-        confinedSpaceMonitoring: types.includes('Confined Space') ? { gasMonitorSlNo: '', calibrationValid: false, confinedSpaceId: '', standbyPerson: rescue.nameOfRescuer, rescuers: rescue.nameOfRescuer, gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' } : null,
+        confinedSpaceMonitoring: types.includes('Confined Space') ? { gasMonitorSlNo: '', calibrationValid: false, confinedSpaceId: '', standbyPerson: rescue.rescuers.filter(Boolean).join(', '), rescuers: rescue.rescuers.filter(Boolean).join(', '), gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' } : null,
         transfers: [], closure: emptyClosure(),
         checklist: [{ id: 1, label: 'Pre-job briefing', done: false }],
         timeline: [
@@ -126,8 +151,9 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
           <div>Area: {jobDetails.area} · Location: {jobDetails.location}</div>
           <div>{jobDetails.dateFrom} {jobDetails.fromTime} → {jobDetails.dateTill} {jobDetails.toTime}</div>
           <div>WI No: {jobDetails.wiNo || '— (JSA required, see HOD/Plant Head)'}</div>
-          <div>Owner Dept: {jobDetails.ownerDepartment}{jobDetails.contractor && ` · Contractor: ${jobDetails.contractor}`}</div>
-          {jobDetails.preferredApprover && <div>Preferred Approver: {jobDetails.preferredApprover}</div>}
+          <div>Owner Dept: {jobDetails.ownerDepartment}{jobDetails.contractor && jobDetails.contractor !== 'N/A' && ` · Contractor: ${jobDetails.contractor}`}</div>
+          <div>Approver: {jobDetails.approver}</div>
+          {jobDetails.isolationOfficer && <div>Isolation Officer: {jobDetails.isolationOfficer}</div>}
           <div>IT Approval required: {itApprovalRequired ? 'Yes' : 'No'} · OHC informed: {ohcInformed ? 'Yes' : 'No'}</div>
           <div className="mt-1">{jobDetails.jobDescription}</div>
         </Card>
@@ -140,10 +166,10 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
           </Card>
         )}
         <SummaryCard title="E. Risk Control Measures" items={riskControlMeasures} tone="green" />
-        {(rescue.nameOfRescuer || rescue.nameOfFirstAider) && (
+        {(rescue.rescuers.some(Boolean) || rescue.firstAiders.some(Boolean)) && (
           <Card className="mb-3 p-3 text-xs text-slate-600">
             <div className="mb-1 font-bold text-nz-navy">Rescue Provisions</div>
-            <div>Rescuer: {rescue.nameOfRescuer || '—'} · First Aider: {rescue.nameOfFirstAider || '—'}</div>
+            <div>Rescuer(s): {rescue.rescuers.filter(Boolean).join(', ') || '—'} · First Aider(s): {rescue.firstAiders.filter(Boolean).join(', ') || '—'}</div>
             <div>Rescue procedure available: {rescue.procedureAvailable ? 'Yes' : 'No'} · Rescuer intimated: {rescue.intimationProvided ? 'Yes' : 'No'}</div>
           </Card>
         )}
@@ -156,7 +182,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
 
         {isolationRequired && (
           <div className="mb-3 rounded-lg bg-nz-blue-light px-3 py-2.5 text-xs font-medium text-nz-blue-dark">
-            This permit includes Isolation & Electrical work — Isolation Setup (Step 3) will be required before Declaration.
+            This permit includes Isolation & Electrical work — Isolation Setup will be required before Declaration.
           </div>
         )}
 
@@ -180,8 +206,8 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
       )}
 
       {/* Section A */}
-      <Card className="mb-3 p-4">
-        <SectionLabel>A. Type of Permit</SectionLabel>
+      <Card className={`mb-3 p-4 ${attemptedSubmit && missingFields.types ? 'border border-nz-red' : ''}`}>
+        <SectionLabel>A. Type of Permit {attemptedSubmit && missingFields.types && <span className="text-nz-red">*</span>}</SectionLabel>
         <p className="mb-2 text-xs text-slate-400">Select all that apply — a job can involve multiple permit types simultaneously.</p>
         <CheckboxGrid items={PERMIT_TYPES} selected={types} onToggle={(t) => setTypes((prev) => toggleItem(prev, t))} />
       </Card>
@@ -190,7 +216,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
       <Card className="mb-3 p-4">
         <SectionLabel>B. Job Details</SectionLabel>
         <div className="space-y-3">
-          <SelectField label="Area" value={jobDetails.area} onChange={(v) => updateJobDetail('area', v)} options={PLANT_AREAS} />
+          <SelectField label="Area" value={jobDetails.area} onChange={(v) => updateJobDetail('area', v)} options={PLANT_AREAS} error={attemptedSubmit && missingFields.area} required />
           <SelectField label="Equipment / Location" value={jobDetails.location} onChange={(v) => updateJobDetail('location', v)} options={EQUIPMENT.map((e) => e.name)} />
           <div className="grid grid-cols-2 gap-3">
             <Field label="Date From" type="date" value={jobDetails.dateFrom} onChange={(v) => updateJobDetail('dateFrom', v)} />
@@ -201,28 +227,46 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
             <Field label="To Time" type="time" value={jobDetails.toTime} onChange={(v) => updateJobDetail('toTime', v)} />
           </div>
           <label className="block">
-            <span className="mb-1 block text-xs font-semibold text-slate-500">Job Description</span>
-            <textarea rows={2} value={jobDetails.jobDescription} onChange={(e) => updateJobDetail('jobDescription', e.target.value)} placeholder="Describe the job scope…" className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white" />
+            <span className="mb-1 block text-xs font-semibold text-slate-500">Job Description<span className="text-nz-red"> *</span></span>
+            <textarea
+              rows={2}
+              value={jobDetails.jobDescription}
+              onChange={(e) => updateJobDetail('jobDescription', e.target.value)}
+              placeholder="Describe the job scope…"
+              className={`w-full rounded-lg border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white ${attemptedSubmit && missingFields.jobDescription ? 'border-nz-red' : 'border-nz-border'}`}
+            />
           </label>
-          <label className="block">
-            <span className="mb-1 block text-xs font-semibold text-slate-500">WI No (Work Instruction)</span>
-            <input value={jobDetails.wiNo} onChange={(e) => updateJobDetail('wiNo', e.target.value)} placeholder="e.g. WI-4108" className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white" />
-            {!jobDetails.wiNo && <span className="mt-1 block text-[11px] text-nz-amber">If not available, prepare JSA and get HOD/Plant Head & Safety approval.</span>}
-          </label>
+          <SelectField label="WI No (Work Instruction)" value={jobDetails.wiNo} onChange={(v) => updateJobDetail('wiNo', v)} options={WI_NUMBERS} />
+          {jobDetails.wiNo === 'Not available (JSA required)' && <span className="block text-[11px] text-nz-amber">Prepare JSA and get HOD/Plant Head & Safety approval.</span>}
           <SelectField
             label="Owner Department"
             value={jobDetails.ownerDepartment}
-            onChange={(v) => setJobDetails((f) => ({ ...f, ownerDepartment: v, preferredApprover: '' }))}
+            onChange={(v) => setJobDetails((f) => ({ ...f, ownerDepartment: v, approver: '', isolationOfficer: '' }))}
             options={DEPARTMENTS.map((d) => d.key)}
+            error={attemptedSubmit && missingFields.ownerDepartment}
+            required
           />
           <SelectField
-            label="Preferred Approver (optional)"
-            value={jobDetails.preferredApprover}
-            onChange={(v) => updateJobDetail('preferredApprover', v)}
+            label="Approver"
+            value={jobDetails.approver}
+            onChange={(v) => updateJobDetail('approver', v)}
             options={availableApprovers.map((u) => u.name)}
-            placeholder={jobDetails.ownerDepartment ? 'No preference — route to department queue' : 'Select Owner Department first'}
+            placeholder={jobDetails.ownerDepartment ? 'Select an Approver…' : 'Select Owner Department first'}
+            error={attemptedSubmit && missingFields.approver}
+            required
           />
-          <Field label="Contractor (if external)" value={jobDetails.contractor} onChange={(v) => updateJobDetail('contractor', v)} />
+          {isolationRequired && (
+            <SelectField
+              label="Isolation Officer"
+              value={jobDetails.isolationOfficer}
+              onChange={(v) => updateJobDetail('isolationOfficer', v)}
+              options={availableIsolationOfficers.map((u) => u.name)}
+              placeholder={jobDetails.ownerDepartment ? 'Select an Isolation Officer…' : 'Select Owner Department first'}
+              error={attemptedSubmit && missingFields.isolationOfficer}
+              required
+            />
+          )}
+          <SelectField label="Contractor (if external)" value={jobDetails.contractor} onChange={(v) => updateJobDetail('contractor', v)} options={CONTRACTORS} />
           <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">
             <input type="checkbox" checked={itApprovalRequired} onChange={(e) => setItApprovalRequired(e.target.checked)} />
             IT Approval required for this job?
@@ -259,7 +303,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
               value={hazardJustification}
               onChange={(e) => setHazardJustification(e.target.value)}
               placeholder="Explain the specific mitigation for the hazards identified above…"
-              className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white"
+              className={`w-full rounded-lg border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white ${attemptedSubmit && missingFields.hazardJustification ? 'border-nz-red' : 'border-nz-border'}`}
             />
           </label>
         )}
@@ -281,9 +325,59 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
 
         <div className="mt-3 rounded-lg border border-nz-border bg-nz-surface p-3">
           <div className="mb-2 text-xs font-bold uppercase text-slate-400">Rescue Provisions (mandatory for high-risk jobs)</div>
-          <div className="space-y-2">
-            <SelectField label="Name of Rescuer" value={rescue.nameOfRescuer} onChange={(v) => setRescue((r) => ({ ...r, nameOfRescuer: v }))} options={certifiedRoster.map((p) => p.name)} placeholder="Select a certified rescuer…" />
-            <SelectField label="Name of First Aider" value={rescue.nameOfFirstAider} onChange={(v) => setRescue((r) => ({ ...r, nameOfFirstAider: v }))} options={certifiedRoster.map((p) => p.name)} placeholder="Select a certified first aider…" />
+          <div className="space-y-3">
+            <div>
+              <div className="mb-1.5 text-xs font-semibold text-slate-500">Name of Rescuer</div>
+              <div className="space-y-2">
+                {rescue.rescuers.map((name, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <select
+                      value={name}
+                      onChange={(e) => setRescue((r) => ({ ...r, rescuers: r.rescuers.map((n, idx) => (idx === i ? e.target.value : n)) }))}
+                      className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring"
+                    >
+                      <option value="">Select a certified rescuer…</option>
+                      {certifiedRoster.map((p) => <option key={p.id} value={p.name}>{p.name}</option>)}
+                    </select>
+                    {rescue.rescuers.length > 1 && (
+                      <button onClick={() => setRescue((r) => ({ ...r, rescuers: r.rescuers.filter((_, idx) => idx !== i) }))}>
+                        <Trash2 size={14} className="text-nz-red" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setRescue((r) => ({ ...r, rescuers: [...r.rescuers, ''] }))} className="mt-1.5 flex items-center gap-1 text-xs font-semibold text-nz-blue">
+                <Plus size={13} /> Add More
+              </button>
+            </div>
+
+            <div>
+              <div className="mb-1.5 text-xs font-semibold text-slate-500">Name of First Aider</div>
+              <div className="space-y-2">
+                {rescue.firstAiders.map((name, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <select
+                      value={name}
+                      onChange={(e) => setRescue((r) => ({ ...r, firstAiders: r.firstAiders.map((n, idx) => (idx === i ? e.target.value : n)) }))}
+                      className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring"
+                    >
+                      <option value="">Select a certified first aider…</option>
+                      {certifiedRoster.map((p) => <option key={p.id} value={p.name}>{p.name}</option>)}
+                    </select>
+                    {rescue.firstAiders.length > 1 && (
+                      <button onClick={() => setRescue((r) => ({ ...r, firstAiders: r.firstAiders.filter((_, idx) => idx !== i) }))}>
+                        <Trash2 size={14} className="text-nz-red" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setRescue((r) => ({ ...r, firstAiders: [...r.firstAiders, ''] }))} className="mt-1.5 flex items-center gap-1 text-xs font-semibold text-nz-blue">
+                <Plus size={13} /> Add More
+              </button>
+            </div>
+
             <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">
               <input type="checkbox" checked={rescue.procedureAvailable} onChange={(e) => setRescue((r) => ({ ...r, procedureAvailable: e.target.checked }))} />
               Rescue Procedure Available for this job?
@@ -304,41 +398,55 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
       </Card>
 
       {/* Section F */}
-      <Card className="mb-4 p-4">
-        <SectionLabel>F. PPE & Fire Protection</SectionLabel>
+      <Card className={`mb-4 p-4 ${attemptedSubmit && missingFields.ppeFireProtection ? 'border border-nz-red' : ''}`}>
+        <SectionLabel>F. PPE & Fire Protection {attemptedSubmit && missingFields.ppeFireProtection && <span className="text-nz-red">*</span>}</SectionLabel>
         <CheckboxGrid items={PPE_FIRE_PROTECTION} selected={ppeFireProtection} onToggle={(p) => setPpeFireProtection((prev) => toggleItem(prev, p))} columns={3} />
       </Card>
 
-      <Button variant="orange" size="lg" className="w-full" disabled={!sectionsComplete} onClick={() => setStep('review')}>
+      <Button variant="orange" size="lg" className="w-full" onClick={tryContinue}>
         Review & Continue →
       </Button>
-      {!sectionsComplete && <div className="mt-2 text-center text-xs text-slate-400">Select at least one permit type, fill job details, choose PPE, and justify any identified hazards to continue.</div>}
+
+      {showMissingPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => setShowMissingPopup(false)}>
+          <div className="w-full max-w-sm rounded-xl2 bg-white p-5 shadow-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-bold text-nz-red">
+                <AlertTriangle size={17} /> Missing Required Values
+              </div>
+              <button onClick={() => setShowMissingPopup(false)}><X size={16} className="text-slate-400" /></button>
+            </div>
+            <p className="text-xs text-slate-500">Fill in every field marked in red before continuing. Scroll up to review each section.</p>
+            <Button variant="primary" className="mt-4 w-full" onClick={() => setShowMissingPopup(false)}>OK</Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function Field({ label, value, onChange, type = 'text' }) {
+function Field({ label, value, onChange, type = 'text', error = false, required = false }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-semibold text-slate-500">{label}</span>
+      <span className="mb-1 block text-xs font-semibold text-slate-500">{label}{required && <span className="text-nz-red"> *</span>}</span>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm font-medium text-nz-navy focus-ring focus:bg-white"
+        className={`w-full rounded-lg border bg-nz-surface px-3 py-2 text-sm font-medium text-nz-navy focus-ring focus:bg-white ${error ? 'border-nz-red' : 'border-nz-border'}`}
       />
     </label>
   );
 }
 
-function SelectField({ label, value, onChange, options, placeholder = 'Select…' }) {
+function SelectField({ label, value, onChange, options, placeholder = 'Select…', error = false, required = false }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-semibold text-slate-500">{label}</span>
+      <span className="mb-1 block text-xs font-semibold text-slate-500">{label}{required && <span className="text-nz-red"> *</span>}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm font-medium text-nz-navy focus-ring focus:bg-white"
+        className={`w-full rounded-lg border bg-nz-surface px-3 py-2 text-sm font-medium text-nz-navy focus-ring focus:bg-white ${error ? 'border-nz-red' : 'border-nz-border'}`}
       >
         <option value="">{placeholder}</option>
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
