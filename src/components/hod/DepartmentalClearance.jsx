@@ -51,11 +51,11 @@ export default function DepartmentalClearance({ navigate, params }) {
   function advance() {
     updatePermit(permit.id, {
       deptClearances: clearances,
-      status: permit.isolationRequired ? 'pending-isolation' : 'pending-declaration'
+      status: 'pending-approval'
     });
     addTimelineEvent(permit.id, 'Departmental Clearance complete — all departments resolved', `${currentUser.name} (Approver)`);
-    addTimelineEvent(permit.id, permit.isolationRequired ? 'Awaiting Isolation Setup' : 'Awaiting Precautions & Declaration', 'System');
-    pushToast(`${permit.id} cleared — ${permit.isolationRequired ? 'routed to Isolation Setup' : 'routed to Declaration'}`);
+    addTimelineEvent(permit.id, 'Awaiting Approval', 'System');
+    pushToast(`${permit.id} cleared — routed to Approval`);
     setTimeout(() => navigate('dashboard'), 900);
   }
 
@@ -74,6 +74,12 @@ export default function DepartmentalClearance({ navigate, params }) {
       </div>
 
       <div className="mb-4"><PTWStepper permit={permit} /></div>
+
+      {permit.safetyReview && (
+        <Card className="mb-4 border-nz-blue/20 bg-nz-blue-light p-3 text-xs text-nz-blue-dark">
+          <span className="font-bold">Safety Officer Review — {permit.safetyReview.by}:</span> {permit.safetyReview.comment || 'No additional comments.'}
+        </Card>
+      )}
 
       {blocked && (
         <Card className="mb-4 border-nz-red/30 bg-nz-red-light p-4">

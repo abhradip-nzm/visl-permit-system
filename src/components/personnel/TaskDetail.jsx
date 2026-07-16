@@ -95,20 +95,12 @@ function StatusAction({ navigate, permit, updatePermit, pushToast }) {
           variant="danger"
           className="w-full"
           onClick={() => {
-            updatePermit(permit.id, { status: 'pending-clearance' });
-            pushToast(`${permit.id} corrected and resubmitted for clearance`);
+            updatePermit(permit.id, { status: 'pending-declaration' });
+            pushToast(`${permit.id} corrected and resubmitted`);
           }}
         >
-          <RotateCcw size={15} /> Correct & Resubmit for Clearance
+          <RotateCcw size={15} /> Correct & Resubmit
         </Button>
-      </Card>
-    );
-  }
-
-  if (permit.status === 'pending-isolation') {
-    return (
-      <Card className="mb-4 border-nz-amber/30 bg-nz-amber-light p-4">
-        <div className="text-sm font-semibold text-nz-amber">Awaiting Isolation Officer — equipment isolation is performed and verified independently. You'll be notified once it's confirmed.</div>
       </Card>
     );
   }
@@ -124,14 +116,38 @@ function StatusAction({ navigate, permit, updatePermit, pushToast }) {
     );
   }
 
+  if (permit.status === 'pending-safety-review') {
+    return (
+      <Card className="mb-4 border-nz-amber/30 bg-nz-amber-light p-4">
+        <div className="text-sm font-semibold text-nz-amber">Awaiting Safety Officer review — you'll be notified once it's cleared for Departmental Clearance.</div>
+      </Card>
+    );
+  }
+
+  if (permit.status === 'pending-isolation') {
+    return (
+      <Card className="mb-4 border-nz-amber/30 bg-nz-amber-light p-4">
+        <div className="text-sm font-semibold text-nz-amber">Awaiting Isolation Officer — equipment isolation is performed and verified independently. You'll be notified once it's confirmed.</div>
+      </Card>
+    );
+  }
+
   if (permit.status === 'live') {
     return <ExecutionAction navigate={navigate} permit={permit} pushToast={pushToast} />;
   }
 
-  if (permit.status === 'pending-closure' && permit.closure?.requesterSigned) {
+  if (permit.status === 'pending-safety-inspection') {
     return (
       <Card className="mb-4 border-nz-orange/30 bg-nz-orange-light p-4 text-sm font-semibold text-nz-orange">
-        Closure submitted — awaiting Approver's final on-site verification.
+        Closure submitted — awaiting Safety Officer inspection.
+      </Card>
+    );
+  }
+
+  if (permit.status === 'pending-closure') {
+    return (
+      <Card className="mb-4 border-nz-orange/30 bg-nz-orange-light p-4 text-sm font-semibold text-nz-orange">
+        Safety Officer inspection complete — awaiting Approver's final closure verification.
       </Card>
     );
   }

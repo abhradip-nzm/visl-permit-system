@@ -1,6 +1,7 @@
 import React from 'react';
 import AppShell from '../shell/AppShell.jsx';
 import SafetyDashboard from './SafetyDashboard.jsx';
+import SafetyGates from './SafetyGates.jsx';
 import MonitorPermitDetail from './MonitorPermitDetail.jsx';
 import LotoMonitor from './LotoMonitor.jsx';
 import Reporting from './Reporting.jsx';
@@ -9,6 +10,7 @@ import Profile from '../shared/Profile.jsx';
 
 const TITLES = {
   dashboard: 'Safety Dashboard',
+  gates: 'Permit Gates',
   monitor: 'Monitor Permit',
   lotomonitor: 'LOTO Monitor',
   reporting: 'Reporting',
@@ -19,6 +21,8 @@ const TITLES = {
 export default function SafetyOfficerApp() {
   function renderScreen(screen, navigate, params) {
     switch (screen) {
+      case 'gates':
+        return <SafetyGates />;
       case 'monitor':
         return <MonitorPermitDetail navigate={navigate} params={params} />;
       case 'lotomonitor':

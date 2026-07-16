@@ -161,15 +161,22 @@ export const PPE_FIRE_PROTECTION = [
 export { DEPARTMENTS } from './departmentsData.js';
 export const CLEARANCE_DEPARTMENTS = ['Mechanical', 'E&I', 'Production'];
 
-// The 9-step lifecycle used by the WorkflowStepper component.
+// Phase 7 flow re-architecture: Declaration moves before Clearance, the
+// Safety Officer becomes a formal two-touchpoint gate (Review before
+// Clearance, Inspection before Closure) instead of an observer-only role,
+// and Isolation moves to sit right before the permit goes Live — it still
+// fully blocks execution, it just happens later in the sequence than it
+// used to.
 export const PTW_STEPS = [
   { key: 'request', num: 1, label: 'Request & Risk Assessment', status: 'draft' },
-  { key: 'clearance', num: 2, label: 'Departmental Clearance', status: 'pending-clearance' },
-  { key: 'isolation', num: 3, label: 'Isolation Setup', status: 'pending-isolation' },
-  { key: 'declaration', num: 4, label: 'Precautions & Declaration', status: 'pending-declaration' },
+  { key: 'declaration', num: 2, label: 'Precautions & Declaration', status: 'pending-declaration' },
+  { key: 'safety-review', num: 3, label: 'Safety Officer Review', status: 'pending-safety-review' },
+  { key: 'clearance', num: 4, label: 'Departmental Clearance', status: 'pending-clearance' },
   { key: 'approval', num: 5, label: 'Approval', status: 'pending-approval' },
-  { key: 'execution', num: 6, label: 'Job Execution', status: 'live' },
-  { key: 'transfer', num: 7, label: 'Shift Transfer', status: 'live' },
-  { key: 'closure', num: 8, label: 'Closure', status: 'pending-closure' },
-  { key: 'closed', num: 9, label: 'Closed', status: 'closed' }
+  { key: 'isolation', num: 6, label: 'Isolation Setup', status: 'pending-isolation' },
+  { key: 'execution', num: 7, label: 'Job Execution', status: 'live' },
+  { key: 'transfer', num: 8, label: 'Shift Transfer', status: 'live' },
+  { key: 'safety-inspection', num: 9, label: 'Safety Officer Inspection', status: 'pending-safety-inspection' },
+  { key: 'closure', num: 10, label: 'Closure', status: 'pending-closure' },
+  { key: 'closed', num: 11, label: 'Closed', status: 'closed' }
 ];

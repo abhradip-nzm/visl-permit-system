@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, ShieldAlert, AlertTriangle, MapPin, Send } from 'lucide-react';
+import { ChevronRight, ShieldAlert, AlertTriangle, MapPin, Send, ClipboardCheck } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { PERSONNEL } from '../../data/mockData.js';
 import { TASKS } from '../../data/tasksData.js';
@@ -13,6 +13,7 @@ export default function SafetyDashboard({ navigate }) {
   const { permits } = useApp();
   const expiredPersonnel = PERSONNEL.filter((p) => p.certifications.some((c) => c.status === 'expired'));
   const flags = permits.filter((p) => p.warnings?.length > 0);
+  const pendingGates = permits.filter((p) => p.status === 'pending-safety-review' || p.status === 'pending-safety-inspection');
   const geoTasks = TASKS.filter((t) => t.status !== 'Completed').map((t) => ({
     ...t,
     pin: t.status === 'Overdue' ? 'overdue' : t.status === 'Pending' ? 'attention' : 'on track'
@@ -25,11 +26,20 @@ export default function SafetyDashboard({ navigate }) {
       </div>
 
       <div className="mb-4 grid grid-cols-2 gap-3">
+        <Stat label="Pending Gates" value={pendingGates.length} icon={ClipboardCheck} tone="amber" />
         <Stat label="Open Flags" value={flags.length} icon={AlertTriangle} tone="amber" />
         <Stat label="High-Risk" value={permits.filter((p) => p.risk === 'high').length} icon={ShieldAlert} tone="red" />
         <Stat label="Expired Certs" value={expiredPersonnel.length} icon={AlertTriangle} tone="red" />
-        <Stat label="Monitored" value={permits.length} icon={ShieldAlert} tone="navy" />
       </div>
+
+      {pendingGates.length > 0 && (
+        <button
+          onClick={() => navigate('gates')}
+          className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl2 bg-nz-blue py-3 text-sm font-bold text-white shadow-card"
+        >
+          <ClipboardCheck size={15} /> {pendingGates.length} Permit{pendingGates.length === 1 ? '' : 's'} Awaiting Safety Gate
+        </button>
+      )}
 
       <button
         onClick={() => navigate('reporting')}

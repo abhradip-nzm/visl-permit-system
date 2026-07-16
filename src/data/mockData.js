@@ -118,13 +118,14 @@ export const PERMITS = [
     deptClearances: emptyDeptClearances(), isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
     additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
     approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
+    safetyOfficer: '', safetyReview: null, safetyInspection: null,
     criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
     checklist: [{ id: 1, label: 'Pre-job briefing', done: false }],
     timeline: [{ stage: 'Draft started', at: '06 Jul, 15:10', by: 'S. Iyer' }]
   },
   {
     id: 'WP-1037', types: ['Confined Space'], type: 'Confined Space', equipment: 'Storage Tank T-5', location: 'Tank Farm',
-    area: 'Tank Farm', shift: 'Night', requester: 'A. Chatterjee', requestor: 'A. Chatterjee', status: 'pending-clearance', createdAt: '2026-07-04',
+    area: 'Tank Farm', shift: 'Night', requester: 'A. Chatterjee', requestor: 'A. Chatterjee', status: 'pending-declaration', createdAt: '2026-07-04',
     dateFrom: '2026-07-05', dateTill: '2026-07-05', fromTime: '22:00', toTime: '06:00',
     jobDescription: 'Internal tank inspection and sludge removal.', wiNo: 'WI-4102', ownerDepartment: 'Mechanical', contractor: 'Coastal Industrial Services',
     hazards: HAZARD_CONTROL_LIBRARY['Confined Space'].hazards, ppe: HAZARD_CONTROL_LIBRARY['Confined Space'].ppe,
@@ -139,13 +140,14 @@ export const PERMITS = [
     deptClearances: emptyDeptClearances(), isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
     additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
     approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
+    safetyOfficer: '', safetyReview: null, safetyInspection: null,
     criticalLift: null,
     confinedSpaceMonitoring: { gasMonitorSlNo: 'GM-2091', calibrationValid: true, confinedSpaceId: 'CS-TF-05', standbyPerson: 'M. Khan', rescuers: 'R. Das', gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' },
     transfers: [], closure: emptyClosure(),
     checklist: [{ id: 1, label: 'Atmosphere test', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '04 Jul, 22:10', by: 'A. Chatterjee' },
-      { stage: 'Submitted for Departmental Clearance', at: '04 Jul, 22:30', by: 'System' }
+      { stage: 'Awaiting Precautions & Declaration', at: '04 Jul, 22:30', by: 'System' }
     ]
   },
   {
@@ -174,19 +176,23 @@ export const PERMITS = [
     ],
     toolboxRecord: [{ name: 'S. Iyer', company: 'Vedanta', personalLockId: '', signed: false }],
     isolationTopicsCovered: '',
-    additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
-    approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
+    additionalPrecautions: '', declaration: { requestorName: 'S. Iyer', date: '05 Jul', time: '07:45', toolboxTalkConfirmed: true, signed: { name: 'S. Iyer', timestamp: '05 Jul, 07:45' } },
+    approval: { approverName: 'D. Fernandes', date: '05 Jul', time: '08:20', onGroundVerified: true, signed: { name: 'D. Fernandes', timestamp: '05 Jul, 08:20' }, rejectionReason: '' },
+    safetyOfficer: 'T. Roy', safetyReview: { comment: 'Reviewed — controls adequate for electrical isolation work.', by: 'T. Roy', at: '05 Jul, 08:00' }, safetyInspection: null,
     criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
     checklist: [{ id: 1, label: 'Voltage test to zero', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '05 Jul, 07:30', by: 'S. Iyer' },
+      { stage: 'Precautions & Declaration signed', at: '05 Jul, 07:45', by: 'S. Iyer' },
+      { stage: 'Safety Officer review complete', at: '05 Jul, 08:00', by: 'T. Roy (Safety Officer)' },
       { stage: 'Departmental Clearance granted', at: '05 Jul, 08:12', by: 'D. Fernandes (Approver)' },
-      { stage: 'Awaiting Isolation Setup', at: '05 Jul, 08:13', by: 'System' }
+      { stage: 'Approved — On-Ground Verification complete', at: '05 Jul, 08:20', by: 'D. Fernandes (Approver)' },
+      { stage: 'Awaiting Isolation Setup', at: '05 Jul, 08:21', by: 'System' }
     ]
   },
   {
     id: 'WP-1044', types: ['Confined Space', 'Isolation & Electrical'], type: 'Confined Space', equipment: 'Hydraulic Accumulator H-9', location: 'Crushing Plant',
-    area: 'Crushing Plant', shift: 'Morning', requester: 'A. Chatterjee', requestor: 'A. Chatterjee', status: 'pending-declaration', createdAt: '2026-07-05',
+    area: 'Crushing Plant', shift: 'Morning', requester: 'A. Chatterjee', requestor: 'A. Chatterjee', status: 'pending-safety-review', createdAt: '2026-07-05',
     dateFrom: '2026-07-06', dateTill: '2026-07-06', fromTime: '06:00', toTime: '14:00',
     jobDescription: 'Internal inspection of hydraulic accumulator after isolation.', wiNo: 'WI-4111', ownerDepartment: 'Mechanical', contractor: '',
     hazards: HAZARD_CONTROL_LIBRARY['Confined Space'].hazards, ppe: HAZARD_CONTROL_LIBRARY['Confined Space'].ppe,
@@ -211,8 +217,9 @@ export const PERMITS = [
     ],
     toolboxRecord: [{ name: 'A. Chatterjee', company: 'Vedanta', personalLockId: 'PL-011', signed: true }],
     isolationTopicsCovered: 'Reviewed hydraulic bleed-down sequence and lock/tag placement with crew before entry.',
-    additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
+    additionalPrecautions: '', declaration: { requestorName: 'A. Chatterjee', date: '05 Jul', time: '15:20', toolboxTalkConfirmed: true, signed: { name: 'A. Chatterjee', timestamp: '05 Jul, 15:20' } },
     approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
+    safetyOfficer: 'T. Roy', safetyReview: null, safetyInspection: null,
     criticalLift: null,
     confinedSpaceMonitoring: { gasMonitorSlNo: 'GM-2077', calibrationValid: true, confinedSpaceId: 'CS-CP-09', standbyPerson: 'P. Rao', rescuers: 'A. Singh', gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' },
     lotoRequired: true, lotoStatus: 'complete', lotoAssignee: 'J. Mehta',
@@ -220,9 +227,8 @@ export const PERMITS = [
     checklist: [{ id: 1, label: 'Atmosphere monitoring active', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '05 Jul, 14:00', by: 'A. Chatterjee' },
-      { stage: 'Departmental Clearance granted', at: '05 Jul, 15:11', by: 'D. Fernandes (Approver)' },
-      { stage: 'Isolation confirmed — LK-198, LOTO-014', at: '05 Jul, 15:40', by: 'J. Mehta (Isolation Officer)' },
-      { stage: 'Awaiting Precautions & Declaration', at: '05 Jul, 15:41', by: 'System' }
+      { stage: 'Precautions & Declaration signed', at: '05 Jul, 15:20', by: 'A. Chatterjee' },
+      { stage: 'Awaiting Safety Officer Review', at: '05 Jul, 15:21', by: 'System' }
     ]
   },
   {
@@ -244,14 +250,16 @@ export const PERMITS = [
     }),
     isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
     additionalPrecautions: 'Vessel to remain depressurized and cooled below 40°C before gasket removal.',
-    declaration: { requestorName: 'T. Roy', date: '01 Jul', time: '09:00', toolboxTalkConfirmed: true, signed: { name: 'T. Roy', timestamp: '01 Jul, 09:00' } },
+    declaration: { requestorName: 'T. Roy', date: '01 Jul', time: '08:00', toolboxTalkConfirmed: true, signed: { name: 'T. Roy', timestamp: '01 Jul, 08:00' } },
     approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
+    safetyOfficer: 'T. Roy', safetyReview: { comment: 'No additional flags — standard mechanical gasket job.', by: 'T. Roy', at: '01 Jul, 08:10' }, safetyInspection: null,
     criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
     checklist: [{ id: 1, label: 'Pre-job briefing', done: true }, { id: 2, label: 'Isolation confirmed', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '01 Jul, 07:50', by: 'T. Roy' },
+      { stage: 'Precautions & Declaration signed', at: '01 Jul, 08:00', by: 'T. Roy' },
+      { stage: 'Safety Officer review complete', at: '01 Jul, 08:10', by: 'T. Roy (Safety Officer)' },
       { stage: 'Departmental Clearance granted', at: '01 Jul, 08:25', by: 'D. Fernandes (Approver)' },
-      { stage: 'Precautions & Declaration signed', at: '01 Jul, 09:00', by: 'T. Roy' },
       { stage: 'Awaiting Approval', at: '01 Jul, 09:01', by: 'System' }
     ]
   },
@@ -276,8 +284,9 @@ export const PERMITS = [
     }),
     isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
     additionalPrecautions: '',
-    declaration: { requestorName: 'S. Iyer', date: '02 Jul', time: '08:40', toolboxTalkConfirmed: true, signed: { name: 'S. Iyer', timestamp: '02 Jul, 08:40' } },
+    declaration: { requestorName: 'S. Iyer', date: '02 Jul', time: '08:10', toolboxTalkConfirmed: true, signed: { name: 'S. Iyer', timestamp: '02 Jul, 08:10' } },
     approval: { approverName: 'D. Fernandes', date: '02 Jul', time: '08:45', onGroundVerified: true, signed: { name: 'D. Fernandes', timestamp: '02 Jul, 08:45' }, rejectionReason: '' },
+    safetyOfficer: 'T. Roy', safetyReview: { comment: 'Cleared — routine mechanical work.', by: 'T. Roy', at: '02 Jul, 08:15' }, safetyInspection: null,
     criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
     checklist: [
       { id: 1, label: 'Confirm isolation with LOTO tag', done: true },
@@ -289,15 +298,16 @@ export const PERMITS = [
     ],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '02 Jul, 08:00', by: 'S. Iyer' },
+      { stage: 'Precautions & Declaration signed', at: '02 Jul, 08:10', by: 'S. Iyer' },
+      { stage: 'Safety Officer review complete', at: '02 Jul, 08:15', by: 'T. Roy (Safety Officer)' },
       { stage: 'Departmental Clearance granted', at: '02 Jul, 08:20', by: 'D. Fernandes (Approver)' },
-      { stage: 'Precautions & Declaration signed', at: '02 Jul, 08:40', by: 'S. Iyer' },
       { stage: 'Approved — Permit is LIVE', at: '02 Jul, 08:45', by: 'D. Fernandes (Approver)' },
       { stage: 'Job Execution started', at: '02 Jul, 09:20', by: 'System' }
     ]
   },
   {
     id: 'WP-1019', types: ['Cold/General'], type: 'Mechanical', equipment: 'Storage Tank T-5', location: 'Tank Farm',
-    area: 'Tank Farm', shift: 'Morning', requester: 'K. Verma', requestor: 'K. Verma', status: 'pending-closure', createdAt: '2026-06-28',
+    area: 'Tank Farm', shift: 'Morning', requester: 'K. Verma', requestor: 'K. Verma', status: 'pending-safety-inspection', createdAt: '2026-06-28',
     dateFrom: '2026-06-28', dateTill: '2026-07-05', fromTime: '08:00', toTime: '16:00',
     jobDescription: 'Tank exterior recoating and housekeeping.', wiNo: 'WI-3902', ownerDepartment: 'Mechanical', contractor: '',
     hazards: HAZARD_CONTROL_LIBRARY.Mechanical.hazards, ppe: HAZARD_CONTROL_LIBRARY.Mechanical.ppe,
@@ -314,8 +324,9 @@ export const PERMITS = [
     }),
     isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
     additionalPrecautions: '',
-    declaration: { requestorName: 'K. Verma', date: '28 Jun', time: '08:40', toolboxTalkConfirmed: true, signed: { name: 'K. Verma', timestamp: '28 Jun, 08:40' } },
+    declaration: { requestorName: 'K. Verma', date: '28 Jun', time: '08:10', toolboxTalkConfirmed: true, signed: { name: 'K. Verma', timestamp: '28 Jun, 08:10' } },
     approval: { approverName: 'D. Fernandes', date: '28 Jun', time: '09:40', onGroundVerified: true, signed: { name: 'D. Fernandes', timestamp: '28 Jun, 09:40' }, rejectionReason: '' },
+    safetyOfficer: 'T. Roy', safetyReview: { comment: 'Cleared — routine recoating work.', by: 'T. Roy', at: '28 Jun, 08:15' }, safetyInspection: null,
     criticalLift: null, confinedSpaceMonitoring: null, transfers: [],
     closure: emptyClosure({
       requesterChecklist: { controlsBack: true, interlocksRestored: true, guardsInPlace: true, permitsSurrendered: true },
@@ -332,7 +343,7 @@ export const PERMITS = [
       { stage: 'Departmental Clearance granted', at: '28 Jun, 08:30', by: 'D. Fernandes (Approver)' },
       { stage: 'Approved — Permit is LIVE', at: '28 Jun, 09:40', by: 'D. Fernandes (Approver)' },
       { stage: 'Job Execution completed', at: '05 Jul, 15:45', by: 'K. Verma' },
-      { stage: 'Closure submitted — awaiting Approver verification', at: '05 Jul, 16:00', by: 'K. Verma' }
+      { stage: 'Closure submitted — awaiting Safety Officer inspection', at: '05 Jul, 16:00', by: 'K. Verma' }
     ]
   },
   {
@@ -346,8 +357,9 @@ export const PERMITS = [
     rescue: { rescuers: [], firstAiders: [], procedureAvailable: false, intimationProvided: false },
     deptClearances: emptyDeptClearances({ Mechanical: { status: 'cleared', name: 'D. Fernandes', datetime: '20 Jun, 08:15' } }),
     isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '', additionalPrecautions: '',
-    declaration: { requestorName: 'K. Verma', date: '20 Jun', time: '08:30', toolboxTalkConfirmed: true, signed: { name: 'K. Verma', timestamp: '20 Jun, 08:30' } },
+    declaration: { requestorName: 'K. Verma', date: '20 Jun', time: '08:00', toolboxTalkConfirmed: true, signed: { name: 'K. Verma', timestamp: '20 Jun, 08:00' } },
     approval: { approverName: 'D. Fernandes', date: '20 Jun', time: '09:00', onGroundVerified: true, signed: { name: 'D. Fernandes', timestamp: '20 Jun, 09:00' }, rejectionReason: '' },
+    safetyOfficer: 'T. Roy', safetyReview: { comment: 'Cleared.', by: 'T. Roy', at: '20 Jun, 08:05' }, safetyInspection: { comment: 'Inspected — normalised.', by: 'T. Roy', at: '21 Jun, 15:45' },
     criticalLift: null, confinedSpaceMonitoring: null, transfers: [],
     closure: emptyClosure({
       requesterChecklist: { controlsBack: true, interlocksRestored: true, guardsInPlace: true, permitsSurrendered: true },
@@ -387,6 +399,7 @@ export const PERMITS = [
     isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '', additionalPrecautions: '',
     declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
     approval: { approverName: 'D. Fernandes', date: '06 Jul', time: '06:50', onGroundVerified: false, signed: null, rejectionReason: 'Equipment calibration is overdue — resolve with the Isolation Officer before resubmission.' },
+    safetyOfficer: '', safetyReview: null, safetyInspection: null,
     criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
     checklist: [{ id: 1, label: 'Gas test before start', done: false }],
     timeline: [

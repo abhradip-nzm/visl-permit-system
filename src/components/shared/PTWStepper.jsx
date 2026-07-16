@@ -2,7 +2,10 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import { PTW_STEPS } from '../../data/ptwFormData.js';
 
-const STATUS_ORDER = ['draft', 'pending-clearance', 'pending-isolation', 'pending-declaration', 'pending-approval', 'live', 'pending-closure', 'closed'];
+const STATUS_ORDER = [
+  'draft', 'pending-declaration', 'pending-safety-review', 'pending-clearance',
+  'pending-approval', 'pending-isolation', 'live', 'pending-safety-inspection', 'pending-closure', 'closed'
+];
 
 // Steps 6 (Job Execution) and 7 (Shift Transfer) both live under the "live"
 // status, so within that status we can't tell them apart from status alone —

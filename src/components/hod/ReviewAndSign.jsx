@@ -19,10 +19,16 @@ export default function ReviewAndSign({ navigate, params }) {
   function approve() {
     const now = { name: currentUser.name, timestamp: 'Just now' };
     setSigned(now);
-    updatePermit(permit.id, { status: 'live', approval: { approverName: currentUser.name, date: 'Today', time: 'Just now', onGroundVerified: true, signed: now, rejectionReason: '', comment: comment.trim() } });
-    addTimelineEvent(permit.id, `Approved — Permit is LIVE${comment.trim() ? ` — "${comment.trim()}"` : ''}`, `${currentUser.name} (Approver)`);
-    addTimelineEvent(permit.id, 'Job Execution started', 'System');
-    pushToast(`${permit.id} approved — Permit is now LIVE`);
+    // Phase 7: Isolation now sits right before Live instead of before
+    // Declaration — a permit that needs isolation still can't go live
+    // (and the Requester still can't start real work) until the
+    // Isolation Officer independently confirms it, same guarantee as
+    // before, just later in the sequence.
+    const nextStatus = permit.isolationRequired ? 'pending-isolation' : 'live';
+    updatePermit(permit.id, { status: nextStatus, approval: { approverName: currentUser.name, date: 'Today', time: 'Just now', onGroundVerified: true, signed: now, rejectionReason: '', comment: comment.trim() } });
+    addTimelineEvent(permit.id, `Approved${comment.trim() ? ` — "${comment.trim()}"` : ''}`, `${currentUser.name} (Approver)`);
+    addTimelineEvent(permit.id, permit.isolationRequired ? 'Awaiting Isolation Setup' : 'Job Execution started', 'System');
+    pushToast(permit.isolationRequired ? `${permit.id} approved — routed to Isolation Setup` : `${permit.id} approved — Permit is now LIVE`);
     setTimeout(() => navigate('dashboard'), 900);
   }
 
@@ -128,7 +134,7 @@ export default function ReviewAndSign({ navigate, params }) {
 
       <div className="flex gap-3">
         <Button variant="success" className="flex-1" disabled={blocked || !verified || !!signed} onClick={approve}>
-          <CheckCircle2 size={16} /> Approve — Permit is Now LIVE
+          <CheckCircle2 size={16} /> {permit.isolationRequired ? 'Approve — Route to Isolation Setup' : 'Approve — Permit is Now LIVE'}
         </Button>
         {!returnOpen ? (
           <Button variant="danger" className="flex-1" disabled={blocked} onClick={() => setReturnOpen(true)}>

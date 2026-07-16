@@ -25,12 +25,12 @@ export default function ClosePermit({ navigate, params }) {
     const now = { name: currentUser.name, timestamp: 'Just now' };
     setSigned(now);
     updatePermit(permit.id, {
-      status: 'pending-closure',
+      status: 'pending-safety-inspection',
       closure: { ...permit.closure, requesterChecklist: checklist, toolboxTalkRefNo: tbtRef, requesterSigned: now, requesterDate: 'Today', requesterTime: 'Just now' }
     });
     addTimelineEvent(permit.id, 'Job Execution completed', currentUser.name);
-    addTimelineEvent(permit.id, 'Closure submitted — awaiting Approver verification', currentUser.name);
-    pushToast(`${permit.id} closure submitted for Approver verification`);
+    addTimelineEvent(permit.id, 'Closure submitted — awaiting Safety Officer inspection', currentUser.name);
+    pushToast(`${permit.id} closure submitted for Safety Officer inspection`);
     setTimeout(() => navigate('mytasks'), 900);
   }
 
@@ -66,7 +66,7 @@ export default function ClosePermit({ navigate, params }) {
       </Card>
 
       <Button variant="orange" size="lg" className="w-full" disabled={!allChecked || !tbtRef.trim() || !!signed} onClick={submit}>
-        {signed ? <><CheckCircle2 size={16} /> Submitted</> : 'Submit Closure for Approver Verification →'}
+        {signed ? <><CheckCircle2 size={16} /> Submitted</> : 'Submit Closure for Safety Officer Inspection →'}
       </Button>
       {!allChecked && <div className="mt-2 text-center text-xs text-slate-400">Complete the checklist above to submit.</div>}
     </div>

@@ -105,7 +105,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
       {
         id: newId, types, type: types[0], equipment: jobDetails.location, location: jobDetails.area,
         area: jobDetails.area, shift: base.shift, requester: currentUser.name, requestor: currentUser.name,
-        status: 'pending-clearance', createdAt: jobDetails.dateFrom,
+        status: 'pending-declaration', createdAt: jobDetails.dateFrom,
         dateFrom: jobDetails.dateFrom, dateTill: jobDetails.dateTill, fromTime: jobDetails.fromTime, toTime: jobDetails.toTime,
         jobDescription: jobDetails.jobDescription, wiNo: jobDetails.wiNo, ownerDepartment: jobDetails.ownerDepartment, contractor: jobDetails.contractor,
         approver: jobDetails.approver, isolationOfficer: jobDetails.isolationOfficer,
@@ -121,18 +121,19 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
         toolboxRecord: [], isolationTopicsCovered: '',
         additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
         approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
+        safetyOfficer: '', safetyReview: null, safetyInspection: null,
         criticalLift: types.includes('Crane & Lifting') ? {} : null,
         confinedSpaceMonitoring: types.includes('Confined Space') ? { gasMonitorSlNo: '', calibrationValid: false, confinedSpaceId: '', standbyPerson: rescue.rescuers.filter(Boolean).join(', '), rescuers: rescue.rescuers.filter(Boolean).join(', '), gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' } : null,
         transfers: [], closure: emptyClosure(),
         checklist: [{ id: 1, label: 'Pre-job briefing', done: false }],
         timeline: [
           { stage: 'Created — Request & Risk Assessment', at: 'Just now', by: currentUser.name },
-          { stage: 'Submitted for Departmental Clearance', at: 'Just now', by: 'System' }
+          { stage: 'Awaiting Precautions & Declaration', at: 'Just now', by: 'System' }
         ]
       },
       ...prev
     ]);
-    pushToast(`${newId} submitted for Departmental Clearance`);
+    pushToast(`${newId} submitted — Precautions & Declaration required next`);
     setTimeout(() => navigate('mytasks'), 900);
   }
 
@@ -143,7 +144,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
           <ArrowLeft size={15} /> Back to form
         </button>
         <h2 className="mb-1 text-lg font-bold text-nz-navy">Review Before Submitting</h2>
-        <p className="mb-4 text-sm text-slate-500">Confirm every section is correct — this goes to Departmental Clearance next.</p>
+        <p className="mb-4 text-sm text-slate-500">Confirm every section is correct — you'll complete Precautions & Declaration next.</p>
 
         <SummaryCard title="A. Type of Permit" items={types} />
         <Card className="mb-3 p-3 text-xs text-slate-600">
@@ -182,12 +183,12 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
 
         {isolationRequired && (
           <div className="mb-3 rounded-lg bg-nz-blue-light px-3 py-2.5 text-xs font-medium text-nz-blue-dark">
-            This permit includes Isolation & Electrical work — Isolation Setup will be required before Declaration.
+            This permit includes Isolation & Electrical work — Isolation Setup will be required after Approval, before the permit goes live.
           </div>
         )}
 
         <Button variant="orange" size="lg" className="w-full" onClick={submit}>
-          <CheckCircle2 size={16} /> Submit for Departmental Clearance →
+          <CheckCircle2 size={16} /> Submit for Precautions & Declaration →
         </Button>
       </div>
     );

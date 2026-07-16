@@ -84,12 +84,12 @@ export default function LotoApprovals({ params }) {
       isolationDetails: details,
       toolboxRecord: form.rows.filter((r) => r.name).map((r) => ({ ...r, company: 'Vedanta', signed: true })),
       isolationTopicsCovered: form.topics,
-      status: 'pending-declaration'
+      status: 'live'
     });
     addTimelineEvent(permit.id, `Isolation confirmed — ${form.deptLockNo}, ${form.lotoIdNo}${form.topics.trim() ? ` — "${form.topics.trim()}"` : ''}`, `${currentUser.name} (Isolation Officer)`);
-    addTimelineEvent(permit.id, 'Awaiting Precautions & Declaration', 'System');
+    addTimelineEvent(permit.id, 'Job Execution started', 'System');
     setConfirmed(true);
-    pushToast(`${permit.id} isolation verified — requester notified to proceed`);
+    pushToast(`${permit.id} isolation verified — permit is now LIVE`);
   }
 
   return (

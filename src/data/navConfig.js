@@ -20,6 +20,7 @@ export const NAV_CONFIG = {
   ],
   safety: [
     { key: 'dashboard', label: 'Dashboard', icon: 'ShieldAlert' },
+    { key: 'gates', label: 'Permit Gates', icon: 'ClipboardCheck' },
     { key: 'lotomonitor', label: 'LOTO Monitor', icon: 'Lock' },
     { key: 'compliance', label: 'Compliance', icon: 'BadgeCheck' },
     { key: 'profile', label: 'Profile', icon: 'User' }

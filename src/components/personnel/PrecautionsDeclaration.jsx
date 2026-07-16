@@ -1,14 +1,25 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
+import { USERS } from '../../data/usersData.js';
 import { Card, SectionLabel, Button, SignaturePad } from '../shared/Primitives.jsx';
 
 export default function PrecautionsDeclaration({ navigate, params }) {
   const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
   const permit = permits.find((p) => p.id === params?.id) || permits[0];
   const [precautions, setPrecautions] = useState(permit.additionalPrecautions || '');
+  const [safetyOfficer, setSafetyOfficer] = useState(permit.safetyOfficer || '');
   const [confirmed, setConfirmed] = useState(false);
   const [signed, setSigned] = useState(null);
+
+  // Phase 7: the Safety Officer becomes a formal gate right after
+  // Declaration — the Requester names who will review it, a required
+  // point of contact (non-exclusive, matching the Approver/Isolation
+  // Officer pattern), dynamically sourced from active Safety Officer
+  // accounts.
+  const availableSafetyOfficers = USERS.filter(
+    (u) => u.status === 'active' && u.name !== currentUser.name && u.roles.some((r) => r.role === 'safety')
+  );
 
   function submit() {
     const now = { name: currentUser.name, timestamp: 'Just now' };
@@ -16,11 +27,12 @@ export default function PrecautionsDeclaration({ navigate, params }) {
     updatePermit(permit.id, {
       additionalPrecautions: precautions,
       declaration: { requestorName: currentUser.name, date: 'Today', time: 'Just now', toolboxTalkConfirmed: true, signed: now },
-      status: 'pending-approval'
+      safetyOfficer,
+      status: 'pending-safety-review'
     });
     addTimelineEvent(permit.id, 'Precautions & Declaration signed', currentUser.name);
-    addTimelineEvent(permit.id, 'Awaiting Approval', 'System');
-    pushToast(`${permit.id} submitted for Approval`);
+    addTimelineEvent(permit.id, 'Awaiting Safety Officer Review', 'System');
+    pushToast(`${permit.id} submitted for Safety Officer review`);
     setTimeout(() => navigate('mytasks'), 900);
   }
 
@@ -46,11 +58,22 @@ export default function PrecautionsDeclaration({ navigate, params }) {
           <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
           I have conducted the toolbox talk with all crew members
         </label>
+        <label className="mb-3 block">
+          <span className="mb-1 block text-xs font-semibold text-slate-500">Safety Officer<span className="text-nz-red"> *</span></span>
+          <select
+            value={safetyOfficer}
+            onChange={(e) => setSafetyOfficer(e.target.value)}
+            className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white"
+          >
+            <option value="">Select an available Safety Officer…</option>
+            {availableSafetyOfficers.map((u) => <option key={u.id} value={u.name}>{u.name}</option>)}
+          </select>
+        </label>
         <SignaturePad signed={signed} onSign={() => {}} label="Tap to sign declaration" />
       </Card>
 
-      <Button variant="orange" size="lg" className="w-full" disabled={!confirmed || !!signed} onClick={submit}>
-        {signed ? <><CheckCircle2 size={16} /> Submitted</> : 'Sign & Submit for Approval →'}
+      <Button variant="orange" size="lg" className="w-full" disabled={!confirmed || !safetyOfficer || !!signed} onClick={submit}>
+        {signed ? <><CheckCircle2 size={16} /> Submitted</> : 'Sign & Submit for Safety Officer Review →'}
       </Button>
     </div>
   );
