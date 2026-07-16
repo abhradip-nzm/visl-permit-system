@@ -8,11 +8,17 @@ import { Button, Card, SectionLabel } from '../shared/Primitives.jsx';
 import { CheckboxGrid, Accordion } from '../shared/ChecklistGrid.jsx';
 import { useApp } from '../../context/AppContext.jsx';
 
-// Phase 2: the certified form (FRMT/MR/26 Rev 4) has one entry path — this
-// fixed checkbox/dropdown wizard. "source" only ever distinguishes a blank
-// form from one seeded by a real system-of-record lookup (SAP PM order);
-// there is no free-text/AI-parsed prefill path anymore.
-const SOURCE_LABEL = { sap: 'Auto-populated from SAP PM order' };
+// Phase 2/8: the certified form (FRMT/MR/26 Rev 4) has one shape and one
+// submission path — this fixed checkbox/dropdown wizard. "source" only
+// distinguishes a blank form from one seeded by a faster entry method
+// (NLP text, OCR scan, SAP lookup); every path lands here for full review
+// before anything is actually submitted, so free text / AI output never
+// reaches the record unverified.
+const SOURCE_LABEL = {
+  nlp: 'Parsed from natural language input',
+  ocr: 'Extracted via OCR from scanned permit',
+  sap: 'Auto-populated from SAP PM order'
+};
 
 const SHIFT_TIMES = { Morning: ['06:00', '14:00'], Afternoon: ['14:00', '22:00'], Night: ['22:00', '06:00'] };
 

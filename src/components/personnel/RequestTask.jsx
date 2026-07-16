@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
-import { FileText, Hash, ArrowLeft, ClipboardList, Wrench } from 'lucide-react';
+import { FileText, Hash, Type, ScanLine, Sparkles, ArrowLeft, ClipboardList, Wrench } from 'lucide-react';
+import { NLP_SAMPLE_PARSE, OCR_SAMPLE_EXTRACTION } from '../../data/mockData.js';
 import { Button, Card } from '../shared/Primitives.jsx';
 import { useApp } from '../../context/AppContext.jsx';
 import TaskRequestForm from './TaskRequestForm.jsx';
 
-// Phase 2: the certified PTW form (FRMT/MR/26 Rev 4) has exactly one entry
-// path — the fixed checkbox/dropdown wizard. NLP text parsing, voice input,
-// and OCR scanning were "smart form" shortcuts inconsistent with a legally
-// certified document and have been removed. SAP PM Order lookup stays: it
-// pulls from a real system of record by ID, not free-text/AI interpretation.
+// Phase 8: Type (NLP) and Scan (OCR) are back as entry conveniences, but not
+// as the free-text/AI-driven submission paths they used to be — like SAP
+// lookup, they only ever *prefill* the same fixed checkbox/dropdown form
+// (see SOURCE_LABEL in TaskRequestForm.jsx, "verify every section before
+// submitting"). The certified form itself still has exactly one shape; nothing
+// gets submitted without passing through it for review.
 const MODES = [
   { key: 'manual', label: 'New Permit Request', sub: 'Fill the certified PTW form', icon: FileText },
+  { key: 'nlp', label: 'Type', sub: 'Describe the job, then confirm on the form', icon: Type },
+  { key: 'ocr', label: 'Scan', sub: 'Digitize a legacy paper permit', icon: ScanLine },
   { key: 'sap', label: 'From SAP PM Order #', sub: 'Auto-populate from a work order', icon: Hash },
   { key: 'personal-task', label: 'Personal Task', sub: 'Simple task request — no permit form', icon: ClipboardList },
   { key: 'personal-instrument', label: 'Instrument Request', sub: 'Request an instrument from your supervisor', icon: Wrench }
@@ -70,10 +74,103 @@ export default function RequestTask({ navigate }) {
         </>
       )}
 
+      {step === 'nlp' && (
+        <NLPInputStep onParsed={(data) => { setPrefillSource('nlp'); setPrefillData(data); setStep('form'); }} />
+      )}
+      {step === 'ocr' && (
+        <OCRInputStep onParsed={(data) => { setPrefillSource('ocr'); setPrefillData(data); setStep('form'); }} />
+      )}
       {step === 'sap' && (
         <SAPInputStep onParsed={(data) => { setPrefillSource('sap'); setPrefillData(data); setStep('form'); }} />
       )}
     </div>
+  );
+}
+
+function NLPInputStep({ onParsed }) {
+  const [text, setText] = useState('');
+  const [parsing, setParsing] = useState(false);
+
+  function parse() {
+    setParsing(true);
+    setTimeout(() => {
+      onParsed({
+        permitType: NLP_SAMPLE_PARSE.permitType,
+        equipment: NLP_SAMPLE_PARSE.equipment,
+        area: NLP_SAMPLE_PARSE.location,
+        date: NLP_SAMPLE_PARSE.date,
+        shift: NLP_SAMPLE_PARSE.shift
+      });
+    }, 1100);
+  }
+
+  return (
+    <Card className="p-4">
+      <div className="mb-2 text-sm font-bold text-nz-navy">Describe the job</div>
+      <textarea
+        rows={4}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="e.g. welding work on conveyor belt 7 in crushing plant tomorrow morning shift"
+        className="w-full rounded-lg border border-nz-border p-3 text-sm focus-ring"
+      />
+      <button
+        onClick={() => setText(NLP_SAMPLE_PARSE.inputText)}
+        className="mt-2 text-xs font-semibold text-nz-blue underline"
+      >
+        Use sample sentence
+      </button>
+      <Button variant="primary" className="mt-4 w-full" disabled={!text.trim() || parsing} onClick={parse}>
+        <Sparkles size={15} /> {parsing ? 'Parsing…' : 'Parse & Pre-fill Form'}
+      </Button>
+    </Card>
+  );
+}
+
+function OCRInputStep({ onParsed }) {
+  const [scanning, setScanning] = useState(false);
+  const [extracted, setExtracted] = useState(false);
+
+  function scan() {
+    setScanning(true);
+    setTimeout(() => {
+      setScanning(false);
+      setExtracted(true);
+    }, 1400);
+  }
+
+  function useExtracted() {
+    onParsed({
+      permitType: OCR_SAMPLE_EXTRACTION.permitType,
+      equipment: OCR_SAMPLE_EXTRACTION.equipment,
+      area: OCR_SAMPLE_EXTRACTION.location,
+      date: OCR_SAMPLE_EXTRACTION.date,
+      shift: OCR_SAMPLE_EXTRACTION.shift
+    });
+  }
+
+  return (
+    <Card className="p-4">
+      <div className="mb-3 text-sm font-bold text-nz-navy">Scan Legacy Permit</div>
+      <div className="flex h-40 items-center justify-center rounded-lg border-2 border-dashed border-nz-border bg-nz-surface">
+        {!extracted ? (
+          <button onClick={scan} disabled={scanning} className="flex flex-col items-center gap-2 text-slate-400">
+            <ScanLine size={28} className={scanning ? 'animate-pulseSoft text-nz-blue' : ''} />
+            <span className="text-xs font-semibold">{scanning ? 'Extracting fields…' : 'Tap to capture / upload photo'}</span>
+          </button>
+        ) : (
+          <div className="w-full px-4 text-xs text-slate-500">
+            <div className="mb-1 font-bold text-nz-navy">Extraction preview — {OCR_SAMPLE_EXTRACTION.sourceFile}</div>
+            <div>Confidence: <span className="font-semibold text-nz-green">{Math.round(OCR_SAMPLE_EXTRACTION.confidence * 100)}%</span></div>
+            <div>Equipment: {OCR_SAMPLE_EXTRACTION.equipment}</div>
+            <div>Location: {OCR_SAMPLE_EXTRACTION.location}</div>
+          </div>
+        )}
+      </div>
+      <Button variant="primary" className="mt-4 w-full" disabled={!extracted} onClick={useExtracted}>
+        <Sparkles size={15} /> Use Extracted Data — Pre-fill Form
+      </Button>
+    </Card>
   );
 }
 
