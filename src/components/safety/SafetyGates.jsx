@@ -16,7 +16,7 @@ export default function SafetyGates() {
   const pendingInspection = permits.filter((p) => p.status === 'pending-safety-inspection');
 
   return (
-    <div className="grid grid-cols-2 gap-6">
+    <div className="flex flex-col gap-6">
       <GateQueue
         icon={ShieldAlert}
         title="Pending Safety Review"
