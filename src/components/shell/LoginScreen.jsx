@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LogIn, AlertCircle } from 'lucide-react';
-import { USERS } from '../../data/usersData.js';
+import { USERS, FIXED_ROLES } from '../../data/usersData.js';
 import { ROLE_LABELS } from '../../data/navConfig.js';
 import { useApp } from '../../context/AppContext.jsx';
 import { DemoBadge, Button } from '../shared/Primitives.jsx';
@@ -100,13 +100,22 @@ export default function LoginScreen() {
                     <div className="text-sm font-semibold text-nz-navy">{u.name}</div>
                     <div className="text-[11px] text-slate-400">@{u.username}</div>
                   </div>
-                  <div className="flex flex-wrap justify-end gap-1">
-                    {u.roles.map((r, i) => (
-                      <span key={i} className="rounded-full bg-nz-blue-light px-2 py-0.5 text-[10px] font-semibold text-nz-blue-dark">
-                        {ROLE_LABELS[r.role]}{r.department ? ` · ${r.department}` : ''}
-                      </span>
-                    ))}
-                  </div>
+                  {/* Phase 9: only fixed, single-purpose roles (HOD, Safety
+                      Officer, Worker, Rescuer, First Aider, Super Admin) get
+                      a role badge here — general staff accounts always hold
+                      the same three tile-capabilities (Requester / Approver
+                      / Isolation Officer), so showing badges for them would
+                      just be noise. Their name is enough; the three tiles
+                      appear after they sign in (see RoleSelector.jsx). */}
+                  {u.roles.every((r) => FIXED_ROLES.includes(r.role)) && (
+                    <div className="flex flex-wrap justify-end gap-1">
+                      {u.roles.map((r, i) => (
+                        <span key={i} className="rounded-full bg-nz-blue-light px-2 py-0.5 text-[10px] font-semibold text-nz-blue-dark">
+                          {ROLE_LABELS[r.role]}{r.department ? ` · ${r.department}` : ''}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </button>
               ))}
             </div>

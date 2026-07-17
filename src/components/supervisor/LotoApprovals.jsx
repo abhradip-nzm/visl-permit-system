@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CheckCircle2, Lock, LockOpen, Plus, Trash2, ShieldAlert } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { isOwnPermit } from '../../utils/segregationOfDuties.js';
-import { LOTO_IDS, PERSONAL_LOCKS } from '../../data/ptwFormData.js';
+import { LOTO_IDS } from '../../data/ptwFormData.js';
 import { USERS } from '../../data/usersData.js';
 import { Card, SectionLabel, Button, StatusBadge } from '../shared/Primitives.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
@@ -41,7 +41,7 @@ function emptyForm(permit) {
 // (type, permit no, toolbox/personal locks, topics, LOTO ID, dept lock) is
 // entered here and here only.
 export default function LotoApprovals({ params }) {
-  const { permits, updatePermit, addTimelineEvent, pushToast, currentUser, currentDepartment, lockRegister, reserveLock } = useApp();
+  const { permits, updatePermit, addTimelineEvent, pushToast, currentUser, currentDepartment, lockRegister, reserveLock, personalLockRegister } = useApp();
   const pending = permits.filter((p) => p.isolationRequired && p.status === 'pending-isolation');
   const verified = permits.filter((p) => p.isolationRequired && p.isolationDetails?.[0]?.lotoIdNo);
   const [permitId, setPermitId] = useState(params?.id || pending[0]?.id);
@@ -55,8 +55,11 @@ export default function LotoApprovals({ params }) {
   const availableLocks = lockRegister.filter((l) => l.state === 'available' && (!currentDepartment || l.department === currentDepartment));
   const personnelRoster = USERS.filter((u) => u.status === 'active' && u.roles.some((r) => r.role === 'personnel'));
 
-  function updateRow(i, key, value) {
-    setForm((f) => ({ ...f, rows: f.rows.map((r, idx) => (idx === i ? { ...r, [key]: value } : r)) }));
+  // Phase 9: personal lock IDs are no longer freely picked — each person has
+  // exactly one, permanently associated with their account.
+  function selectRowName(i, name) {
+    const lock = personalLockRegister.find((l) => l.ownerName === name);
+    setForm((f) => ({ ...f, rows: f.rows.map((r, idx) => (idx === i ? { ...r, name, personalLockId: lock?.id || '' } : r)) }));
   }
 
   const blocked = isOwnPermit(permit, currentUser);
@@ -217,17 +220,16 @@ export default function LotoApprovals({ params }) {
                   <div className="grid grid-cols-2 gap-2">
                     <label className="block">
                       <span className="mb-1 block text-xs font-semibold text-slate-500">Name</span>
-                      <select value={r.name} onChange={(e) => updateRow(i, 'name', e.target.value)} className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring">
+                      <select value={r.name} onChange={(e) => selectRowName(i, e.target.value)} className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring">
                         <option value="">Select…</option>
                         {personnelRoster.map((u) => <option key={u.id} value={u.name}>{u.name}</option>)}
                       </select>
                     </label>
                     <label className="block">
                       <span className="mb-1 block text-xs font-semibold text-slate-500">Personal Lock ID</span>
-                      <select value={r.personalLockId} onChange={(e) => updateRow(i, 'personalLockId', e.target.value)} className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring">
-                        <option value="">Select…</option>
-                        {PERSONAL_LOCKS.map((id) => <option key={id}>{id}</option>)}
-                      </select>
+                      <div className="flex h-[38px] items-center rounded-lg border border-nz-border bg-nz-surface px-3 text-sm text-slate-500">
+                        {r.personalLockId || '— (select a name)'}
+                      </div>
                     </label>
                   </div>
                 </div>
@@ -273,6 +275,14 @@ function DeIsolationSection() {
   const pendingDeIsolation = permits.filter((p) => p.isolationRequired && p.status === 'pending-closure' && !p.deIsolation);
   const [comments, setComments] = useState({});
 
+  // Phase 9: proper group-lockout sequencing — every assigned Worker must
+  // remove their own personal lock before the Isolation Officer's master
+  // lock can come off (workers apply after the master lock, and must
+  // remove before it — see WorkerApp's job detail screen).
+  function stillLocked(p) {
+    return (p.workers || []).some((w) => w.applied);
+  }
+
   function confirm(p) {
     const lockId = p.isolationDetails?.[0]?.deptLockNo;
     const comment = comments[p.id]?.trim();
@@ -289,6 +299,7 @@ function DeIsolationSection() {
         <div className="divide-y divide-nz-border/60">
           {pendingDeIsolation.map((p) => {
             const blocked = isOwnPermit(p, currentUser);
+            const locked = stillLocked(p);
             return (
               <div key={p.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                 <div>
@@ -297,9 +308,16 @@ function DeIsolationSection() {
                     {blocked && <span className="ml-1.5 rounded-full bg-nz-red-light px-1.5 py-0.5 text-[10px] font-bold text-nz-red">YOURS</span>}
                   </div>
                   <div className="text-xs text-slate-400">Lock {p.isolationDetails?.[0]?.deptLockNo || '—'} · LOTO {p.isolationDetails?.[0]?.lotoIdNo || '—'}</div>
+                  {locked && (
+                    <div className="mt-1 text-[11px] font-semibold text-nz-amber">
+                      {(p.workers || []).filter((w) => w.applied).length} worker lock(s) still applied — must be removed first.
+                    </div>
+                  )}
                 </div>
                 {blocked ? (
                   <span className="text-xs italic text-nz-red">Blocked — your own permit</span>
+                ) : locked ? (
+                  <span className="text-xs italic text-nz-amber">Blocked — worker locks still on</span>
                 ) : (
                   <div className="flex items-center gap-2">
                     <input

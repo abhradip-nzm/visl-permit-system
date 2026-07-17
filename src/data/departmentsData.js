@@ -32,3 +32,11 @@ export function departmentsForTypes(types = []) {
   types.forEach((t) => (PERMIT_TYPE_DEPARTMENTS[t] || []).forEach((d) => set.add(d)));
   return [...set];
 }
+
+// Phase 9: HOD departmental clearance is no longer a universal gate — it now
+// only applies to Excavation-type permits or anything routed through the
+// Production department. Everything else skips clearance entirely and goes
+// straight from Declaration to Approval.
+export function needsClearance(types = []) {
+  return types.includes('Excavation') || departmentsForTypes(types).includes('Production');
+}

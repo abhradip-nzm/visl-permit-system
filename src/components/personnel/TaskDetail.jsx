@@ -116,14 +116,6 @@ function StatusAction({ navigate, permit, updatePermit, pushToast }) {
     );
   }
 
-  if (permit.status === 'pending-safety-review') {
-    return (
-      <Card className="mb-4 border-nz-amber/30 bg-nz-amber-light p-4">
-        <div className="text-sm font-semibold text-nz-amber">Awaiting Safety Officer review — you'll be notified once it's cleared for Departmental Clearance.</div>
-      </Card>
-    );
-  }
-
   if (permit.status === 'pending-isolation') {
     return (
       <Card className="mb-4 border-nz-amber/30 bg-nz-amber-light p-4">
@@ -136,18 +128,10 @@ function StatusAction({ navigate, permit, updatePermit, pushToast }) {
     return <ExecutionAction navigate={navigate} permit={permit} pushToast={pushToast} />;
   }
 
-  if (permit.status === 'pending-safety-inspection') {
-    return (
-      <Card className="mb-4 border-nz-orange/30 bg-nz-orange-light p-4 text-sm font-semibold text-nz-orange">
-        Closure submitted — awaiting Safety Officer inspection.
-      </Card>
-    );
-  }
-
   if (permit.status === 'pending-closure') {
     return (
       <Card className="mb-4 border-nz-orange/30 bg-nz-orange-light p-4 text-sm font-semibold text-nz-orange">
-        Safety Officer inspection complete — awaiting Approver's final closure verification.
+        Closure submitted — awaiting Approver's final closure verification.
       </Card>
     );
   }
@@ -239,11 +223,11 @@ function ExecutionAction({ navigate, permit, pushToast }) {
 }
 
 function ChatWithApprover() {
-  const [chat, setChat] = useState([{ from: 'hod', text: 'Please confirm equipment isolation before I sign.' }]);
+  const [chat, setChat] = useState([{ from: 'approver', text: 'Please confirm equipment isolation before I sign.' }]);
   const [msg, setMsg] = useState('');
   return (
     <Card className="mb-4 p-4">
-      <SectionLabel>Chat with HOD</SectionLabel>
+      <SectionLabel>Chat with Approver</SectionLabel>
       <div className="mb-3 max-h-40 space-y-2 overflow-y-auto">
         {chat.map((c, i) => (
           <div key={i} className={`flex ${c.from === 'me' ? 'justify-end' : 'justify-start'}`}>
@@ -255,7 +239,7 @@ function ChatWithApprover() {
         onSubmit={(e) => { e.preventDefault(); if (!msg.trim()) return; setChat((c) => [...c, { from: 'me', text: msg }]); setMsg(''); }}
         className="flex gap-2"
       >
-        <input value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Message the HOD…" className="flex-1 rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-xs focus-ring" />
+        <input value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Message the Approver…" className="flex-1 rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-xs focus-ring" />
         <button type="submit" className="flex h-9 w-9 items-center justify-center rounded-lg bg-nz-blue text-white"><Send size={14} /></button>
       </form>
     </Card>

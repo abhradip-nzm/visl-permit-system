@@ -1,10 +1,11 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 import { PTW_STEPS } from '../../data/ptwFormData.js';
+import { needsClearance } from '../../data/departmentsData.js';
 
 const STATUS_ORDER = [
-  'draft', 'pending-declaration', 'pending-safety-review', 'pending-clearance',
-  'pending-approval', 'pending-isolation', 'live', 'pending-safety-inspection', 'pending-closure', 'closed'
+  'draft', 'pending-declaration', 'pending-clearance',
+  'pending-approval', 'pending-isolation', 'live', 'pending-closure', 'closed'
 ];
 
 // Steps 6 (Job Execution) and 7 (Shift Transfer) both live under the "live"
@@ -15,7 +16,8 @@ export default function PTWStepper({ permit, currentStepKey = null, compact = fa
   if (!permit) return null;
   const isReturned = permit.status === 'returned';
   const skipIsolation = !permit.isolationRequired;
-  const steps = PTW_STEPS.filter((s) => !(s.key === 'isolation' && skipIsolation));
+  const skipClearance = !needsClearance(permit.types || [permit.type]);
+  const steps = PTW_STEPS.filter((s) => !(s.key === 'isolation' && skipIsolation) && !(s.key === 'clearance' && skipClearance));
 
   const statusIdx = isReturned ? 0 : STATUS_ORDER.indexOf(permit.status);
   const activeIdx = currentStepKey

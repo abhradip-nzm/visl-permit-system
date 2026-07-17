@@ -19,11 +19,11 @@ export const CONTRACTORS = ['N/A', 'L&T Construction', 'Voltas Ltd', 'Thermax En
 // used in seed data e.g. LOTO-014).
 export const LOTO_IDS = ['LOTO-011', 'LOTO-012', 'LOTO-013', 'LOTO-014', 'LOTO-015', 'LOTO-016'];
 
-// Personal (individual) locks used in group lockout toolbox records —
-// distinct from the departmental lock register, which tracks equipment
-// isolation locks with live uniqueness enforcement. Personal locks aren't
-// shared/contended so they don't need that same state tracking.
-export const PERSONAL_LOCKS = ['PL-001', 'PL-002', 'PL-003', 'PL-004', 'PL-005', 'PL-006', 'PL-011', 'PL-012'];
+// Phase 9: personal locks are no longer a free-pick list — every person has
+// exactly one personal LOTO key permanently associated with their account,
+// tracked live with the same uniqueness enforcement as the departmental
+// lock register. See personalLockRegisterData.js / AppContext's
+// reservePersonalLock / releasePersonalLock.
 
 // Section A — Type of Permit (multi-select)
 export const PERMIT_TYPES = [
@@ -37,11 +37,58 @@ export const PERMIT_TYPES = [
   'Project'
 ];
 
+// Phase 9: auto-check data for Sections C/D/F, keyed by Section A permit
+// type — selecting a type in Section A pre-selects (unions into) the
+// matching Tools/Hazards/PPE checkboxes below. The Requester can still
+// uncheck anything that doesn't apply; this only ever adds, never removes.
+export const AUTO_CHECK_BY_TYPE = {
+  'Cold/General': {
+    tools: ['Hand tools', 'Power tools', 'Other'],
+    hazards: ['Fall of Person', 'Crush/Cut Injury', 'Dust/Fumes', 'Less Illumination', 'Lone Working', 'Moving Vehicles', 'Unguarded opening'],
+    ppe: ['Safety helmet', 'Safety shoes', 'Safety goggles', 'Hand gloves', 'Dust Mask', 'Ear plug/Muff', 'First Aid Kit']
+  },
+  'Hot Work': {
+    tools: ['Gas cutter', 'Welding Machine', 'Grinding machine', 'Power tools', 'Hand tools'],
+    hazards: ['Fire Hazard', 'Hot Surface', 'High Temp.', 'Static Electricity', 'Toxic/Flammable gas', 'Dust/Fumes', 'Electric Shock', 'Excess Noise'],
+    ppe: ['Safety helmet', 'Safety shoes', 'Safety goggles', 'Face Shield', 'Leather gloves', 'Leather Apron', 'Fire Blanket', 'Fire Extinguishers', 'Ear plug/Muff', 'Full body Suit', 'First Aid Kit']
+  },
+  Excavation: {
+    tools: ['Excavator', 'JCB', 'Wheel Loader', 'Hand tools'],
+    hazards: ['Soil Collapse', 'Entrapment', 'Engulfment', 'Overhead line', 'Moving Vehicles', 'Fall of materials', 'Fall of Person', 'Dust/Fumes'],
+    ppe: ['Safety helmet', 'Safety shoes', 'Safety goggles', 'Hand gloves', 'Dust Mask', 'Ear plug/Muff', 'First Aid Kit']
+  },
+  'Isolation & Electrical': {
+    tools: ['Hand tools', 'Power tools', 'Other'],
+    hazards: ['Electric Shock', 'Static Electricity', 'Overhead line', 'Fire Hazard', 'Oil spill/splash', 'Entrapment'],
+    ppe: ['Safety helmet', 'Safety shoes', 'Arc flash suit', 'Electrical gloves', 'Face Shield', 'First Aid Kit']
+  },
+  'Crane & Lifting': {
+    tools: ['Crane/Hydra', 'Lifting tools', 'Man basket', 'Other'],
+    hazards: ['Fall of materials', 'Crush/Cut Injury', 'Overhead line', 'Moving Vehicles', 'Simultaneous operation', 'Pressurized hose/hydraulic failure', 'Fall of Person'],
+    ppe: ['Safety helmet', 'Safety shoes', 'Hand gloves', 'Safety goggles', 'Full Body harness', 'First Aid Kit']
+  },
+  'Height Work': {
+    tools: ['Scaffold', 'Ladder', 'Man basket', 'Hand tools', 'Power tools'],
+    hazards: ['Fall of Person', 'Fall of materials', 'Unguarded opening', 'Less Illumination', 'Moving Vehicles', 'Lone Working'],
+    ppe: ['Safety helmet', 'Safety shoes', 'Full Body harness', 'Fall Arrestors', 'Lifeline', 'Hand gloves', 'First Aid Kit']
+  },
+  'Confined Space': {
+    tools: ['Hand tools', 'Power tools', 'Other'],
+    hazards: ['Oxygen deficiency', 'Toxic/Flammable gas', 'Engulfment', 'Entrapment', 'Less Illumination', 'Lone Working', 'Steam', 'Static Electricity'],
+    ppe: ['Safety helmet', 'Safety shoes', 'Full Body harness', 'Lifeline', 'Dust Mask', 'Face Shield', 'First Aid Kit']
+  },
+  Project: {
+    tools: ['Hand tools', 'Power tools', 'Scaffold', 'Ladder', 'Pneumatic/hydraulic tools', 'Other'],
+    hazards: ['Fall of Person', 'Crush/Cut Injury', 'Dust/Fumes', 'Moving Vehicles', 'Fall of materials', 'Less Illumination', 'Lone Working', 'Simultaneous operation'],
+    ppe: ['Safety helmet', 'Safety shoes', 'Safety goggles', 'Hand gloves', 'Dust Mask', 'Ear plug/Muff', 'First Aid Kit']
+  }
+};
+
 // Section C — Tools & Equipment to be Used
 export const TOOLS_EQUIPMENT = [
   'Gas cutter', 'JCB', 'Man basket', 'Pneumatic/hydraulic tools', 'Hand tools',
   'Power tools', 'Excavator', 'Scaffold', 'Ladder', 'Grinding machine',
-  'Crane/Hydra', 'Lifting tools', 'Welding Machine', 'Wheel Loader'
+  'Crane/Hydra', 'Lifting tools', 'Welding Machine', 'Wheel Loader', 'Other'
 ];
 
 // Section D — Hazards Identified
@@ -161,22 +208,20 @@ export const PPE_FIRE_PROTECTION = [
 export { DEPARTMENTS } from './departmentsData.js';
 export const CLEARANCE_DEPARTMENTS = ['Mechanical', 'E&I', 'Production'];
 
-// Phase 7 flow re-architecture: Declaration moves before Clearance, the
-// Safety Officer becomes a formal two-touchpoint gate (Review before
-// Clearance, Inspection before Closure) instead of an observer-only role,
-// and Isolation moves to sit right before the permit goes Live — it still
-// fully blocks execution, it just happens later in the sequence than it
-// used to.
+// Phase 9 flow re-architecture: the Safety Officer is no longer a blocking
+// gate anywhere in the sequence (pure read-only Observer instead — see
+// SafetyOfficerApp.jsx). Departmental Clearance is now conditional — it only
+// appears in the sequence when needsClearance() says so (see
+// departmentsData.js) — the stepper filters this step out dynamically, same
+// pattern as the existing isolation-required filter.
 export const PTW_STEPS = [
   { key: 'request', num: 1, label: 'Request & Risk Assessment', status: 'draft' },
   { key: 'declaration', num: 2, label: 'Precautions & Declaration', status: 'pending-declaration' },
-  { key: 'safety-review', num: 3, label: 'Safety Officer Review', status: 'pending-safety-review' },
-  { key: 'clearance', num: 4, label: 'Departmental Clearance', status: 'pending-clearance' },
-  { key: 'approval', num: 5, label: 'Approval', status: 'pending-approval' },
-  { key: 'isolation', num: 6, label: 'Isolation Setup', status: 'pending-isolation' },
-  { key: 'execution', num: 7, label: 'Job Execution', status: 'live' },
-  { key: 'transfer', num: 8, label: 'Shift Transfer', status: 'live' },
-  { key: 'safety-inspection', num: 9, label: 'Safety Officer Inspection', status: 'pending-safety-inspection' },
-  { key: 'closure', num: 10, label: 'Closure', status: 'pending-closure' },
-  { key: 'closed', num: 11, label: 'Closed', status: 'closed' }
+  { key: 'clearance', num: 3, label: 'Departmental Clearance', status: 'pending-clearance' },
+  { key: 'approval', num: 4, label: 'Approval', status: 'pending-approval' },
+  { key: 'isolation', num: 5, label: 'Isolation Setup', status: 'pending-isolation' },
+  { key: 'execution', num: 6, label: 'Job Execution', status: 'live' },
+  { key: 'transfer', num: 7, label: 'Shift Transfer', status: 'live' },
+  { key: 'closure', num: 8, label: 'Closure', status: 'pending-closure' },
+  { key: 'closed', num: 9, label: 'Closed', status: 'closed' }
 ];

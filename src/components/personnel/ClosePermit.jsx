@@ -25,12 +25,12 @@ export default function ClosePermit({ navigate, params }) {
     const now = { name: currentUser.name, timestamp: 'Just now' };
     setSigned(now);
     updatePermit(permit.id, {
-      status: 'pending-safety-inspection',
+      status: 'pending-closure',
       closure: { ...permit.closure, requesterChecklist: checklist, toolboxTalkRefNo: tbtRef, requesterSigned: now, requesterDate: 'Today', requesterTime: 'Just now' }
     });
     addTimelineEvent(permit.id, 'Job Execution completed', currentUser.name);
-    addTimelineEvent(permit.id, 'Closure submitted — awaiting Safety Officer inspection', currentUser.name);
-    pushToast(`${permit.id} closure submitted for Safety Officer inspection`);
+    addTimelineEvent(permit.id, 'Closure submitted — awaiting Approver verification', currentUser.name);
+    pushToast(`${permit.id} closure submitted for Approver verification`);
     setTimeout(() => navigate('mytasks'), 900);
   }
 
@@ -55,6 +55,9 @@ export default function ClosePermit({ navigate, params }) {
 
       <Card className="mb-4 p-4">
         <SectionLabel>Toolbox Talk Reference No</SectionLabel>
+        {permit.closure?.toolboxTalkRefNo && (
+          <p className="mb-2 text-xs text-slate-400">Carried over from the Toolbox Talk Attendance Record — edit if a different reference applies.</p>
+        )}
         <input value={tbtRef} onChange={(e) => setTbtRef(e.target.value)} placeholder="e.g. TBT-0562" className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white" />
       </Card>
 
@@ -66,7 +69,7 @@ export default function ClosePermit({ navigate, params }) {
       </Card>
 
       <Button variant="orange" size="lg" className="w-full" disabled={!allChecked || !tbtRef.trim() || !!signed} onClick={submit}>
-        {signed ? <><CheckCircle2 size={16} /> Submitted</> : 'Submit Closure for Safety Officer Inspection →'}
+        {signed ? <><CheckCircle2 size={16} /> Submitted</> : 'Submit Closure for Approver Verification →'}
       </Button>
       {!allChecked && <div className="mt-2 text-center text-xs text-slate-400">Complete the checklist above to submit.</div>}
     </div>

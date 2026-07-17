@@ -3,8 +3,9 @@ import AppShell from '../shell/AppShell.jsx';
 import ShiftDashboard from './ShiftDashboard.jsx';
 import MaintenanceRequests from './MaintenanceRequests.jsx';
 import LotoApprovals from './LotoApprovals.jsx';
+import ShiftCalendar from '../shared/ShiftCalendar.jsx';
 
-const TITLES = { dashboard: 'Shift Dashboard', maintenance: 'Maintenance Requests', lotoapprovals: 'LOTO Approvals' };
+const TITLES = { dashboard: 'Shift Dashboard', maintenance: 'Maintenance Requests', lotoapprovals: 'LOTO Approvals', shiftcalendar: 'Shift Calendar' };
 
 export default function SupervisorApp() {
   function renderScreen(screen, navigate, params) {
@@ -13,6 +14,8 @@ export default function SupervisorApp() {
         return <MaintenanceRequests />;
       case 'lotoapprovals':
         return <LotoApprovals params={params} />;
+      case 'shiftcalendar':
+        return <ShiftCalendar scopeLabel="Your Department" />;
       default:
         return <ShiftDashboard navigate={navigate} />;
     }

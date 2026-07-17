@@ -11,6 +11,7 @@ import ClosePermit from './ClosePermit.jsx';
 import LotoTaskList from './LotoTaskList.jsx';
 import LotoExecution from './LotoExecution.jsx';
 import Inventory from './Inventory.jsx';
+import ShiftCalendar from '../shared/ShiftCalendar.jsx';
 import Profile from '../shared/Profile.jsx';
 
 const TITLES = {
@@ -25,6 +26,7 @@ const TITLES = {
   loto: 'LOTO',
   execution: 'LOTO Execution',
   inventory: 'Inventory',
+  shiftcalendar: 'Shift Calendar',
   profile: 'Profile'
 };
 
@@ -51,6 +53,8 @@ export default function PersonnelApp() {
         return <LotoExecution navigate={navigate} params={params} />;
       case 'inventory':
         return <Inventory navigate={navigate} />;
+      case 'shiftcalendar':
+        return <ShiftCalendar scopeLabel="Your Shift" />;
       case 'profile':
         return <Profile />;
       default:

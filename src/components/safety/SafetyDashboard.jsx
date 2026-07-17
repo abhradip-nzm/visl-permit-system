@@ -1,105 +1,72 @@
 import React from 'react';
-import { ChevronRight, ShieldAlert, AlertTriangle, MapPin, Send, ClipboardCheck } from 'lucide-react';
+import { ChevronRight, ShieldAlert, AlertTriangle, Eye } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { PERSONNEL } from '../../data/mockData.js';
-import { TASKS } from '../../data/tasksData.js';
 import { Card, StatusBadge, RiskBadge } from '../shared/Primitives.jsx';
-import WorkflowStrip from '../shared/WorkflowStrip.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
 
-const PIN_TONE = { 'on track': 'bg-nz-green', attention: 'bg-nz-amber', overdue: 'bg-nz-red' };
-
+// Phase 9: the Safety Officer is a pure observer — this dashboard is a
+// read-only portfolio view of every permit in the system and its current
+// lifecycle stage, plus any open flags/warnings. No gates, no queues to
+// action, nothing to approve. Clicking through opens the same lifecycle
+// detail a Requester sees on their own permit (see MonitorPermitDetail.jsx).
 export default function SafetyDashboard({ navigate }) {
   const { permits } = useApp();
   const expiredPersonnel = PERSONNEL.filter((p) => p.certifications.some((c) => c.status === 'expired'));
   const flags = permits.filter((p) => p.warnings?.length > 0);
-  const pendingGates = permits.filter((p) => p.status === 'pending-safety-review' || p.status === 'pending-safety-inspection');
-  const geoTasks = TASKS.filter((t) => t.status !== 'Completed').map((t) => ({
-    ...t,
-    pin: t.status === 'Overdue' ? 'overdue' : t.status === 'Pending' ? 'attention' : 'on track'
-  }));
 
   return (
-    <div className="px-4 py-4">
-      <div className="mb-4 overflow-x-auto">
-        <WorkflowStrip activeRole="safety" />
+    <div>
+      <div className="mb-4 flex items-center gap-1.5 rounded-lg bg-nz-blue-light px-3 py-2 text-xs font-semibold text-nz-blue-dark">
+        <Eye size={13} /> Read-only observer — you can view every permit's live status and history, but cannot action any of them.
       </div>
 
-      <div className="mb-4 grid grid-cols-2 gap-3">
-        <Stat label="Pending Gates" value={pendingGates.length} icon={ClipboardCheck} tone="amber" />
+      <div className="mb-4 grid grid-cols-3 gap-4">
+        <Stat label="Total Permits" value={permits.length} icon={Eye} tone="navy" />
         <Stat label="Open Flags" value={flags.length} icon={AlertTriangle} tone="amber" />
         <Stat label="High-Risk" value={permits.filter((p) => p.risk === 'high').length} icon={ShieldAlert} tone="red" />
-        <Stat label="Expired Certs" value={expiredPersonnel.length} icon={AlertTriangle} tone="red" />
       </div>
 
-      {pendingGates.length > 0 && (
-        <button
-          onClick={() => navigate('gates')}
-          className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl2 bg-nz-blue py-3 text-sm font-bold text-white shadow-card"
-        >
-          <ClipboardCheck size={15} /> {pendingGates.length} Permit{pendingGates.length === 1 ? '' : 's'} Awaiting Safety Gate
-        </button>
+      {flags.length > 0 && (
+        <>
+          <div className="mb-2 text-sm font-bold text-nz-navy">Open Flags</div>
+          <Card className="mb-6">
+            <div className="divide-y divide-nz-border/60">
+              {flags.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => navigate('monitor', { id: p.id })}
+                  className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left hover:bg-nz-surface"
+                >
+                  <div>
+                    <span className="font-bold text-nz-navy">{p.id}</span>
+                    <div className="text-xs text-slate-500">{p.warnings[0].text}</div>
+                  </div>
+                  <RiskBadge risk={p.risk} />
+                </button>
+              ))}
+            </div>
+          </Card>
+        </>
       )}
 
-      <button
-        onClick={() => navigate('reporting')}
-        className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl2 bg-nz-orange py-3 text-sm font-bold text-white shadow-card"
-      >
-        <Send size={15} /> Reporting, Alerts & Complaints
-      </button>
-
-      <Card className="mb-4 p-3">
-        <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase text-slate-400"><MapPin size={12} /> Active Tasks with Geo</div>
-        <div className="mb-2 flex h-24 items-center justify-center rounded-lg bg-nz-surface text-xs text-slate-400">Map placeholder</div>
-        <div className="space-y-1.5">
-          {geoTasks.slice(0, 4).map((t) => (
-            <div key={t.id} className="flex items-center justify-between rounded-lg border border-nz-border px-3 py-2 text-xs">
-              <div>
-                <div className="font-semibold text-nz-navy">{t.id} — {t.equipment}</div>
-                <div className="text-slate-400">{t.department}</div>
-              </div>
-              <span className={`h-2.5 w-2.5 rounded-full ${PIN_TONE[t.pin]}`} />
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      <Card className="mb-4 p-3">
-        <div className="mb-2 text-xs font-bold uppercase text-slate-400">Open Flags</div>
-        <div className="space-y-2">
-          {flags.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => navigate('monitor', { id: p.id })}
-              className="flex w-full items-start justify-between gap-2 rounded-lg border border-nz-border px-3 py-2.5 text-left"
-            >
-              <div>
-                <span className="font-bold text-nz-navy">{p.id}</span>
-                <div className="text-xs text-slate-500">{p.warnings[0].text}</div>
-              </div>
-              <RiskBadge risk={p.risk} />
-            </button>
-          ))}
-          {flags.length === 0 && <div className="py-4 text-center text-xs text-slate-400">No open flags right now.</div>}
-        </div>
-      </Card>
-
-      <Card className="mb-4 p-3">
-        <div className="mb-2 text-xs font-bold uppercase text-slate-400">All Permits — Portfolio View</div>
-        <div className="space-y-2">
+      <div className="mb-2 text-sm font-bold text-nz-navy">All Permits — Portfolio View</div>
+      <Card className="mb-6">
+        <div className="divide-y divide-nz-border/60">
           {permits.map((p) => (
             <button
               key={p.id}
               onClick={() => navigate('monitor', { id: p.id })}
-              className="flex w-full flex-col gap-1.5 rounded-lg border border-nz-border px-3 py-2.5 text-left"
+              className="flex w-full flex-col gap-1.5 px-4 py-3 text-left hover:bg-nz-surface"
             >
               <div className="flex w-full items-center justify-between">
                 <div>
-                  <div className="font-bold text-nz-navy">{p.id}</div>
-                  <div className="text-xs text-slate-400">{(p.types || [p.type]).join(', ')} · {p.location}</div>
+                  <div className="font-bold text-nz-navy">{p.id} — {p.equipment}</div>
+                  <div className="text-xs text-slate-400">{(p.types || [p.type]).join(', ')} · {p.location} · {p.requester}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <RiskBadge risk={p.risk} />
+                  <StatusBadge status={p.status} />
                   <ChevronRight size={14} className="text-slate-300" />
                 </div>
               </div>
@@ -109,8 +76,8 @@ export default function SafetyDashboard({ navigate }) {
         </div>
       </Card>
 
+      <div className="mb-2 text-sm font-bold text-nz-navy">Certification Expiry Heat-strip</div>
       <Card className="p-3">
-        <div className="mb-2 text-xs font-bold uppercase text-slate-400">Certification Expiry Heat-strip</div>
         <div className="flex flex-wrap gap-1.5">
           {PERSONNEL.map((p) =>
             p.certifications.map((c) => (
@@ -127,6 +94,9 @@ export default function SafetyDashboard({ navigate }) {
             ))
           )}
         </div>
+        {expiredPersonnel.length > 0 && (
+          <div className="mt-2 text-xs text-slate-400">{expiredPersonnel.length} personnel with expired certifications.</div>
+        )}
       </Card>
     </div>
   );
@@ -135,12 +105,12 @@ export default function SafetyDashboard({ navigate }) {
 function Stat({ label, value, icon: Icon, tone }) {
   const tones = { amber: 'text-nz-amber', red: 'text-nz-red', navy: 'text-nz-navy' };
   return (
-    <Card className="p-3">
+    <Card className="p-4">
       <div className="flex items-center justify-between">
-        <div className="text-[10px] font-semibold uppercase text-slate-400">{label}</div>
-        <Icon size={13} className={tones[tone]} />
+        <div className="text-xs font-semibold uppercase text-slate-400">{label}</div>
+        <Icon size={14} className={tones[tone]} />
       </div>
-      <div className={`mt-1 text-2xl font-extrabold ${tones[tone]}`}>{value}</div>
+      <div className={`mt-1 text-3xl font-extrabold ${tones[tone]}`}>{value}</div>
     </Card>
   );
 }

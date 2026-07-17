@@ -5,13 +5,13 @@ import { StatusBadge } from '../shared/Primitives.jsx';
 import WorkflowStrip from '../shared/WorkflowStrip.jsx';
 
 const STATUS_TABS = [
-  'All', 'Draft', 'Pending Declaration', 'Pending Safety Review', 'Pending Clearance', 'Pending Approval',
-  'Pending Isolation', 'Live', 'Pending Safety Inspection', 'Pending Closure', 'Closed', 'Returned'
+  'All', 'Draft', 'Pending Declaration', 'Pending Clearance', 'Pending Approval',
+  'Pending Isolation', 'Live', 'Pending Closure', 'Closed', 'Returned'
 ];
 const STATUS_TAB_MAP = {
-  draft: 'Draft', 'pending-declaration': 'Pending Declaration', 'pending-safety-review': 'Pending Safety Review',
+  draft: 'Draft', 'pending-declaration': 'Pending Declaration',
   'pending-clearance': 'Pending Clearance', 'pending-approval': 'Pending Approval', 'pending-isolation': 'Pending Isolation',
-  live: 'Live', 'pending-safety-inspection': 'Pending Safety Inspection', 'pending-closure': 'Pending Closure',
+  live: 'Live', 'pending-closure': 'Pending Closure',
   closed: 'Closed', returned: 'Returned'
 };
 const ACTION_STATUSES = ['draft', 'pending-declaration', 'live', 'returned'];

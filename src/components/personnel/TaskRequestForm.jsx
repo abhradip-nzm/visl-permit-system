@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, CheckCircle2, AlertTriangle, Plus, Trash2, X } from 'lucide-react';
 import { EQUIPMENT, SHIFT_ROSTER, emptyDeptClearances, emptyClosure } from '../../data/mockData.js';
-import { PERMIT_TYPES, TOOLS_EQUIPMENT, HAZARDS_IDENTIFIED, RISK_CONTROL_GROUPS, PPE_FIRE_PROTECTION, PLANT_AREAS, WI_NUMBERS, CONTRACTORS } from '../../data/ptwFormData.js';
+import { PERMIT_TYPES, TOOLS_EQUIPMENT, HAZARDS_IDENTIFIED, RISK_CONTROL_GROUPS, PPE_FIRE_PROTECTION, PLANT_AREAS, WI_NUMBERS, CONTRACTORS, AUTO_CHECK_BY_TYPE } from '../../data/ptwFormData.js';
 import { DEPARTMENTS, departmentsForTypes } from '../../data/departmentsData.js';
 import { USERS } from '../../data/usersData.js';
 import { Button, Card, SectionLabel } from '../shared/Primitives.jsx';
@@ -26,6 +26,12 @@ const HIGH_RISK_TYPES = ['Height Work', 'Confined Space', 'Crane & Lifting', 'Ex
 
 function toggleItem(list, item) {
   return list.includes(item) ? list.filter((i) => i !== item) : [...list, item];
+}
+
+function unionAutoCheck(prev, types, field) {
+  const additions = types.flatMap((t) => AUTO_CHECK_BY_TYPE[t]?.[field] || []);
+  const merged = new Set([...prev, ...additions]);
+  return [...merged];
 }
 
 export default function TaskRequestForm({ source, prefillData, navigate, onBack }) {
@@ -63,19 +69,21 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
   const isolationRequired = types.includes('Isolation & Electrical');
   const certifiedRoster = SHIFT_ROSTER.filter((p) => p.certified);
 
-  // H-3: dynamic assignee selection — the Approver list is derived live from
-  // USERS' role-capability grants (Super Admin manages that list in User
-  // Management), not a hardcoded roster, and always excludes the requester
-  // themselves (ties into the C-5 self-approval guard). Naming an Approver
-  // is now mandatory (a required point of contact) but is not an exclusive
-  // assignment — routing still lands in the department's shared clearance
-  // queue for any qualified Approver, matching how Approver dashboards
-  // already work (C-4).
+  // H-3 / Phase 9: dynamic assignee selection — every general staff account
+  // can act as Requester, Approver, and Isolation Officer (see
+  // usersData.js), so the candidate list is every active general staff
+  // member, not narrowed by department. The only exclusion is segregation
+  // of duty: whoever performed the last step on this permit — at creation
+  // time that's just the Requester raising it (ties into the C-5 self-
+  // approval guard). Naming an Approver/Isolation Officer here is a
+  // required point of contact, not an exclusive assignment — routing still
+  // lands in the department's shared clearance queue for any qualified
+  // Approver, matching how Approver dashboards already work (C-4).
   const availableApprovers = USERS.filter(
-    (u) => u.status === 'active' && u.name !== currentUser.name && u.roles.some((r) => r.role === 'hod' && r.department === jobDetails.ownerDepartment)
+    (u) => u.status === 'active' && u.name !== currentUser.name && u.roles.some((r) => r.role === 'approver')
   );
   const availableIsolationOfficers = USERS.filter(
-    (u) => u.status === 'active' && u.name !== currentUser.name && u.roles.some((r) => r.role === 'supervisor' && r.department === jobDetails.ownerDepartment)
+    (u) => u.status === 'active' && u.name !== currentUser.name && u.roles.some((r) => r.role === 'supervisor')
   );
 
   function updateJobDetail(key, value) {
@@ -95,6 +103,17 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
     hazardJustification: hazardsIdentified.length > 0 && !hazardJustification.trim()
   };
   const sectionsComplete = !Object.values(missingFields).some(Boolean);
+
+  // Phase 9: selecting a permit type in Section A auto-selects the matching
+  // Tools/Hazards/PPE checkboxes below (per-type master data in
+  // AUTO_CHECK_BY_TYPE) — this only adds, it never unchecks something the
+  // Requester (or a previously-selected type) already checked.
+  useEffect(() => {
+    setToolsEquipment((prev) => unionAutoCheck(prev, types, 'tools'));
+    setHazardsIdentified((prev) => unionAutoCheck(prev, types, 'hazards'));
+    setPpeFireProtection((prev) => unionAutoCheck(prev, types, 'ppe'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [types]);
 
   function tryContinue() {
     setAttemptedSubmit(true);
@@ -124,10 +143,9 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
           departmentsForTypes(types)
         ),
         isolationRequired, isolationDetails: isolationRequired ? [{ equipment: jobDetails.location, typeOfIsolation: '', isolationPermitNo: '', isolationOfficerName: '', lotoIdNo: '', deptLockNo: '' }] : [],
-        toolboxRecord: [], isolationTopicsCovered: '',
+        toolboxRecord: [], workers: [], tbtRecord: null, isolationTopicsCovered: '',
         additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
         approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
-        safetyOfficer: '', safetyReview: null, safetyInspection: null,
         criticalLift: types.includes('Crane & Lifting') ? {} : null,
         confinedSpaceMonitoring: types.includes('Confined Space') ? { gasMonitorSlNo: '', calibrationValid: false, confinedSpaceId: '', standbyPerson: rescue.rescuers.filter(Boolean).join(', '), rescuers: rescue.rescuers.filter(Boolean).join(', '), gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' } : null,
         transfers: [], closure: emptyClosure(),
@@ -289,6 +307,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
       {/* Section C */}
       <Card className="mb-3 p-4">
         <SectionLabel>C. Tools & Equipment to be Used</SectionLabel>
+        <p className="mb-2 text-xs text-slate-400">Pre-selected based on the permit type(s) chosen in Section A — uncheck anything that doesn't apply.</p>
         <CheckboxGrid items={TOOLS_EQUIPMENT} selected={toolsEquipment} onToggle={(t) => setToolsEquipment((prev) => toggleItem(prev, t))} />
         <label className="mt-2 block">
           <span className="mb-1 block text-xs font-semibold text-slate-500">Other (specify)</span>
@@ -299,6 +318,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
       {/* Section D */}
       <Card className="mb-3 p-4">
         <SectionLabel>D. Hazards Identified</SectionLabel>
+        <p className="mb-2 text-xs text-slate-400">Pre-selected based on the permit type(s) chosen in Section A — uncheck anything that doesn't apply.</p>
         <CheckboxGrid items={HAZARDS_IDENTIFIED} selected={hazardsIdentified} onToggle={(h) => setHazardsIdentified((prev) => toggleItem(prev, h))} />
         {hazardsIdentified.length > 0 && (
           <label className="mt-3 block">
@@ -407,6 +427,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
       {/* Section F */}
       <Card className={`mb-4 p-4 ${attemptedSubmit && missingFields.ppeFireProtection ? 'border border-nz-red' : ''}`}>
         <SectionLabel>F. PPE & Fire Protection {attemptedSubmit && missingFields.ppeFireProtection && <span className="text-nz-red">*</span>}</SectionLabel>
+        <p className="mb-2 text-xs text-slate-400">Pre-selected based on the permit type(s) chosen in Section A — uncheck anything that doesn't apply.</p>
         <CheckboxGrid items={PPE_FIRE_PROTECTION} selected={ppeFireProtection} onToggle={(p) => setPpeFireProtection((prev) => toggleItem(prev, p))} columns={3} />
       </Card>
 

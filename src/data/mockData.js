@@ -136,13 +136,12 @@ export const PERMITS = [
     hazardsIdentified: ['Oxygen deficiency', 'Toxic/Flammable gas', 'Engulfment', 'Less Illumination'],
     riskControlMeasures: ['Portable Gas monitor calibrated', 'Respirator/SCBA available', 'Authorized gas tester available', 'Standby person name ___', 'Use of 24V lamp and confined space', 'Ventilation'],
     ppeFireProtection: ['Safety helmet', 'Full Body harness', 'Safety goggles', 'First Aid Kit'],
-    rescue: { rescuers: ['R. Das'], firstAiders: ['M. Khan'], procedureAvailable: true, intimationProvided: true },
+    rescue: { rescuers: ['R. Nair'], firstAiders: ['S. Pillai'], procedureAvailable: true, intimationProvided: true },
     deptClearances: emptyDeptClearances(), isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
     additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
     approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
-    safetyOfficer: '', safetyReview: null, safetyInspection: null,
     criticalLift: null,
-    confinedSpaceMonitoring: { gasMonitorSlNo: 'GM-2091', calibrationValid: true, confinedSpaceId: 'CS-TF-05', standbyPerson: 'M. Khan', rescuers: 'R. Das', gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' },
+    confinedSpaceMonitoring: { gasMonitorSlNo: 'GM-2091', calibrationValid: true, confinedSpaceId: 'CS-TF-05', standbyPerson: 'S. Pillai', rescuers: 'R. Nair', gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' },
     transfers: [], closure: emptyClosure(),
     checklist: [{ id: 1, label: 'Atmosphere test', done: false }],
     timeline: [
@@ -175,10 +174,10 @@ export const PERMITS = [
       { equipment: 'MCC-3 Drive Panel', typeOfIsolation: 'Electrical', isolationPermitNo: '', isolationOfficerName: '', lotoIdNo: '', deptLockNo: '' }
     ],
     toolboxRecord: [{ name: 'S. Iyer', company: 'Vedanta', personalLockId: '', signed: false }],
+    workers: [{ name: 'K. Reddy', personalLockId: 'PL-016', applied: false, appliedAt: null }],
     isolationTopicsCovered: '',
     additionalPrecautions: '', declaration: { requestorName: 'S. Iyer', date: '05 Jul', time: '07:45', toolboxTalkConfirmed: true, signed: { name: 'S. Iyer', timestamp: '05 Jul, 07:45' } },
     approval: { approverName: 'D. Fernandes', date: '05 Jul', time: '08:20', onGroundVerified: true, signed: { name: 'D. Fernandes', timestamp: '05 Jul, 08:20' }, rejectionReason: '' },
-    safetyOfficer: 'T. Roy', safetyReview: { comment: 'Reviewed — controls adequate for electrical isolation work.', by: 'T. Roy', at: '05 Jul, 08:00' }, safetyInspection: null,
     criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
     checklist: [{ id: 1, label: 'Voltage test to zero', done: false }],
     timeline: [
@@ -192,7 +191,7 @@ export const PERMITS = [
   },
   {
     id: 'WP-1044', types: ['Confined Space', 'Isolation & Electrical'], type: 'Confined Space', equipment: 'Hydraulic Accumulator H-9', location: 'Crushing Plant',
-    area: 'Crushing Plant', shift: 'Morning', requester: 'A. Chatterjee', requestor: 'A. Chatterjee', status: 'pending-safety-review', createdAt: '2026-07-05',
+    area: 'Crushing Plant', shift: 'Morning', requester: 'A. Chatterjee', requestor: 'A. Chatterjee', status: 'pending-clearance', createdAt: '2026-07-05',
     dateFrom: '2026-07-06', dateTill: '2026-07-06', fromTime: '06:00', toTime: '14:00',
     jobDescription: 'Internal inspection of hydraulic accumulator after isolation.', wiNo: 'WI-4111', ownerDepartment: 'Mechanical', contractor: '',
     hazards: HAZARD_CONTROL_LIBRARY['Confined Space'].hazards, ppe: HAZARD_CONTROL_LIBRARY['Confined Space'].ppe,
@@ -215,11 +214,11 @@ export const PERMITS = [
     isolationDetails: [
       { equipment: 'Hydraulic Accumulator H-9', typeOfIsolation: 'Mechanical', isolationPermitNo: 'ISO-0231', isolationOfficerName: 'J. Mehta', lotoIdNo: 'LOTO-014', deptLockNo: 'LK-198' }
     ],
-    toolboxRecord: [{ name: 'A. Chatterjee', company: 'Vedanta', personalLockId: 'PL-011', signed: true }],
+    toolboxRecord: [{ name: 'A. Chatterjee', company: 'Vedanta', personalLockId: 'PL-005', signed: true }],
+    workers: [{ name: 'B. Naik', personalLockId: 'PL-017', applied: false, appliedAt: null }],
     isolationTopicsCovered: 'Reviewed hydraulic bleed-down sequence and lock/tag placement with crew before entry.',
     additionalPrecautions: '', declaration: { requestorName: 'A. Chatterjee', date: '05 Jul', time: '15:20', toolboxTalkConfirmed: true, signed: { name: 'A. Chatterjee', timestamp: '05 Jul, 15:20' } },
     approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
-    safetyOfficer: 'T. Roy', safetyReview: null, safetyInspection: null,
     criticalLift: null,
     confinedSpaceMonitoring: { gasMonitorSlNo: 'GM-2077', calibrationValid: true, confinedSpaceId: 'CS-CP-09', standbyPerson: 'P. Rao', rescuers: 'A. Singh', gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' },
     lotoRequired: true, lotoStatus: 'complete', lotoAssignee: 'J. Mehta',
@@ -228,7 +227,7 @@ export const PERMITS = [
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '05 Jul, 14:00', by: 'A. Chatterjee' },
       { stage: 'Precautions & Declaration signed', at: '05 Jul, 15:20', by: 'A. Chatterjee' },
-      { stage: 'Awaiting Safety Officer Review', at: '05 Jul, 15:21', by: 'System' }
+      { stage: 'Awaiting Departmental Clearance', at: '05 Jul, 15:21', by: 'System' }
     ]
   },
   {
@@ -307,7 +306,7 @@ export const PERMITS = [
   },
   {
     id: 'WP-1019', types: ['Cold/General'], type: 'Mechanical', equipment: 'Storage Tank T-5', location: 'Tank Farm',
-    area: 'Tank Farm', shift: 'Morning', requester: 'K. Verma', requestor: 'K. Verma', status: 'pending-safety-inspection', createdAt: '2026-06-28',
+    area: 'Tank Farm', shift: 'Morning', requester: 'K. Verma', requestor: 'K. Verma', status: 'pending-closure', createdAt: '2026-06-28',
     dateFrom: '2026-06-28', dateTill: '2026-07-05', fromTime: '08:00', toTime: '16:00',
     jobDescription: 'Tank exterior recoating and housekeeping.', wiNo: 'WI-3902', ownerDepartment: 'Mechanical', contractor: '',
     hazards: HAZARD_CONTROL_LIBRARY.Mechanical.hazards, ppe: HAZARD_CONTROL_LIBRARY.Mechanical.ppe,
@@ -326,7 +325,6 @@ export const PERMITS = [
     additionalPrecautions: '',
     declaration: { requestorName: 'K. Verma', date: '28 Jun', time: '08:10', toolboxTalkConfirmed: true, signed: { name: 'K. Verma', timestamp: '28 Jun, 08:10' } },
     approval: { approverName: 'D. Fernandes', date: '28 Jun', time: '09:40', onGroundVerified: true, signed: { name: 'D. Fernandes', timestamp: '28 Jun, 09:40' }, rejectionReason: '' },
-    safetyOfficer: 'T. Roy', safetyReview: { comment: 'Cleared — routine recoating work.', by: 'T. Roy', at: '28 Jun, 08:15' }, safetyInspection: null,
     criticalLift: null, confinedSpaceMonitoring: null, transfers: [],
     closure: emptyClosure({
       requesterChecklist: { controlsBack: true, interlocksRestored: true, guardsInPlace: true, permitsSurrendered: true },
@@ -343,7 +341,7 @@ export const PERMITS = [
       { stage: 'Departmental Clearance granted', at: '28 Jun, 08:30', by: 'D. Fernandes (Approver)' },
       { stage: 'Approved — Permit is LIVE', at: '28 Jun, 09:40', by: 'D. Fernandes (Approver)' },
       { stage: 'Job Execution completed', at: '05 Jul, 15:45', by: 'K. Verma' },
-      { stage: 'Closure submitted — awaiting Safety Officer inspection', at: '05 Jul, 16:00', by: 'K. Verma' }
+      { stage: 'Closure submitted — awaiting Approver verification', at: '05 Jul, 16:00', by: 'K. Verma' }
     ]
   },
   {
@@ -416,10 +414,13 @@ export const NOTIFICATIONS = {
     { id: 3, text: 'New announcement scheduled: Plant shutdown 15 Jul.', time: '1d ago', unread: false }
   ],
   hod: [
+    { id: 1, text: 'WP-1044 awaiting Departmental Clearance.', time: '20m ago', unread: true },
+    { id: 2, text: 'WP-1037 aging beyond 24h SLA.', time: '1h ago', unread: true }
+  ],
+  approver: [
     { id: 1, text: 'WP-1042 re-submitted with corrections.', time: '5m ago', unread: true },
-    { id: 2, text: 'WP-1037 aging beyond 24h SLA.', time: '1h ago', unread: true },
-    { id: 3, text: 'WP-1031 and WP-1028 ready to issue.', time: '2h ago', unread: false },
-    { id: 4, text: 'Compliance renewal request from R. Das.', time: '3h ago', unread: false }
+    { id: 2, text: 'WP-1031 and WP-1028 ready to issue.', time: '2h ago', unread: false },
+    { id: 3, text: 'Compliance renewal request from R. Das.', time: '3h ago', unread: false }
   ],
   safety: [
     { id: 1, text: 'Critical flag: LOTO not applied on WP-1044.', time: '20m ago', unread: true },
@@ -456,21 +457,27 @@ export const NLP_SAMPLE_PARSE = {
   shift: 'Morning'
 };
 
-// Phase 0 role model — label/description match ROLE_LABELS in navConfig.js
-// (internal keys unchanged; see usersData.js header comment for why).
+// Phase 9 role model — label/description match ROLE_LABELS in navConfig.js
+// (internal keys unchanged; see usersData.js header comment for why). HOD
+// and Approver are now two separate roles; Worker, Rescuer, and First Aider
+// are new fixed roles. No role runs on the mobile shell anymore.
 export const ROLES = [
   { key: 'useradmin', label: 'Super Admin', platform: 'web', description: 'Back-office: users, RBAC, lock register & departments', icon: 'ShieldCheck' },
-  { key: 'hod', label: 'Approver', platform: 'web', description: 'Departmental clearance & final on-ground approval', icon: 'Stamp' },
-  { key: 'safety', label: 'Safety Officer', platform: 'mobile', description: 'On-ground approval, live monitoring & closure verification', icon: 'Eye' },
+  { key: 'hod', label: 'HOD', platform: 'web', description: 'Departmental clearance for Excavation and Production permits', icon: 'Stamp' },
+  { key: 'approver', label: 'Approver', platform: 'web', description: 'On-ground verification & final closure', icon: 'CheckSquare' },
+  { key: 'safety', label: 'Safety Officer', platform: 'web', description: 'Read-only observer — every permit, every stage, no gates', icon: 'Eye' },
   { key: 'supervisor', label: 'Isolation Officer', platform: 'web', description: 'Independently isolates equipment & manages the lock register', icon: 'Users' },
-  { key: 'personnel', label: 'Requester', platform: 'mobile', description: 'Raises permits, runs risk assessment & executes the job', icon: 'HardHat' }
+  { key: 'personnel', label: 'Requester', platform: 'web', description: 'Raises permits, runs risk assessment & executes the job', icon: 'HardHat' },
+  { key: 'worker', label: 'Worker', platform: 'web', description: 'Performs the job, applies personal lock after isolation', icon: 'HardHat' },
+  { key: 'rescuer', label: 'Rescuer', platform: 'web', description: 'Standby rescue assignments across live permits', icon: 'LifeBuoy' },
+  { key: 'firstaider', label: 'First Aider', platform: 'web', description: 'Standby first-aid assignments across live permits', icon: 'Cross' }
 ];
 
 // Ordered lifecycle used by the workflow connection strip / breadcrumb indicators.
 export const WORKFLOW_STAGES = [
   { key: 'request', label: 'Request', role: 'personnel' },
   { key: 'review', label: 'Review', role: 'supervisor' },
-  { key: 'approve', label: 'Approve', role: 'hod' },
+  { key: 'approve', label: 'Approve', role: 'approver' },
   { key: 'execute', label: 'Execute', role: 'personnel' },
   { key: 'monitor', label: 'Monitor', role: 'safety' }
 ];

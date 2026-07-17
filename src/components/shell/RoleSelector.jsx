@@ -2,6 +2,7 @@ import React from 'react';
 import * as Icons from 'lucide-react';
 import { ROLES } from '../../data/mockData.js';
 import { useApp } from '../../context/AppContext.jsx';
+import { getPendingCount } from '../../utils/pendingWork.js';
 import { DemoBadge, Button } from '../shared/Primitives.jsx';
 import { LogOut } from 'lucide-react';
 
@@ -9,7 +10,7 @@ import { LogOut } from 'lucide-react';
 // capability (see usersData.js). Unlike the old landing page, this is
 // constrained to the signed-in user's own grants — never the full role list.
 export default function RoleSelector() {
-  const { currentUser, selectRole, logout, pushToast } = useApp();
+  const { currentUser, permits, selectRole, logout, pushToast } = useApp();
 
   function handleSelect(role, department) {
     selectRole(role, department);
@@ -41,12 +42,18 @@ export default function RoleSelector() {
           {currentUser.roles.map((r, i) => {
             const roleMeta = ROLES.find((role) => role.key === r.role);
             const Icon = Icons[roleMeta?.icon] || Icons.User;
+            const pending = getPendingCount(r.role, r.department, permits, currentUser);
             return (
               <button
                 key={i}
                 onClick={() => handleSelect(r.role, r.department)}
-                className="group flex flex-col items-start gap-3 rounded-xl2 border border-nz-border bg-white p-5 text-left shadow-card transition-all hover:-translate-y-0.5 hover:border-nz-orange/50 hover:bg-nz-surface focus-ring"
+                className="group relative flex flex-col items-start gap-3 rounded-xl2 border border-nz-border bg-white p-5 text-left shadow-card transition-all hover:-translate-y-0.5 hover:border-nz-orange/50 hover:bg-nz-surface focus-ring"
               >
+                {pending > 0 && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-nz-red px-1 text-[10px] font-bold text-white shadow-card">
+                    {pending}
+                  </span>
+                )}
                 <div className="flex w-full items-center justify-between">
                   <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-nz-blue/20 text-nz-orange group-hover:bg-nz-orange/20">
                     <Icon size={22} />

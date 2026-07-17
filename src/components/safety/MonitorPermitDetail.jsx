@@ -18,7 +18,7 @@ export default function MonitorPermitDetail({ navigate, params }) {
   function submitFlag() {
     if (!obsText.trim()) return;
     setSubmitted(true);
-    pushToast('Observation logged and routed to HOD & Safety team');
+    pushToast('Observation logged for the record');
   }
 
   return (
@@ -46,12 +46,32 @@ export default function MonitorPermitDetail({ navigate, params }) {
         </Card>
       )}
 
+      {permit.status !== 'draft' && <ClearanceSummary permit={permit} />}
+
       <Card className="mb-4 p-4">
         <SectionLabel>Checklist Progress</SectionLabel>
         <div className="space-y-1.5">
           {permit.checklist.map((c) => (
             <div key={c.id} className="flex items-center gap-2 text-sm text-slate-600">
               <span className={`h-2 w-2 rounded-full ${c.done ? 'bg-nz-green' : 'bg-slate-300'}`} /> {c.label}
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mb-4 p-4">
+        <SectionLabel>Status Timeline</SectionLabel>
+        <div className="space-y-3">
+          {permit.timeline.map((t, i) => (
+            <div key={i} className="flex gap-3">
+              <div className="flex flex-col items-center">
+                <span className={`h-2.5 w-2.5 rounded-full ${i === permit.timeline.length - 1 ? 'bg-nz-orange' : 'bg-nz-blue'}`} />
+                {i < permit.timeline.length - 1 && <span className="h-full w-px flex-1 bg-nz-border" />}
+              </div>
+              <div className="pb-3">
+                <div className="text-sm font-semibold text-nz-navy">{t.stage}</div>
+                <div className="text-xs text-slate-400">{t.at} · {t.by}</div>
+              </div>
             </div>
           ))}
         </div>
@@ -98,5 +118,28 @@ export default function MonitorPermitDetail({ navigate, params }) {
         )}
       </Card>
     </div>
+  );
+}
+
+function ClearanceSummary({ permit }) {
+  const rows = [
+    ['Mechanical', permit.deptClearances?.Mechanical],
+    ['E&I', permit.deptClearances?.['E&I']],
+    ['Production', permit.deptClearances?.Production]
+  ];
+  return (
+    <Card className="mb-4 p-4">
+      <SectionLabel>G. Departmental Clearance Status</SectionLabel>
+      <div className="space-y-1.5">
+        {rows.map(([dept, c]) => (
+          <div key={dept} className="flex items-center justify-between rounded-lg border border-nz-border px-3 py-2 text-xs">
+            <span className="font-semibold text-nz-navy">{dept}</span>
+            <span className={c?.status === 'cleared' ? 'text-nz-green font-semibold' : c?.status === 'not-applicable' ? 'text-slate-400' : 'text-nz-amber font-semibold'}>
+              {c?.status === 'cleared' ? `Cleared — ${c.name}` : c?.status === 'not-applicable' ? 'Not Applicable' : 'Pending'}
+            </span>
+          </div>
+        ))}
+      </div>
+    </Card>
   );
 }

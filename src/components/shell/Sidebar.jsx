@@ -3,10 +3,11 @@ import * as Icons from 'lucide-react';
 import { NAV_CONFIG, ROLE_LABELS } from '../../data/navConfig.js';
 import { LogOut, Repeat } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
+import { getPendingCount } from '../../utils/pendingWork.js';
 import { DemoBadge } from '../shared/Primitives.jsx';
 
 export default function Sidebar({ activeScreen, onNavigate }) {
-  const { currentRole, currentDepartment, currentUser, selectRole, logout, pushToast } = useApp();
+  const { currentRole, currentDepartment, currentUser, permits, selectRole, logout, pushToast } = useApp();
   const items = NAV_CONFIG[currentRole] || [];
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const hasMultipleRoles = (currentUser?.roles?.length || 0) > 1;
@@ -61,21 +62,27 @@ export default function Sidebar({ activeScreen, onNavigate }) {
             </button>
             {showRoleMenu && (
               <div className="absolute bottom-full left-0 z-30 mb-1 w-full rounded-lg border border-nz-border bg-white p-1 shadow-panel">
-                {currentUser.roles.map((r, i) => (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      selectRole(r.role, r.department);
-                      setShowRoleMenu(false);
-                      pushToast(`Acting as ${ROLE_LABELS[r.role]}${r.department ? ` · ${r.department}` : ''}`);
-                    }}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm ${
-                      r.role === currentRole && r.department === currentDepartment ? 'font-semibold text-nz-blue' : 'text-slate-600 hover:bg-nz-surface'
-                    }`}
-                  >
-                    {ROLE_LABELS[r.role]}{r.department ? ` · ${r.department}` : ''}
-                  </button>
-                ))}
+                {currentUser.roles.map((r, i) => {
+                  const pending = getPendingCount(r.role, r.department, permits, currentUser);
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        selectRole(r.role, r.department);
+                        setShowRoleMenu(false);
+                        pushToast(`Acting as ${ROLE_LABELS[r.role]}${r.department ? ` · ${r.department}` : ''}`);
+                      }}
+                      className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm ${
+                        r.role === currentRole && r.department === currentDepartment ? 'font-semibold text-nz-blue' : 'text-slate-600 hover:bg-nz-surface'
+                      }`}
+                    >
+                      <span>{ROLE_LABELS[r.role]}{r.department ? ` · ${r.department}` : ''}</span>
+                      {pending > 0 && (
+                        <span className="ml-2 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-nz-red px-1 text-[9px] font-bold text-white">{pending}</span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>

@@ -33,7 +33,7 @@ export default function DepartmentalClearance({ navigate, params }) {
     setClearances(updated);
     updatePermit(permit.id, { deptClearances: updated });
     const verb = status === 'cleared' ? 'granted' : 'marked not applicable';
-    addTimelineEvent(permit.id, `${dept} clearance ${verb}${comment ? ` — "${comment}"` : ''}`, `${currentUser.name} (Approver · ${dept})`);
+    addTimelineEvent(permit.id, `${dept} clearance ${verb}${comment ? ` — "${comment}"` : ''}`, `${currentUser.name} (HOD · ${dept})`);
     pushToast(`${dept} clearance recorded for ${permit.id}`);
   }
 
@@ -44,7 +44,7 @@ export default function DepartmentalClearance({ navigate, params }) {
     const updated = { ...clearances, itApproval: { ...clearances.itApproval, granted: true, name: currentUser.name } };
     setClearances(updated);
     updatePermit(permit.id, { deptClearances: updated });
-    addTimelineEvent(permit.id, 'IT Approval granted', `${currentUser.name} (Approver)`);
+    addTimelineEvent(permit.id, 'IT Approval granted', `${currentUser.name} (HOD)`);
     pushToast(`IT Approval recorded for ${permit.id}`);
   }
 
@@ -53,7 +53,7 @@ export default function DepartmentalClearance({ navigate, params }) {
       deptClearances: clearances,
       status: 'pending-approval'
     });
-    addTimelineEvent(permit.id, 'Departmental Clearance complete — all departments resolved', `${currentUser.name} (Approver)`);
+    addTimelineEvent(permit.id, 'Departmental Clearance complete — all departments resolved', `${currentUser.name} (HOD)`);
     addTimelineEvent(permit.id, 'Awaiting Approval', 'System');
     pushToast(`${permit.id} cleared — routed to Approval`);
     setTimeout(() => navigate('dashboard'), 900);
@@ -75,18 +75,12 @@ export default function DepartmentalClearance({ navigate, params }) {
 
       <div className="mb-4"><PTWStepper permit={permit} /></div>
 
-      {permit.safetyReview && (
-        <Card className="mb-4 border-nz-blue/20 bg-nz-blue-light p-3 text-xs text-nz-blue-dark">
-          <span className="font-bold">Safety Officer Review — {permit.safetyReview.by}:</span> {permit.safetyReview.comment || 'No additional comments.'}
-        </Card>
-      )}
-
       {blocked && (
         <Card className="mb-4 border-nz-red/30 bg-nz-red-light p-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-nz-red">
             <ShieldAlert size={16} /> You raised this permit — you cannot grant clearance on your own request.
           </div>
-          <p className="mt-1 text-xs text-nz-red/80">Another Approver in this department must action this row.</p>
+          <p className="mt-1 text-xs text-nz-red/80">Another HOD in this department must action this row.</p>
         </Card>
       )}
 

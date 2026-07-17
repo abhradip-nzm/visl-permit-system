@@ -3,10 +3,12 @@ import { PERMITS, NOTIFICATIONS } from '../data/mockData.js';
 import { TASKS } from '../data/tasksData.js';
 import { USERS } from '../data/usersData.js';
 import { LOCK_REGISTER } from '../data/lockRegisterData.js';
+import { PERSONAL_LOCK_REGISTER } from '../data/personalLockRegisterData.js';
 
 const AppContext = createContext(null);
 
 let toastId = 0;
+let shiftTransferId = 0;
 
 export function AppProvider({ children }) {
   // Phase 0 auth: currentUser is the logged-in account; currentRole is which
@@ -22,7 +24,9 @@ export function AppProvider({ children }) {
   const [permits, setPermits] = useState(PERMITS);
   const [tasks, setTasks] = useState(TASKS);
   const [lockRegister, setLockRegister] = useState(LOCK_REGISTER);
+  const [personalLockRegister, setPersonalLockRegister] = useState(PERSONAL_LOCK_REGISTER);
   const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const [shiftTransfers, setShiftTransfers] = useState([]);
   const [toasts, setToasts] = useState([]);
   const [language, setLanguage] = useState('English');
   const [aiOpen, setAiOpen] = useState(false);
@@ -68,6 +72,23 @@ export function AppProvider({ children }) {
     setLockRegister((prev) => prev.map((l) => (l.id === lockId && l.state === 'in-use' ? { ...l, state: 'available', permitId: null } : l)));
   }, []);
 
+  // Phase 9: personal LOTO keys get the exact same live uniqueness guarantee
+  // as the departmental lock register — a key already in use on one permit
+  // can never be reserved for another until it's released.
+  const reservePersonalLock = useCallback(
+    (lockId, permitId) => {
+      const target = personalLockRegister.find((l) => l.id === lockId);
+      if (!target || target.state !== 'available') return false;
+      setPersonalLockRegister((prev) => prev.map((l) => (l.id === lockId ? { ...l, state: 'in-use', permitId } : l)));
+      return true;
+    },
+    [personalLockRegister]
+  );
+
+  const releasePersonalLock = useCallback((lockId) => {
+    setPersonalLockRegister((prev) => prev.map((l) => (l.id === lockId && l.state === 'in-use' ? { ...l, state: 'available', permitId: null } : l)));
+  }, []);
+
   const pushToast = useCallback((message, tone = 'success') => {
     const id = ++toastId;
     setToasts((t) => [...t, { id, message, tone }]);
@@ -89,6 +110,18 @@ export function AppProvider({ children }) {
       )
     );
   }, []);
+
+  // Phase 9: shift transfer is now available to every role, not just the
+  // Requester's permit-level handoff (PermitTransfer.jsx) — this is a
+  // role-level "I'm going off shift, hand my current duties to a colleague"
+  // record, scoped to whoever else holds the same role (and department, if
+  // scoped).
+  const transferShift = useCallback((toName, role, department) => {
+    setShiftTransfers((prev) => [
+      { id: ++shiftTransferId, from: currentUser?.name, to: toName, role, department, at: 'Just now' },
+      ...prev
+    ]);
+  }, [currentUser]);
 
   const markNotificationsRead = useCallback((roleKey) => {
     setNotifications((prev) => ({
@@ -119,8 +152,13 @@ export function AppProvider({ children }) {
       lockRegister,
       reserveLock,
       releaseLock,
+      personalLockRegister,
+      reservePersonalLock,
+      releasePersonalLock,
       notifications,
       markNotificationsRead,
+      shiftTransfers,
+      transferShift,
       toasts,
       pushToast,
       language,
@@ -130,8 +168,9 @@ export function AppProvider({ children }) {
     }),
     [
       currentUser, currentRole, currentDepartment, login, selectRole, logout,
-      permits, tasks, lockRegister, notifications, toasts, language, aiOpen,
-      pushToast, updatePermit, addTimelineEvent, updateTask, reserveLock, releaseLock, markNotificationsRead
+      permits, tasks, lockRegister, personalLockRegister, notifications, shiftTransfers, toasts, language, aiOpen,
+      pushToast, updatePermit, addTimelineEvent, updateTask, reserveLock, releaseLock,
+      reservePersonalLock, releasePersonalLock, markNotificationsRead, transferShift
     ]
   );
 
