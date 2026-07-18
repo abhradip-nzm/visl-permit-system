@@ -1,23 +1,23 @@
 import React from 'react';
 import { ChevronRight, Clock } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
-import { departmentsForTypes } from '../../data/departmentsData.js';
 import { StatusBadge, RiskBadge, Card } from '../shared/Primitives.jsx';
 import WorkflowStrip from '../shared/WorkflowStrip.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
 
-// C-4: an Approver only sees permits that concern their own department.
-// Phase 9: clearance moved to HodDashboard.jsx — this dashboard covers
-// on-ground approval and final closure verification only.
+// Approver is department-free — any Approver can act on any permit, so
+// this dashboard shows every permit regardless of department (unlike HOD,
+// which stays scoped to its own department for clearance — see
+// HodDashboard.jsx). Clearance itself lives on HodDashboard.jsx; this
+// dashboard covers on-ground approval and final closure verification only.
 export default function ApproverDashboard({ navigate }) {
-  const { permits, currentDepartment } = useApp();
-  const inMyDept = (p) => !currentDepartment || departmentsForTypes(p.types || [p.type]).includes(currentDepartment);
+  const { permits } = useApp();
 
-  const pendingApproval = permits.filter((p) => p.status === 'pending-approval' && inMyDept(p));
-  const pendingClosureVerification = permits.filter((p) => p.status === 'pending-closure' && inMyDept(p));
-  const live = permits.filter((p) => p.status === 'live' && inMyDept(p));
-  const returned = permits.filter((p) => p.status === 'returned' && inMyDept(p));
-  const compliance = permits.filter((p) => p.warnings?.length > 0 && inMyDept(p)).length;
+  const pendingApproval = permits.filter((p) => p.status === 'pending-approval');
+  const pendingClosureVerification = permits.filter((p) => p.status === 'pending-closure');
+  const live = permits.filter((p) => p.status === 'live');
+  const returned = permits.filter((p) => p.status === 'returned');
+  const compliance = permits.filter((p) => p.warnings?.length > 0).length;
 
   return (
     <div>

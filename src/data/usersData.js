@@ -16,11 +16,12 @@
 //
 // 2. General staff — every other account. These are shown on the sign-in
 //    screen by name only, with no role badge — every general staff account
-//    uniformly holds all three of Requester / Approver / Isolation Officer
-//    (Approver and Isolation Officer scoped to that person's home
-//    department). Logging in lands them on the three-tile RoleSelector,
-//    each tile carrying a notification dot for pending work (see
-//    utils/pendingWork.js).
+//    uniformly holds all three of Requester / Approver / Isolation Officer.
+//    Unlike HOD, Approver and Isolation Officer are department-free — any
+//    general staff account can act on any permit regardless of department,
+//    so any qualified person can pick it up. Logging in lands them on the
+//    three-tile RoleSelector, each tile carrying a notification dot for
+//    pending work (see utils/pendingWork.js).
 //
 // Trimmed to a small, demo-friendly roster (one account per fixed role,
 // two general staff) — see conversation history for the full account list
@@ -82,23 +83,25 @@ export const USERS = [
   },
 
   // ---- General staff — always Requester + Approver + Isolation Officer,
-  // Approver/Isolation Officer scoped to their home department. ----
+  // department-free (see header comment). ----
   {
     id: 'U-005', name: 'A. Chatterjee', username: 'achatterjee', password: 'demo123',
     email: 'a.chatterjee@vedanta.com', employeeId: 'EMP-1005', plant: 'Tank Farm', status: 'active', lastLogin: '2026-07-06 07:00',
-    roles: [{ role: 'personnel' }, { role: 'approver', department: 'Mechanical' }, { role: 'supervisor', department: 'Mechanical' }]
+    roles: [{ role: 'personnel' }, { role: 'approver' }, { role: 'supervisor' }]
   },
   {
     id: 'U-013', name: 'V. Kulkarni', username: 'vkulkarni', password: 'demo123',
     email: 'v.kulkarni@vedanta.com', employeeId: 'EMP-1013', plant: 'Process Unit 2', status: 'active', lastLogin: '2026-07-06 07:10',
-    roles: [{ role: 'personnel' }, { role: 'approver', department: 'E&I' }, { role: 'supervisor', department: 'E&I' }]
+    roles: [{ role: 'personnel' }, { role: 'approver' }, { role: 'supervisor' }]
   }
 ];
 
 // Role keys that are scoped to a department (used by login/role-selection UI
 // and by the Super Admin user-management screen to decide whether to show
-// a department picker for a given capability).
-export const DEPARTMENT_SCOPED_ROLES = ['hod', 'approver', 'supervisor'];
+// a department picker for a given capability). HOD is the only one — every
+// HOD instance is tied to a specific department (Mechanical/E&I/Production);
+// Approver and Isolation Officer are department-free.
+export const DEPARTMENT_SCOPED_ROLES = ['hod'];
 
 // Phase 9: fixed, single-purpose role keys — shown with a role badge on the
 // sign-in screen (see LoginScreen.jsx). Every other account is "general

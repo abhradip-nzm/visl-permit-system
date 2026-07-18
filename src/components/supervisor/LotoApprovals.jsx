@@ -50,8 +50,9 @@ export default function LotoApprovals({ params }) {
   const [confirmed, setConfirmed] = useState(false);
 
   // Phase 0 (C-3 foundation): lock IDs are always a dropdown drawn from the
-  // live register, scoped to this Isolation Officer's own department, and a
-  // lock already in-use on another permit is never offered here.
+  // live register, and a lock already in-use on another permit is never
+  // offered here. Isolation Officer is department-free (Phase 9), so every
+  // available lock is offered regardless of department.
   const availableLocks = lockRegister.filter((l) => l.state === 'available' && (!currentDepartment || l.department === currentDepartment));
   const personnelRoster = USERS.filter((u) => u.status === 'active' && u.roles.some((r) => r.role === 'personnel'));
 
