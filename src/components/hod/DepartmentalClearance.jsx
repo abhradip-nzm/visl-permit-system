@@ -37,17 +37,6 @@ export default function DepartmentalClearance({ navigate, params }) {
     pushToast(`${dept} clearance recorded for ${permit.id}`);
   }
 
-  // M-4: IT Approval "required?" is now a Requester-declared fact set at
-  // submission — this screen only grants it, and persists immediately like
-  // department grants do.
-  function grantItApproval() {
-    const updated = { ...clearances, itApproval: { ...clearances.itApproval, granted: true, name: currentUser.name } };
-    setClearances(updated);
-    updatePermit(permit.id, { deptClearances: updated });
-    addTimelineEvent(permit.id, 'IT Approval granted', `${currentUser.name} (HOD)`);
-    pushToast(`IT Approval recorded for ${permit.id}`);
-  }
-
   function advance() {
     updatePermit(permit.id, {
       deptClearances: clearances,
@@ -144,11 +133,11 @@ export default function DepartmentalClearance({ navigate, params }) {
           </div>
           {itApproval.required && (
             <div className="flex items-center justify-between text-sm">
-              <span className="font-semibold text-slate-600">IT Approval granted</span>
+              <span className="font-semibold text-slate-600">IT Approval granted <span className="font-normal text-slate-400">(routed to IT Department)</span></span>
               {itApproval.granted ? (
                 <span className="text-xs font-bold text-nz-green">Granted — {itApproval.name}</span>
               ) : (
-                <Button variant="success" size="sm" disabled={blocked} onClick={grantItApproval}>Grant</Button>
+                <span className="text-xs font-bold text-nz-amber">Pending IT Professional</span>
               )}
             </div>
           )}

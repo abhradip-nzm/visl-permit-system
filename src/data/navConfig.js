@@ -61,6 +61,13 @@ export const NAV_CONFIG = {
     { key: 'dashboard', label: 'My Assignments', icon: 'Cross' },
     { key: 'shiftcalendar', label: 'Shift Calendar', icon: 'CalendarDays' },
     { key: 'profile', label: 'Profile', icon: 'User' }
+  ],
+  // IT Professional: a permit flagged "IT Approval required" at request
+  // time routes here for sign-off, independent of departmental clearance.
+  itprofessional: [
+    { key: 'dashboard', label: 'IT Approval Dashboard', icon: 'Laptop' },
+    { key: 'shiftcalendar', label: 'Shift Calendar', icon: 'CalendarDays' },
+    { key: 'profile', label: 'Profile', icon: 'User' }
   ]
 };
 
@@ -77,7 +84,8 @@ export const ROLE_LABELS = {
   personnel: 'Requester',
   worker: 'Worker',
   rescuer: 'Rescuer',
-  firstaider: 'First Aider'
+  firstaider: 'First Aid Personnel',
+  itprofessional: 'IT Professional'
 };
 
 // Phase 9: no mobile shell anywhere — every role renders through the same
@@ -91,5 +99,6 @@ export const ROLE_PLATFORM = {
   personnel: 'web',
   worker: 'web',
   rescuer: 'web',
-  firstaider: 'web'
+  firstaider: 'web',
+  itprofessional: 'web'
 };

@@ -11,6 +11,7 @@ import PersonnelApp from './components/personnel/PersonnelApp.jsx';
 import WorkerApp from './components/worker/WorkerApp.jsx';
 import RescuerApp from './components/rescuer/RescuerApp.jsx';
 import FirstAiderApp from './components/firstaider/FirstAiderApp.jsx';
+import ITProfessionalApp from './components/itprofessional/ITProfessionalApp.jsx';
 
 const ROLE_APPS = {
   useradmin: UserAdminApp,
@@ -21,7 +22,8 @@ const ROLE_APPS = {
   personnel: PersonnelApp,
   worker: WorkerApp,
   rescuer: RescuerApp,
-  firstaider: FirstAiderApp
+  firstaider: FirstAiderApp,
+  itprofessional: ITProfessionalApp
 };
 
 function RootRouter() {

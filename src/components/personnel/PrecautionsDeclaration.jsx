@@ -61,7 +61,7 @@ export default function PrecautionsDeclaration({ navigate, params }) {
       additionalPrecautions: precautions,
       jobDescription,
       declaration: { requestorName: currentUser.name, date: 'Today', time: 'Just now', toolboxTalkConfirmed: true, signed: now },
-      workers: namedAttendees.map((a) => ({ name: a.name, personalLockId: a.isolationKeyId, applied: false, appliedAt: null })),
+      workers: namedAttendees.map((a) => ({ name: a.name, personalLockId: a.isolationKeyId, applied: false, appliedAt: null, removed: false, removedAt: null })),
       tbtRecord: {
         refNo,
         attendees: namedAttendees,
