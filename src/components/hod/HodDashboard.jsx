@@ -2,6 +2,7 @@ import React from 'react';
 import { ChevronRight, Clock } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { needsClearance } from '../../data/departmentsData.js';
+import { CLEARANCE_DEPARTMENTS } from '../../data/ptwFormData.js';
 import { StatusBadge, RiskBadge, Card } from '../shared/Primitives.jsx';
 import WorkflowStrip from '../shared/WorkflowStrip.jsx';
 
@@ -9,15 +10,23 @@ import WorkflowStrip from '../shared/WorkflowStrip.jsx';
 // queue: permits awaiting this department's clearance, and only for permit
 // types that actually need clearance (Excavation, or anything touching
 // Production — see needsClearance() in departmentsData.js).
+//
+// A permit stays listed for this HOD either while their own department's
+// row is still pending (their turn to act), OR once every department row
+// is already resolved but the permit hasn't been formally advanced yet —
+// otherwise, once the last row gets resolved, it would vanish from every
+// HOD's queue with nobody able to reach the final "Confirm & Continue"
+// button (a permit stuck with no way to move it forward).
 export default function HodDashboard({ navigate }) {
   const { permits, currentDepartment } = useApp();
 
-  const pendingClearance = permits.filter(
-    (p) =>
-      p.status === 'pending-clearance' &&
-      needsClearance(p.types || [p.type]) &&
-      (!currentDepartment || p.deptClearances?.[currentDepartment]?.status === 'pending')
-  );
+  const pendingClearance = permits.filter((p) => {
+    if (p.status !== 'pending-clearance' || !needsClearance(p.types || [p.type])) return false;
+    if (!currentDepartment) return true;
+    const myRowPending = p.deptClearances?.[currentDepartment]?.status === 'pending';
+    const allResolved = CLEARANCE_DEPARTMENTS.every((d) => p.deptClearances?.[d]?.status !== 'pending');
+    return myRowPending || allResolved;
+  });
 
   return (
     <div>

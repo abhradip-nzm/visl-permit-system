@@ -6,7 +6,8 @@ import { USERS } from '../../data/usersData.js';
 import { Card, SectionLabel, Button, SignaturePad } from '../shared/Primitives.jsx';
 
 function emptyAttendee(w) {
-  return { name: w?.name || '', company: 'Vedanta', gatePassId: '', isolationKeyId: w?.personalLockId || '', signed: false };
+  const user = w?.name ? USERS.find((u) => u.name === w.name) : null;
+  return { name: w?.name || '', company: 'Vedanta', gatePassId: user?.employeeId || '', isolationKeyId: w?.personalLockId || '', signed: false };
 }
 
 // Phase 9: Precautions & Declaration is where the Requester assigns the
@@ -44,7 +45,8 @@ export default function PrecautionsDeclaration({ navigate, params }) {
 
   function selectAttendeeName(i, name) {
     const lock = personalLockRegister.find((l) => l.ownerName === name);
-    setAttendees((prev) => prev.map((a, idx) => (idx === i ? { ...a, name, isolationKeyId: lock?.id || '' } : a)));
+    const user = USERS.find((u) => u.name === name);
+    setAttendees((prev) => prev.map((a, idx) => (idx === i ? { ...a, name, isolationKeyId: lock?.id || '', gatePassId: user?.employeeId || '' } : a)));
   }
 
   function updateAttendee(i, key, value) {
@@ -61,7 +63,7 @@ export default function PrecautionsDeclaration({ navigate, params }) {
       additionalPrecautions: precautions,
       jobDescription,
       declaration: { requestorName: currentUser.name, date: 'Today', time: 'Just now', toolboxTalkConfirmed: true, signed: now },
-      workers: namedAttendees.map((a) => ({ name: a.name, personalLockId: a.isolationKeyId, applied: false, appliedAt: null, removed: false, removedAt: null })),
+      workers: namedAttendees.map((a) => ({ name: a.name, personalLockId: a.isolationKeyId, applied: false, appliedAt: null, removed: false, removedAt: null, started: false, startedAt: null })),
       tbtRecord: {
         refNo,
         attendees: namedAttendees,
@@ -120,7 +122,7 @@ export default function PrecautionsDeclaration({ navigate, params }) {
       <Card className="mb-4 overflow-x-auto p-4">
         <SectionLabel>Toolbox Talk Attendance — Assign Workers</SectionLabel>
         <p className="mb-2 text-xs text-slate-400">
-          Each worker's Isolation Key ID is fixed to their account and applies only after the Isolation Officer's master lock is on.
+          Selecting a worker auto-fills their Employee ID and Isolation Key ID from their account. The Isolation Key ID only applies once the Isolation Officer's master lock is on.
         </p>
         <table className="w-full text-left text-xs">
           <thead>
@@ -148,7 +150,7 @@ export default function PrecautionsDeclaration({ navigate, params }) {
                   <input value={a.company} onChange={(e) => updateAttendee(i, 'company', e.target.value)} className="w-24 rounded-md border border-nz-border px-2 py-1.5 text-xs focus-ring" />
                 </td>
                 <td className="py-2 pr-2">
-                  <input value={a.gatePassId} onChange={(e) => updateAttendee(i, 'gatePassId', e.target.value)} placeholder="—" className="w-28 rounded-md border border-nz-border px-2 py-1.5 text-xs focus-ring" />
+                  <div className="w-28 rounded-md border border-nz-border bg-nz-surface px-2 py-1.5 text-center text-slate-500">{a.gatePassId || '—'}</div>
                 </td>
                 <td className="py-2 pr-2">
                   <div className="w-24 rounded-md border border-nz-border bg-nz-surface px-2 py-1.5 text-center text-slate-500">{a.isolationKeyId || '—'}</div>

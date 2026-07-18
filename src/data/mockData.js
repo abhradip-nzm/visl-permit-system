@@ -174,7 +174,7 @@ export const PERMITS = [
       { equipment: 'MCC-3 Drive Panel', typeOfIsolation: 'Electrical', isolationPermitNo: '', isolationOfficerName: '', lotoIdNo: '', deptLockNo: '' }
     ],
     toolboxRecord: [{ name: 'S. Iyer', company: 'Vedanta', personalLockId: '', signed: false }],
-    workers: [{ name: 'K. Reddy', personalLockId: 'PL-016', applied: false, appliedAt: null, removed: false, removedAt: null }],
+    workers: [{ name: 'K. Reddy', personalLockId: 'PL-016', applied: false, appliedAt: null, removed: false, removedAt: null, started: false, startedAt: null }],
     isolationTopicsCovered: '',
     additionalPrecautions: '', declaration: { requestorName: 'S. Iyer', date: '05 Jul', time: '07:45', toolboxTalkConfirmed: true, signed: { name: 'S. Iyer', timestamp: '05 Jul, 07:45' } },
     approval: { approverName: 'D. Fernandes', date: '05 Jul', time: '08:20', onGroundVerified: true, signed: { name: 'D. Fernandes', timestamp: '05 Jul, 08:20' }, rejectionReason: '' },
@@ -215,7 +215,7 @@ export const PERMITS = [
       { equipment: 'Hydraulic Accumulator H-9', typeOfIsolation: 'Mechanical', isolationPermitNo: 'ISO-0231', isolationOfficerName: 'J. Mehta', lotoIdNo: 'LOTO-014', deptLockNo: 'LK-198' }
     ],
     toolboxRecord: [{ name: 'A. Chatterjee', company: 'Vedanta', personalLockId: 'PL-005', signed: true }],
-    workers: [{ name: 'K. Reddy', personalLockId: 'PL-016', applied: false, appliedAt: null, removed: false, removedAt: null }],
+    workers: [{ name: 'K. Reddy', personalLockId: 'PL-016', applied: false, appliedAt: null, removed: false, removedAt: null, started: false, startedAt: null }],
     isolationTopicsCovered: 'Reviewed hydraulic bleed-down sequence and lock/tag placement with crew before entry.',
     additionalPrecautions: '', declaration: { requestorName: 'A. Chatterjee', date: '05 Jul', time: '15:20', toolboxTalkConfirmed: true, signed: { name: 'A. Chatterjee', timestamp: '05 Jul, 15:20' } },
     approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
