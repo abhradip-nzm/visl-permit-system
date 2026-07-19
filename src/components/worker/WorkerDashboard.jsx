@@ -37,6 +37,18 @@ export default function WorkerDashboard({ navigate }) {
   const myJobs = permits.filter((p) => p.workers?.some((w) => w.name === currentUser.name));
   const liveIsolationJobs = permits.filter((p) => p.status === 'live' && p.isolationRequired);
 
+  // Phase 10 KPIs: "done" = they've submitted their part (permit reached
+  // pending-closure or closed); "current work" = permit is live and they're
+  // assigned; "pending" = current work where their own step isn't done yet
+  // (lock not applied/removed for isolation jobs, not started otherwise —
+  // same fields WorkerJobDetail.jsx uses to decide what to show).
+  const completedJobs = myJobs.filter((p) => p.status === 'pending-closure' || p.status === 'closed');
+  const currentJobs = myJobs.filter((p) => p.status === 'live');
+  const currentPending = currentJobs.filter((p) => {
+    const w = p.workers.find((w) => w.name === currentUser.name);
+    return p.isolationRequired ? !(w.applied || w.removed) : !w.started;
+  });
+
   const jobsByDate = {};
   myJobs.forEach((p) => {
     if (!p.dateFrom) return;
@@ -45,6 +57,12 @@ export default function WorkerDashboard({ navigate }) {
 
   return (
     <div>
+      <div className="mb-4 flex flex-wrap gap-3">
+        <KpiTile label="Total Work Done" value={completedJobs.length} tone="green" />
+        <KpiTile label="Current Work" value={currentJobs.length} tone="blue" />
+        <KpiTile label="Current Work Pending" value={currentPending.length} tone="amber" />
+      </div>
+
       <div className="mb-4 flex items-center gap-1.5 rounded-lg bg-nz-blue-light px-3 py-2 text-xs font-semibold text-nz-blue-dark">
         <HardHat size={13} /> Once assigned to a live job, apply your personal lock after the Isolation Officer's lock — remove it first when your work is done.
       </div>
@@ -78,6 +96,11 @@ export default function WorkerDashboard({ navigate }) {
         <MonthView anchor={anchor} setAnchor={setAnchor} jobsByDate={jobsByDate} navigate={navigate} />
       )}
 
+      <div className="mb-2 mt-6 text-sm font-bold text-nz-navy">Completed Jobs</div>
+      <Card className="mb-6">
+        <JobList jobs={completedJobs} navigate={navigate} />
+      </Card>
+
       <div className="mb-2 mt-6 flex items-center gap-1.5 text-sm font-bold text-nz-navy"><Lock size={14} /> Live Isolation-Gated Jobs (site-wide)</div>
       <Card>
         <div className="divide-y divide-nz-border/60">
@@ -96,6 +119,16 @@ export default function WorkerDashboard({ navigate }) {
         </div>
       </Card>
     </div>
+  );
+}
+
+function KpiTile({ label, value, tone }) {
+  const tones = { amber: 'text-nz-amber', red: 'text-nz-red', blue: 'text-nz-blue', green: 'text-nz-green', orange: 'text-nz-orange' };
+  return (
+    <Card className="min-w-[150px] flex-1 p-4">
+      <div className="text-xs font-semibold uppercase text-slate-400">{label}</div>
+      <div className={`mt-1 text-3xl font-extrabold ${tones[tone] || 'text-nz-navy'}`}>{value}</div>
+    </Card>
   );
 }
 

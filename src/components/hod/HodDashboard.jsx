@@ -18,7 +18,7 @@ import WorkflowStrip from '../shared/WorkflowStrip.jsx';
 // HOD's queue with nobody able to reach the final "Confirm & Continue"
 // button (a permit stuck with no way to move it forward).
 export default function HodDashboard({ navigate }) {
-  const { permits, currentDepartment } = useApp();
+  const { permits, currentDepartment, currentUser } = useApp();
 
   const pendingClearance = permits.filter((p) => {
     if (p.status !== 'pending-clearance' || !needsClearance(p.types || [p.type])) return false;
@@ -28,16 +28,26 @@ export default function HodDashboard({ navigate }) {
     return myRowPending || allResolved;
   });
 
+  // "Cleared by me" — permits where my own department's row shows a
+  // 'cleared' status attributed to this HOD's account.
+  const totalCleared = currentDepartment
+    ? permits.filter((p) => p.deptClearances?.[currentDepartment]?.status === 'cleared' && p.deptClearances[currentDepartment]?.name === currentUser?.name).length
+    : permits.filter((p) => needsClearance(p.types || [p.type]) && CLEARANCE_DEPARTMENTS.some((d) => p.deptClearances?.[d]?.status === 'cleared')).length;
+
   return (
     <div>
       <div className="mb-4">
         <WorkflowStrip activeRole="hod" />
       </div>
 
-      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Card className="p-4">
+      <div className="mb-4 flex flex-wrap gap-4">
+        <Card className="min-w-[150px] flex-1 p-4">
           <div className="text-xs font-semibold uppercase text-slate-400">Pending Clearance</div>
           <div className="mt-1 text-3xl font-extrabold text-nz-amber">{pendingClearance.length}</div>
+        </Card>
+        <Card className="min-w-[150px] flex-1 p-4">
+          <div className="text-xs font-semibold uppercase text-slate-400">Total Cleared</div>
+          <div className="mt-1 text-3xl font-extrabold text-nz-green">{totalCleared}</div>
         </Card>
       </div>
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Wrench, ShieldCheck, ArrowLeftRight } from 'lucide-react';
+import { ChevronRight, Wrench, ShieldCheck, ArrowLeftRight, ScrollText } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { ACTIVE_PERSONNEL } from '../../data/shiftsData.js';
 import { MAINTENANCE_REQUESTS } from '../../data/tasksData.js';
@@ -9,9 +9,17 @@ import WorkflowStrip from '../shared/WorkflowStrip.jsx';
 export default function ShiftDashboard({ navigate }) {
   const { permits, tasks } = useApp();
   const pendingIsolation = permits.filter((p) => p.isolationRequired && p.status === 'pending-isolation');
+  const pendingDeIsolation = permits.filter((p) => p.isolationRequired && p.status === 'pending-closure' && !p.deIsolation);
   const transferred = permits.filter((p) => p.transfers?.length > 0 && p.status === 'live');
   const shiftTasks = tasks.filter((t) => t.status !== 'Completed');
   const alerts = permits.filter((p) => p.status === 'returned').length + pendingIsolation.length;
+
+  // Phase 10: every logged isolation event, flattened from each permit's
+  // own isolationDetails record (the same data the Isolation Officer fills
+  // in on LotoApprovals.jsx) — most recently isolated first.
+  const isolationLogs = permits
+    .flatMap((p) => (p.isolationDetails || []).map((d) => ({ ...d, permitId: p.id, deisolated: !!p.deIsolation })))
+    .filter((l) => l.isolationPermitNo || l.lotoIdNo);
 
   return (
     <div>
@@ -19,10 +27,12 @@ export default function ShiftDashboard({ navigate }) {
         <WorkflowStrip activeRole="supervisor" />
       </div>
 
-      <div className="mb-4 grid grid-cols-4 gap-4">
+      <div className="mb-4 flex flex-wrap gap-4">
         <Stat label="Active Personnel" value={ACTIVE_PERSONNEL.length} />
         <Stat label="Pending Requests" value={MAINTENANCE_REQUESTS.length} tone="amber" />
         <Stat label="Pending Isolation" value={pendingIsolation.length} tone="blue" />
+        <Stat label="Pending De-isolation" value={pendingDeIsolation.length} tone="amber" />
+        <Stat label="Isolations Logged" value={isolationLogs.length} tone="navy" />
         <Stat label="Shift Alerts" value={alerts} tone="red" />
       </div>
 
@@ -91,6 +101,45 @@ export default function ShiftDashboard({ navigate }) {
               {transferred.length === 0 && <div className="px-4 py-6 text-center text-xs text-slate-400">No active transfers this shift.</div>}
             </div>
           </Card>
+
+          <Card className="overflow-x-auto">
+            <div className="border-b border-nz-border px-4 py-3 text-sm font-bold text-nz-navy"><ScrollText size={13} className="mr-1.5 inline" /> Isolation Logs</div>
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-nz-border uppercase text-slate-400">
+                  <th className="px-4 py-2.5">Permit #</th>
+                  <th className="px-4 py-2.5">Equipment</th>
+                  <th className="px-4 py-2.5">Iso. Permit No.</th>
+                  <th className="px-4 py-2.5">Type</th>
+                  <th className="px-4 py-2.5">LOTO ID</th>
+                  <th className="px-4 py-2.5">Dept Lock</th>
+                  <th className="px-4 py-2.5">Isolation Officer</th>
+                  <th className="px-4 py-2.5">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isolationLogs.map((l, i) => (
+                  <tr key={`${l.permitId}-${i}`} className="border-b border-nz-border/60 last:border-0">
+                    <td className="px-4 py-2.5 font-semibold text-nz-navy">{l.permitId}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{l.equipment}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{l.isolationPermitNo || '—'}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{l.typeOfIsolation || '—'}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{l.lotoIdNo || '—'}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{l.deptLockNo || '—'}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{l.isolationOfficerName || '—'}</td>
+                    <td className="px-4 py-2.5">
+                      <span className={l.deisolated ? 'font-semibold text-slate-400' : 'font-semibold text-nz-amber'}>
+                        {l.deisolated ? 'De-isolated' : 'Isolated'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {isolationLogs.length === 0 && (
+                  <tr><td colSpan={8} className="px-4 py-6 text-center text-xs text-slate-400">No isolation events logged yet.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </Card>
         </div>
 
         <Card className="p-4">
@@ -122,9 +171,9 @@ export default function ShiftDashboard({ navigate }) {
 }
 
 function Stat({ label, value, tone }) {
-  const tones = { amber: 'text-nz-amber', red: 'text-nz-red', blue: 'text-nz-blue' };
+  const tones = { amber: 'text-nz-amber', red: 'text-nz-red', blue: 'text-nz-blue', navy: 'text-nz-navy' };
   return (
-    <Card className="p-4">
+    <Card className="min-w-[140px] flex-1 p-4">
       <div className="text-xs font-semibold uppercase text-slate-400">{label}</div>
       <div className={`mt-1 text-3xl font-extrabold ${tones[tone] || 'text-nz-navy'}`}>{value}</div>
     </Card>

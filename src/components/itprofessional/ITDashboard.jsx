@@ -28,10 +28,14 @@ export default function ITDashboard() {
         <Laptop size={13} /> Permits flagged "IT Approval required" by the Requester land here for sign-off.
       </div>
 
-      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Card className="p-4">
+      <div className="mb-4 flex flex-wrap gap-4">
+        <Card className="min-w-[150px] flex-1 p-4">
           <div className="text-xs font-semibold uppercase text-slate-400">Pending IT Approval</div>
           <div className="mt-1 text-3xl font-extrabold text-nz-amber">{pending.length}</div>
+        </Card>
+        <Card className="min-w-[150px] flex-1 p-4">
+          <div className="text-xs font-semibold uppercase text-slate-400">Total Granted</div>
+          <div className="mt-1 text-3xl font-extrabold text-nz-green">{granted.length}</div>
         </Card>
       </div>
 

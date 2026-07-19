@@ -16,6 +16,7 @@ export default function ApproverDashboard({ navigate }) {
   const pendingApproval = permits.filter((p) => p.status === 'pending-approval');
   const pendingClosureVerification = permits.filter((p) => p.status === 'pending-closure');
   const live = permits.filter((p) => p.status === 'live');
+  const closed = permits.filter((p) => p.status === 'closed');
   const returned = permits.filter((p) => p.status === 'returned');
   const compliance = permits.filter((p) => p.warnings?.length > 0).length;
 
@@ -25,9 +26,11 @@ export default function ApproverDashboard({ navigate }) {
         <WorkflowStrip activeRole="approver" />
       </div>
 
-      <div className="mb-4 grid grid-cols-3 gap-4">
+      <div className="mb-4 flex flex-wrap gap-4">
         <StatCard label="Pending My Approval" value={pendingApproval.length} tone="blue" />
         <StatCard label="Pending Closure Verification" value={pendingClosureVerification.length} tone="orange" />
+        <StatCard label="Live" value={live.length} tone="green" />
+        <StatCard label="Closed" value={closed.length} tone="navy" />
         <StatCard label="Compliance Alerts" value={compliance} tone="red" />
       </div>
 
@@ -122,9 +125,9 @@ function PermitQueue({ permits, navigate, target, action }) {
 }
 
 function StatCard({ label, value, tone }) {
-  const tones = { amber: 'text-nz-amber', red: 'text-nz-red', blue: 'text-nz-blue', green: 'text-nz-green', orange: 'text-nz-orange' };
+  const tones = { amber: 'text-nz-amber', red: 'text-nz-red', blue: 'text-nz-blue', green: 'text-nz-green', orange: 'text-nz-orange', navy: 'text-nz-navy' };
   return (
-    <Card className="p-4">
+    <Card className="min-w-[150px] flex-1 p-4">
       <div className="text-xs font-semibold uppercase text-slate-400">{label}</div>
       <div className={`mt-1 text-3xl font-extrabold ${tones[tone] || 'text-nz-navy'}`}>{value}</div>
     </Card>

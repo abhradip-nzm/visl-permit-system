@@ -14,6 +14,8 @@ export default function SafetyDashboard({ navigate }) {
   const { permits } = useApp();
   const expiredPersonnel = PERSONNEL.filter((p) => p.certifications.some((c) => c.status === 'expired'));
   const flags = permits.filter((p) => p.warnings?.length > 0);
+  const live = permits.filter((p) => p.status === 'live').length;
+  const closed = permits.filter((p) => p.status === 'closed').length;
 
   return (
     <div>
@@ -21,8 +23,10 @@ export default function SafetyDashboard({ navigate }) {
         <Eye size={13} /> Read-only observer — you can view every permit's live status and history, but cannot action any of them.
       </div>
 
-      <div className="mb-4 grid grid-cols-3 gap-4">
+      <div className="mb-4 flex flex-wrap gap-4">
         <Stat label="Total Permits" value={permits.length} icon={Eye} tone="navy" />
+        <Stat label="Live" value={live} icon={Eye} tone="green" />
+        <Stat label="Closed" value={closed} icon={Eye} tone="navy" />
         <Stat label="Open Flags" value={flags.length} icon={AlertTriangle} tone="amber" />
         <Stat label="High-Risk" value={permits.filter((p) => p.risk === 'high').length} icon={ShieldAlert} tone="red" />
       </div>
@@ -103,9 +107,9 @@ export default function SafetyDashboard({ navigate }) {
 }
 
 function Stat({ label, value, icon: Icon, tone }) {
-  const tones = { amber: 'text-nz-amber', red: 'text-nz-red', navy: 'text-nz-navy' };
+  const tones = { amber: 'text-nz-amber', red: 'text-nz-red', navy: 'text-nz-navy', green: 'text-nz-green' };
   return (
-    <Card className="p-4">
+    <Card className="min-w-[130px] flex-1 p-4">
       <div className="flex items-center justify-between">
         <div className="text-xs font-semibold uppercase text-slate-400">{label}</div>
         <Icon size={14} className={tones[tone]} />

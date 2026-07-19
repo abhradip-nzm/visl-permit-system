@@ -14,7 +14,7 @@ const STATUS_TAB_MAP = {
   live: 'Live', 'pending-closure': 'Pending Closure',
   closed: 'Closed', returned: 'Returned'
 };
-const ACTION_STATUSES = ['draft', 'pending-declaration', 'live', 'returned'];
+const PENDING_STATUSES = ['pending-declaration', 'pending-clearance', 'pending-approval', 'pending-isolation'];
 
 export default function MyTasks({ navigate }) {
   const { currentUser, permits } = useApp();
@@ -22,8 +22,12 @@ export default function MyTasks({ navigate }) {
 
   const mine = permits.filter((p) => p.requester === currentUser.name);
   const filtered = tab === 'All' ? mine : mine.filter((p) => STATUS_TAB_MAP[p.status] === tab);
-  const myActionCount = mine.filter((p) => ACTION_STATUSES.includes(p.status)).length;
-  const closureCount = mine.filter((p) => p.status === 'pending-closure').length;
+
+  const totalRequests = mine.length;
+  const completed = mine.filter((p) => p.status === 'closed').length;
+  const live = mine.filter((p) => p.status === 'live').length;
+  const pending = mine.filter((p) => PENDING_STATUSES.includes(p.status)).length;
+  const notClosed = totalRequests - completed;
   const transferredToMe = permits.filter((p) => p.transfers?.some((t) => t.transferredTo === currentUser.name) && p.status === 'live');
 
   return (
@@ -32,15 +36,12 @@ export default function MyTasks({ navigate }) {
         <WorkflowStrip activeRole="personnel" />
       </div>
 
-      <div className="mb-4 grid grid-cols-2 gap-3">
-        <div className="rounded-xl2 border border-nz-border bg-white p-3">
-          <div className="text-[10px] font-semibold uppercase text-slate-400">Pending My Action</div>
-          <div className="mt-1 text-2xl font-extrabold text-nz-amber">{myActionCount}</div>
-        </div>
-        <div className="rounded-xl2 border border-nz-border bg-white p-3">
-          <div className="text-[10px] font-semibold uppercase text-slate-400">Requiring My Closure</div>
-          <div className="mt-1 text-2xl font-extrabold text-nz-orange">{closureCount}</div>
-        </div>
+      <div className="mb-4 flex flex-wrap gap-3">
+        <KpiTile label="Total Requests" value={totalRequests} tone="navy" />
+        <KpiTile label="Completed" value={completed} tone="green" />
+        <KpiTile label="Live" value={live} tone="blue" />
+        <KpiTile label="Pending" value={pending} tone="amber" />
+        <KpiTile label="Not Closed" value={notClosed} tone="orange" />
       </div>
 
       {transferredToMe.length > 0 && (
@@ -104,6 +105,16 @@ export default function MyTasks({ navigate }) {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function KpiTile({ label, value, tone }) {
+  const tones = { amber: 'text-nz-amber', red: 'text-nz-red', blue: 'text-nz-blue', green: 'text-nz-green', orange: 'text-nz-orange', navy: 'text-nz-navy' };
+  return (
+    <div className="min-w-[110px] flex-1 rounded-xl2 border border-nz-border bg-white p-3">
+      <div className="text-[10px] font-semibold uppercase text-slate-400">{label}</div>
+      <div className={`mt-1 text-2xl font-extrabold ${tones[tone] || 'text-nz-navy'}`}>{value}</div>
     </div>
   );
 }

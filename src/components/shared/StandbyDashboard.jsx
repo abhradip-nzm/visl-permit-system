@@ -13,12 +13,30 @@ const ICONS = { rescuers: LifeBuoy, firstAiders: Cross };
 export default function StandbyDashboard({ field, roleLabel }) {
   const { permits, currentUser } = useApp();
   const Icon = ICONS[field] || LifeBuoy;
-  const mine = permits.filter((p) => p.status !== 'closed' && p.status !== 'draft' && p.rescue?.[field]?.includes(currentUser.name));
+  const all = permits.filter((p) => p.status !== 'draft' && p.rescue?.[field]?.includes(currentUser.name));
+  const mine = all.filter((p) => p.status !== 'closed');
+  const active = all.filter((p) => p.status === 'live');
+  const completed = all.filter((p) => p.status === 'closed');
 
   return (
     <div>
       <div className="mb-4 flex items-center gap-1.5 rounded-lg bg-nz-blue-light px-3 py-2 text-xs font-semibold text-nz-blue-dark">
         <Icon size={13} /> Permits where you're named as the {roleLabel} standby contact.
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-4">
+        <Card className="min-w-[150px] flex-1 p-4">
+          <div className="text-xs font-semibold uppercase text-slate-400">Total Assignments</div>
+          <div className="mt-1 text-3xl font-extrabold text-nz-navy">{all.length}</div>
+        </Card>
+        <Card className="min-w-[150px] flex-1 p-4">
+          <div className="text-xs font-semibold uppercase text-slate-400">Active</div>
+          <div className="mt-1 text-3xl font-extrabold text-nz-green">{active.length}</div>
+        </Card>
+        <Card className="min-w-[150px] flex-1 p-4">
+          <div className="text-xs font-semibold uppercase text-slate-400">Completed</div>
+          <div className="mt-1 text-3xl font-extrabold text-nz-blue">{completed.length}</div>
+        </Card>
       </div>
 
       <Card>

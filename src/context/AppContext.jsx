@@ -30,6 +30,12 @@ export function AppProvider({ children }) {
   const [toasts, setToasts] = useState([]);
   const [language, setLanguage] = useState('English');
   const [aiOpen, setAiOpen] = useState(false);
+  // Phase 10: a session-wide Desktop/Mobile toggle (see AppShell.jsx) —
+  // independent of role, unlike the old per-role ROLE_PLATFORM split.
+  const [viewMode, setViewMode] = useState('desktop');
+  const toggleViewMode = useCallback(() => {
+    setViewMode((m) => (m === 'desktop' ? 'mobile' : 'desktop'));
+  }, []);
 
   const login = useCallback((username, password) => {
     const user = USERS.find((u) => u.username === username.trim().toLowerCase() && u.password === password && u.status === 'active');
@@ -164,13 +170,15 @@ export function AppProvider({ children }) {
       language,
       setLanguage,
       aiOpen,
-      setAiOpen
+      setAiOpen,
+      viewMode,
+      toggleViewMode
     }),
     [
       currentUser, currentRole, currentDepartment, login, selectRole, logout,
       permits, tasks, lockRegister, personalLockRegister, notifications, shiftTransfers, toasts, language, aiOpen,
       pushToast, updatePermit, addTimelineEvent, updateTask, reserveLock, releaseLock,
-      reservePersonalLock, releasePersonalLock, markNotificationsRead, transferShift
+      reservePersonalLock, releasePersonalLock, markNotificationsRead, transferShift, viewMode, toggleViewMode
     ]
   );
 
