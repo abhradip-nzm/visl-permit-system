@@ -27,7 +27,7 @@ export default function TaskOverview() {
 
   return (
     <div>
-      <div className="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="mb-4 grid grid-cols-2 gap-4 @lg:grid-cols-4">
         <Stat label="Total Tasks" value={tasks.length} />
         <Stat label="Assigned" value={assigned} tone="green" />
         <Stat label="Pending" value={pending} tone="amber" />

@@ -45,7 +45,7 @@ export default function Compliance() {
       </Card>
 
       <SectionLabel>Department Certification Overview — Geofence Linkage</SectionLabel>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 @lg:grid-cols-2">
         {GEOFENCE_LOCATIONS.map((z) => (
           <Card key={z.zone} className="p-4">
             <div className="mb-1 flex items-center gap-2 text-sm font-bold text-nz-navy"><MapPin size={14} className="text-nz-orange" /> {z.zone}</div>

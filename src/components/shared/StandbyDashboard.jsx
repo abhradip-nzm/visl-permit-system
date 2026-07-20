@@ -42,10 +42,10 @@ export default function StandbyDashboard({ field, roleLabel }) {
       <Card>
         <div className="divide-y divide-nz-border/60">
           {mine.map((p) => (
-            <div key={p.id} className="flex items-center justify-between px-4 py-3">
-              <div>
-                <div className="font-semibold text-nz-navy">{p.id} — {p.equipment}</div>
-                <div className="text-xs text-slate-400">{p.location} · {p.requester} · {p.shift} shift</div>
+            <div key={p.id} className="flex items-center justify-between gap-2 px-4 py-3">
+              <div className="min-w-0">
+                <div className="truncate font-semibold text-nz-navy">{p.id} — {p.equipment}</div>
+                <div className="truncate text-xs text-slate-400">{p.location} · {p.requester} · {p.shift} shift</div>
                 <div className="mt-1"><PTWStepper permit={p} compact /></div>
               </div>
               <StatusBadge status={p.status} />

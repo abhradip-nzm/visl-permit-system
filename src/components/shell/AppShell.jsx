@@ -39,7 +39,7 @@ export default function AppShell({ renderScreen, titleFor }) {
           }
         >
           <MobileTopBar title={titleFor ? titleFor(screen) : ''} />
-          <div className="pb-20">{renderScreen(screen, navigate, screenParams)}</div>
+          <div className="@container overflow-x-hidden pb-20">{renderScreen(screen, navigate, screenParams)}</div>
           <MobileTabBar activeScreen={screen} onNavigate={navigate} />
         </PhoneFrame>
       </div>
@@ -51,7 +51,7 @@ export default function AppShell({ renderScreen, titleFor }) {
       <Sidebar activeScreen={screen} onNavigate={navigate} />
       <div className="flex flex-1 flex-col overflow-hidden">
         <TopBar title={titleFor ? titleFor(screen) : ''} />
-        <main className="flex-1 overflow-y-auto p-6">{renderScreen(screen, navigate, screenParams)}</main>
+        <main className="@container flex-1 overflow-y-auto p-6">{renderScreen(screen, navigate, screenParams)}</main>
       </div>
       <AIAssistant />
       <ToastHost toasts={toasts} />

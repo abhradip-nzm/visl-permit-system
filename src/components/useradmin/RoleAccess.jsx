@@ -48,7 +48,7 @@ export default function RoleAccess() {
 
       {tab === 'Permission Matrix' && (
         <>
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-col gap-3 @lg:flex-row @lg:items-center @lg:justify-between">
             <div className="flex items-center gap-3">
               <span className="text-sm font-semibold text-slate-500">Role:</span>
               <select
@@ -59,7 +59,7 @@ export default function RoleAccess() {
                 {ROLE_OPTIONS.map((r) => <option key={r}>{r}</option>)}
               </select>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button variant="outline" onClick={() => setShowCreateRole(true)}><Plus size={14} /> Create Custom Role</Button>
               <Button variant="outline" onClick={() => setGrid(defaultGrid())}>Reset to Default</Button>
               <Button variant="primary" onClick={() => pushToast(`Permissions saved for ${role}`)}>Save Changes</Button>

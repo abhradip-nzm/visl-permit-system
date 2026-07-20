@@ -136,10 +136,10 @@ function JobList({ jobs, navigate }) {
   return (
     <div className="divide-y divide-nz-border/60">
       {jobs.map((p) => (
-        <button key={p.id} onClick={() => navigate('jobdetail', { id: p.id })} className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-nz-surface">
-          <div>
-            <div className="font-semibold text-nz-navy">{p.id} — {p.equipment}</div>
-            <div className="text-xs text-slate-400">{p.dateFrom} · {p.location}</div>
+        <button key={p.id} onClick={() => navigate('jobdetail', { id: p.id })} className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left hover:bg-nz-surface">
+          <div className="min-w-0">
+            <div className="truncate font-semibold text-nz-navy">{p.id} — {p.equipment}</div>
+            <div className="truncate text-xs text-slate-400">{p.dateFrom} · {p.location}</div>
             <div className="mt-1"><PTWStepper permit={p} compact /></div>
           </div>
           <StatusBadge status={p.status} />
@@ -176,7 +176,7 @@ function WeekView({ anchor, setAnchor, jobsByDate, navigate }) {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-7 gap-1 sm:gap-2">
+        <div className="grid grid-cols-7 gap-1 @lg:gap-2">
           {days.map((d, i) => {
             const iso = toISODate(d);
             const jobs = jobsByDate[iso] || [];
@@ -184,11 +184,11 @@ function WeekView({ anchor, setAnchor, jobsByDate, navigate }) {
               <button
                 key={iso}
                 onClick={() => setSelected(iso)}
-                className={`rounded-lg border p-1 text-left sm:p-2 ${selected === iso ? 'border-nz-blue bg-nz-blue-light' : 'border-nz-border bg-white hover:bg-nz-surface'}`}
+                className={`rounded-lg border p-1 text-left @lg:p-2 ${selected === iso ? 'border-nz-blue bg-nz-blue-light' : 'border-nz-border bg-white hover:bg-nz-surface'}`}
               >
-                <div className="truncate text-[9px] font-bold text-nz-navy sm:text-[11px]">{WEEKDAY_LABELS[i].slice(0, 3)}</div>
-                <div className="text-[8px] text-slate-400 sm:text-[10px]">{iso.slice(5)}</div>
-                <div className={`mt-0.5 text-sm font-extrabold sm:mt-1 sm:text-lg ${jobs.length ? 'text-nz-blue' : 'text-slate-300'}`}>{jobs.length}</div>
+                <div className="truncate text-[9px] font-bold text-nz-navy @lg:text-[11px]">{WEEKDAY_LABELS[i].slice(0, 3)}</div>
+                <div className="text-[8px] text-slate-400 @lg:text-[10px]">{iso.slice(5)}</div>
+                <div className={`mt-0.5 text-sm font-extrabold @lg:mt-1 @lg:text-lg ${jobs.length ? 'text-nz-blue' : 'text-slate-300'}`}>{jobs.length}</div>
               </button>
             );
           })}
@@ -228,10 +228,10 @@ function MonthView({ anchor, setAnchor, jobsByDate, navigate }) {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-bold uppercase text-slate-400 sm:gap-1.5 sm:text-[10px]">
+        <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-bold uppercase text-slate-400 @lg:gap-1.5 @lg:text-[10px]">
           {WEEKDAY_LABELS.map((d) => <div key={d} className="truncate">{d.slice(0, 1)}</div>)}
         </div>
-        <div className="mt-1 grid grid-cols-7 gap-1 sm:gap-1.5">
+        <div className="mt-1 grid grid-cols-7 gap-1 @lg:gap-1.5">
           {cells.map((d) => {
             const iso = toISODate(d);
             const inMonth = d.getMonth() === monthStart.getMonth();
@@ -240,9 +240,9 @@ function MonthView({ anchor, setAnchor, jobsByDate, navigate }) {
               <button
                 key={iso}
                 onClick={() => setSelected(iso)}
-                className={`rounded-lg border p-1 text-left sm:p-1.5 ${selected === iso ? 'border-nz-blue bg-nz-blue-light' : 'border-nz-border bg-white hover:bg-nz-surface'} ${inMonth ? '' : 'opacity-30'}`}
+                className={`rounded-lg border p-1 text-left @lg:p-1.5 ${selected === iso ? 'border-nz-blue bg-nz-blue-light' : 'border-nz-border bg-white hover:bg-nz-surface'} ${inMonth ? '' : 'opacity-30'}`}
               >
-                <div className="text-[10px] font-semibold text-nz-navy sm:text-[11px]">{d.getDate()}</div>
+                <div className="text-[10px] font-semibold text-nz-navy @lg:text-[11px]">{d.getDate()}</div>
                 {jobs.length > 0 && <div className="mt-0.5 h-1.5 w-1.5 rounded-full bg-nz-blue" />}
               </button>
             );

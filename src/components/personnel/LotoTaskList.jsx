@@ -36,20 +36,20 @@ export default function LotoTaskList({ navigate }) {
             onClick={() => navigate('execution', { id: p.id })}
             className="flex w-full items-center justify-between rounded-xl2 border border-nz-border bg-white p-4 text-left shadow-card"
           >
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-nz-navy">{p.id}</span>
                 <StatusBadge status={p.status} />
               </div>
-              <div className="mt-1 flex items-center gap-1 text-sm text-slate-500">
-                <Zap size={13} /> {p.equipment} — isolation required
+              <div className="mt-1 flex items-center gap-1 truncate text-sm text-slate-500">
+                <Zap size={13} className="flex-shrink-0" /> {p.equipment} — isolation required
               </div>
-              <div className="mt-1 text-xs text-slate-400">{p.location} · {p.shift} shift</div>
-              <div className="mt-1 text-xs font-semibold text-nz-amber">
+              <div className="mt-1 truncate text-xs text-slate-400">{p.location} · {p.shift} shift</div>
+              <div className="mt-1 truncate text-xs font-semibold text-nz-amber">
                 Energy source: {ENERGY_SOURCES[p.id] || 'Mechanical'}
               </div>
             </div>
-            <ChevronRight size={18} className="text-slate-300" />
+            <ChevronRight size={18} className="flex-shrink-0 text-slate-300" />
           </button>
         ))}
         {tasks.length === 0 && (

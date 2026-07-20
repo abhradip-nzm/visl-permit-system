@@ -19,19 +19,19 @@ export default function TaskManagement() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between border-b border-nz-border">
-        <div className="flex gap-2">
+      <div className="mb-4 flex flex-col gap-2 border-b border-nz-border pb-2 @lg:flex-row @lg:items-center @lg:justify-between @lg:pb-0">
+        <div className="flex gap-2 overflow-x-auto">
           {TABS.map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-4 py-2.5 text-sm font-semibold ${tab === t ? 'border-b-2 border-nz-blue text-nz-blue' : 'text-slate-500'}`}
+              className={`flex-shrink-0 px-4 py-2.5 text-sm font-semibold ${tab === t ? 'border-b-2 border-nz-blue text-nz-blue' : 'text-slate-500'}`}
             >
               {t}
             </button>
           ))}
         </div>
-        <Button variant="orange" className="mb-2" onClick={() => setShowCreate(true)}><Plus size={15} /> Create Task</Button>
+        <Button variant="orange" className="mb-2 flex-shrink-0" onClick={() => setShowCreate(true)}><Plus size={15} /> Create Task</Button>
       </div>
 
       <div className="space-y-3">
@@ -86,7 +86,7 @@ function CreateTaskModal({ onClose }) {
             <span className="mb-1 block text-xs font-semibold text-slate-500">Description</span>
             <textarea rows={2} className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring" />
           </label>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 @lg:grid-cols-2">
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-slate-500">Equipment</span>
               <select className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring">

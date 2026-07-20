@@ -36,8 +36,8 @@ export default function MaintenanceRequests() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <div className="sm:col-span-2">
+    <div className="grid grid-cols-1 gap-4 @lg:grid-cols-3">
+      <div className="@lg:col-span-2">
         <SectionLabel>My Requests</SectionLabel>
         <Card className="overflow-x-auto">
           <table className="w-full text-left text-sm">

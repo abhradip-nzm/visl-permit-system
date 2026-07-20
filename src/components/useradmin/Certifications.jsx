@@ -11,12 +11,12 @@ export default function Certifications() {
   const [tab, setTab] = useState(TABS[0]);
   return (
     <div>
-      <div className="mb-4 flex gap-2 border-b border-nz-border">
+      <div className="mb-4 flex gap-2 overflow-x-auto border-b border-nz-border">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-2.5 text-sm font-semibold ${tab === t ? 'border-b-2 border-nz-blue text-nz-blue' : 'text-slate-500'}`}
+            className={`flex-shrink-0 whitespace-nowrap px-4 py-2.5 text-sm font-semibold ${tab === t ? 'border-b-2 border-nz-blue text-nz-blue' : 'text-slate-500'}`}
           >
             {t}
           </button>
@@ -114,7 +114,7 @@ function PersonnelTab() {
 
 function GeofenceTab() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 @lg:grid-cols-2">
       {GEOFENCE_LOCATIONS.map((z) => (
         <Card key={z.zone} className="p-4">
           <div className="mb-2 flex items-center gap-2 text-sm font-bold text-nz-navy"><MapPin size={14} className="text-nz-orange" /> {z.zone}</div>

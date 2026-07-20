@@ -36,8 +36,8 @@ export default function ShiftDashboard({ navigate }) {
         <Stat label="Shift Alerts" value={alerts} tone="red" />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="space-y-4 sm:col-span-2">
+      <div className="grid grid-cols-1 gap-4 @lg:grid-cols-3">
+        <div className="space-y-4 @lg:col-span-2">
           <Card className="overflow-x-auto">
             <div className="border-b border-nz-border px-4 py-3 text-sm font-bold text-nz-navy">Active Personnel</div>
             <table className="w-full text-left text-sm">
@@ -70,12 +70,12 @@ export default function ShiftDashboard({ navigate }) {
             <div className="border-b border-nz-border px-4 py-3 text-sm font-bold text-nz-navy">Current Shift Tasks</div>
             <div className="divide-y divide-nz-border/60">
               {shiftTasks.map((t) => (
-                <div key={t.id} className="flex items-center justify-between px-4 py-3">
-                  <div>
-                    <div className="font-semibold text-nz-navy">{t.id} — {t.type}</div>
-                    <div className="text-xs text-slate-400">{t.assignedTo || 'Unassigned'} · {t.equipment}</div>
+                <div key={t.id} className="flex items-center justify-between gap-2 px-4 py-3">
+                  <div className="min-w-0">
+                    <div className="truncate font-semibold text-nz-navy">{t.id} — {t.type}</div>
+                    <div className="truncate text-xs text-slate-400">{t.assignedTo || 'Unassigned'} · {t.equipment}</div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-shrink-0 items-center gap-2">
                     {t.lotoRequired && <span className="text-xs font-semibold text-nz-amber">Isolation</span>}
                     <StatusBadge status={t.status === 'Overdue' ? 'blocked' : t.status === 'Completed' ? 'closed' : 'issued'} />
                   </div>
@@ -88,10 +88,10 @@ export default function ShiftDashboard({ navigate }) {
             <div className="border-b border-nz-border px-4 py-3 text-sm font-bold text-nz-navy"><ArrowLeftRight size={13} className="mr-1.5 inline" /> Active Permit Transfers</div>
             <div className="divide-y divide-nz-border/60">
               {transferred.map((p) => (
-                <div key={p.id} className="flex items-center justify-between px-4 py-3 text-sm">
-                  <div>
-                    <div className="font-semibold text-nz-navy">{p.id} — {p.equipment}</div>
-                    <div className="text-xs text-slate-400">
+                <div key={p.id} className="flex items-center justify-between gap-2 px-4 py-3 text-sm">
+                  <div className="min-w-0">
+                    <div className="truncate font-semibold text-nz-navy">{p.id} — {p.equipment}</div>
+                    <div className="truncate text-xs text-slate-400">
                       {p.transfers.map((t) => t.transferredTo).join(' → ')}
                     </div>
                   </div>
@@ -157,10 +157,10 @@ export default function ShiftDashboard({ navigate }) {
               <button
                 key={p.id}
                 onClick={() => navigate('lotoapprovals', { id: p.id })}
-                className="flex w-full items-center justify-between rounded-lg border border-nz-border px-3 py-2 text-left text-xs"
+                className="flex w-full items-center justify-between gap-2 rounded-lg border border-nz-border px-3 py-2 text-left text-xs"
               >
-                <span className="font-semibold text-nz-navy">{p.id} needs isolation verification</span>
-                <ChevronRight size={12} className="text-slate-300" />
+                <span className="min-w-0 truncate font-semibold text-nz-navy">{p.id} needs isolation verification</span>
+                <ChevronRight size={12} className="flex-shrink-0 text-slate-300" />
               </button>
             ))}
           </div>

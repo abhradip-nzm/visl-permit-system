@@ -27,14 +27,14 @@ export default function AdminDashboard() {
         <WorkflowStrip activeRole="useradmin" />
       </div>
 
-      <div className="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="mb-4 grid grid-cols-2 gap-4 @lg:grid-cols-4">
         <Stat label="Active Users" value={SYSTEM_HEALTH.activeUsers} icon={Users} />
         <Stat label="Open Permits" value={SYSTEM_HEALTH.openPermits} icon={FileWarning} />
         <Stat label="Blocked Permits" value={2} icon={AlertTriangle} tone="red" />
         <Stat label="Expired Certifications" value={expired.length} icon={AlertTriangle} tone="red" />
       </div>
 
-      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="mb-4 grid grid-cols-1 gap-4 @lg:grid-cols-3">
         {INTEGRATIONS.map((i) => {
           const tone = i.status === 'ok' ? 'text-nz-green' : i.status === 'warning' ? 'text-nz-amber' : 'text-nz-red';
           const label = i.status === 'ok' ? 'Operating normally' : i.status === 'warning' ? 'Elevated latency' : 'Connection error';
@@ -52,7 +52,7 @@ export default function AdminDashboard() {
 
       <Card className="mb-4 p-4">
         <SectionLabel>Validity & Expiry Summary</SectionLabel>
-        <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 text-sm @lg:grid-cols-3">
           <div className="rounded-lg bg-nz-red-light px-3 py-2.5">
             <div className="font-bold text-nz-red">{expired.length} certifications expired</div>
             <div className="text-xs text-slate-500">{expired.map((p) => p.name).join(', ')}</div>
@@ -74,9 +74,9 @@ export default function AdminDashboard() {
 
       <Card className="mb-4 p-4">
         <SectionLabel>Permit Status Breakdown</SectionLabel>
-        <div className="flex items-end gap-4">
+        <div className="flex flex-wrap items-end gap-4">
           {Object.entries(SYSTEM_HEALTH.breakdown).map(([k, v]) => (
-            <div key={k} className="flex flex-1 flex-col items-center gap-2">
+            <div key={k} className="flex min-w-[70px] flex-1 flex-col items-center gap-2">
               <div className="flex h-32 w-full items-end rounded-lg bg-nz-surface">
                 <div
                   className="w-full rounded-lg bg-nz-blue"
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 @lg:grid-cols-3">
         <Card className="p-4">
           <SectionLabel><span className="flex items-center gap-1.5"><Megaphone size={13} /> Recent Announcements</span></SectionLabel>
           <div className="space-y-2">

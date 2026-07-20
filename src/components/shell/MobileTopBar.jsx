@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, ChevronDown, Wifi, WifiOff, Globe, User, Check, LogOut, Monitor } from 'lucide-react';
+import { Bell, ChevronDown, Wifi, WifiOff, Globe, Check, LogOut, Monitor } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { ROLE_LABELS } from '../../data/navConfig.js';
 import NotificationsPanel from './NotificationsPanel.jsx';
@@ -20,9 +20,13 @@ export default function MobileTopBar({ title }) {
     <div className="sticky top-0 z-20 border-b border-nz-border bg-white">
       <div className="flex items-center justify-between gap-2 border-b border-nz-border/60 bg-nz-surface px-4 py-1.5">
         <DemoBadge />
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-nz-blue-light text-nz-blue">
-          <User size={12} />
-        </div>
+        <button
+          onClick={toggleViewMode}
+          title="Switch to desktop view"
+          className="flex items-center gap-1.5 rounded-full border border-nz-blue bg-nz-blue-light px-3 py-1 text-[11px] font-bold text-nz-blue-dark"
+        >
+          <Monitor size={13} /> Desktop View
+        </button>
       </div>
       <div className="flex items-center justify-between px-4 py-3">
         <div>
@@ -35,13 +39,6 @@ export default function MobileTopBar({ title }) {
           <h2 className="text-base font-bold text-nz-navy">{title}</h2>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={toggleViewMode}
-            title="Switch to desktop view"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-nz-surface text-slate-600"
-          >
-            <Monitor size={14} />
-          </button>
           <div className="relative">
             <button
               onClick={() => setShowLang((s) => !s)}

@@ -243,11 +243,11 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
         <div className="space-y-3">
           <SelectField label="Area" value={jobDetails.area} onChange={(v) => updateJobDetail('area', v)} options={PLANT_AREAS} error={attemptedSubmit && missingFields.area} required />
           <SelectField label="Equipment / Location" value={jobDetails.location} onChange={(v) => updateJobDetail('location', v)} options={EQUIPMENT.map((e) => e.name)} />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 @lg:grid-cols-2">
             <Field label="Date From" type="date" value={jobDetails.dateFrom} onChange={(v) => updateJobDetail('dateFrom', v)} />
             <Field label="Date Till" type="date" value={jobDetails.dateTill} onChange={(v) => updateJobDetail('dateTill', v)} />
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 @lg:grid-cols-2">
             <Field label="From Time" type="time" value={jobDetails.fromTime} onChange={(v) => updateJobDetail('fromTime', v)} />
             <Field label="To Time" type="time" value={jobDetails.toTime} onChange={(v) => updateJobDetail('toTime', v)} />
           </div>

@@ -47,7 +47,7 @@ export default function ActiveTasksLoto() {
       </Card>
 
       <SectionLabel><span className="flex items-center gap-1.5"><Lock size={13} /> LOTO Sub-section — Tasks Requiring Isolation</span></SectionLabel>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 @lg:grid-cols-2">
         {lotoPermits.map((p) => {
           const session = ACTIVE_LOCK_SESSIONS.find((s) => s.permitId === p.id);
           return (

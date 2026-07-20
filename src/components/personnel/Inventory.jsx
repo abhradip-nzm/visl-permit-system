@@ -16,7 +16,7 @@ export default function Inventory({ navigate }) {
   return (
     <div className="px-4 py-4">
       <h2 className="mb-4 text-lg font-bold text-nz-navy">Inventory</h2>
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex gap-2 overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t}

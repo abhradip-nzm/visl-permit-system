@@ -43,12 +43,12 @@ export default function ITDashboard() {
       <Card className="mb-6">
         <div className="divide-y divide-nz-border/60">
           {pending.map((p) => (
-            <div key={p.id} className="flex items-center justify-between px-4 py-3">
-              <div>
-                <div className="font-semibold text-nz-navy">{p.id} — {p.equipment}</div>
-                <div className="text-xs text-slate-400">{(p.types || [p.type]).join(', ')} · {p.location} · {p.requester}</div>
+            <div key={p.id} className="flex flex-col gap-2 px-4 py-3 @lg:flex-row @lg:items-center @lg:justify-between">
+              <div className="min-w-0">
+                <div className="truncate font-semibold text-nz-navy">{p.id} — {p.equipment}</div>
+                <div className="truncate text-xs text-slate-400">{(p.types || [p.type]).join(', ')} · {p.location} · {p.requester}</div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-shrink-0 items-center gap-3">
                 <StatusBadge status={p.status} />
                 <Button variant="success" size="sm" onClick={() => grant(p)}><CheckCircle2 size={13} /> Grant</Button>
               </div>
@@ -62,10 +62,10 @@ export default function ITDashboard() {
       <Card>
         <div className="divide-y divide-nz-border/60">
           {granted.map((p) => (
-            <div key={p.id} className="flex items-center justify-between px-4 py-3 text-sm">
-              <div>
-                <div className="font-semibold text-nz-navy">{p.id} — {p.equipment}</div>
-                <div className="text-xs text-slate-400">Granted by {p.deptClearances.itApproval.name}</div>
+            <div key={p.id} className="flex items-center justify-between gap-2 px-4 py-3 text-sm">
+              <div className="min-w-0">
+                <div className="truncate font-semibold text-nz-navy">{p.id} — {p.equipment}</div>
+                <div className="truncate text-xs text-slate-400">Granted by {p.deptClearances.itApproval.name}</div>
               </div>
               <StatusBadge status={p.status} />
             </div>

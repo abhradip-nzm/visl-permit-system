@@ -11,12 +11,12 @@ export default function MasterData() {
 
   return (
     <div>
-      <div className="mb-4 flex gap-2 border-b border-nz-border">
+      <div className="mb-4 flex gap-2 overflow-x-auto border-b border-nz-border">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-2.5 text-sm font-semibold ${
+            className={`flex-shrink-0 whitespace-nowrap px-4 py-2.5 text-sm font-semibold ${
               tab === t ? 'border-b-2 border-nz-blue text-nz-blue' : 'text-slate-500'
             }`}
           >
@@ -104,7 +104,7 @@ function ImportWizard({ onClose }) {
       {step === 2 && (
         <div>
           <div className="mb-3 text-sm text-slate-500">Field mapping preview (auto-detected from {source}):</div>
-          <div className="grid grid-cols-1 gap-2 text-xs text-slate-600 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 text-xs text-slate-600 @lg:grid-cols-2">
             <div className="rounded bg-nz-surface px-3 py-2">Source: equip_name → Target: name</div>
             <div className="rounded bg-nz-surface px-3 py-2">Source: calib_date → Target: calibrationDate</div>
             <div className="rounded bg-nz-surface px-3 py-2">Source: plant_area → Target: location</div>
@@ -157,7 +157,7 @@ function PermitTypesTab() {
 
 function HazardMappingTab() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 @lg:grid-cols-2">
       {Object.entries(HAZARD_CONTROL_LIBRARY).map(([type, data]) => (
         <Card key={type} className="p-4">
           <div className="mb-2 text-sm font-bold text-nz-navy">{type}</div>

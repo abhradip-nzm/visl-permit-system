@@ -160,7 +160,7 @@ function UserModal({ user, onClose, onSave }) {
           <div className="text-lg font-bold text-nz-navy">{user ? 'Edit User' : 'Create User'}</div>
           <button onClick={onClose} className="rounded-full p-1 hover:bg-nz-surface"><X size={18} /></button>
         </div>
-        <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 text-sm @lg:grid-cols-2">
           <Field label="Name" value={name} onChange={setName} />
           <Field label="Employee ID" value={employeeId} onChange={setEmployeeId} />
           <Field label="Username (for login)" value={username} onChange={setUsername} />

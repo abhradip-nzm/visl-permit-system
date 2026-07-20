@@ -4,7 +4,7 @@ import { Check, ChevronDown } from 'lucide-react';
 // Flat multi-column checkbox grid, used for Sections A/C/D/F.
 export function CheckboxGrid({ items, selected, onToggle, columns = 2 }) {
   return (
-    <div className={`grid gap-2 ${columns === 3 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2'}`}>
+    <div className={`grid gap-2 ${columns === 3 ? 'grid-cols-2 @lg:grid-cols-3' : 'grid-cols-2'}`}>
       {items.map((item) => {
         const active = selected.includes(item);
         return (

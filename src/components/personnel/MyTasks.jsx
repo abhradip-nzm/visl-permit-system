@@ -49,9 +49,9 @@ export default function MyTasks({ navigate }) {
           <div className="mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase text-nz-blue-dark"><ArrowLeftRight size={12} /> Transferred to Me</div>
           <div className="space-y-1.5">
             {transferredToMe.map((p) => (
-              <button key={p.id} onClick={() => navigate('detail', { id: p.id })} className="flex w-full items-center justify-between rounded-lg bg-white px-3 py-2 text-left text-xs">
-                <span className="font-semibold text-nz-navy">{p.id} — {p.equipment}</span>
-                <ChevronRight size={13} className="text-slate-300" />
+              <button key={p.id} onClick={() => navigate('detail', { id: p.id })} className="flex w-full items-center justify-between gap-2 rounded-lg bg-white px-3 py-2 text-left text-xs">
+                <span className="min-w-0 truncate font-semibold text-nz-navy">{p.id} — {p.equipment}</span>
+                <ChevronRight size={13} className="flex-shrink-0 text-slate-300" />
               </button>
             ))}
           </div>
@@ -86,17 +86,17 @@ export default function MyTasks({ navigate }) {
             onClick={() => navigate('detail', { id: p.id })}
             className="flex w-full items-center justify-between rounded-xl2 border border-nz-border bg-white p-4 text-left shadow-card"
           >
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-nz-navy">{p.id}</span>
                 <StatusBadge status={p.status} />
               </div>
-              <div className="mt-1 text-sm text-slate-500">{(p.types || [p.type]).join(', ')} · {p.equipment}</div>
-              <div className="mt-1 flex items-center gap-1 text-xs text-slate-400">
-                <Clock size={11} /> {p.location} · {p.shift} shift
+              <div className="mt-1 truncate text-sm text-slate-500">{(p.types || [p.type]).join(', ')} · {p.equipment}</div>
+              <div className="mt-1 flex items-center gap-1 truncate text-xs text-slate-400">
+                <Clock size={11} className="flex-shrink-0" /> {p.location} · {p.shift} shift
               </div>
             </div>
-            <ChevronRight size={18} className="text-slate-300" />
+            <ChevronRight size={18} className="flex-shrink-0 text-slate-300" />
           </button>
         ))}
         {filtered.length === 0 && (

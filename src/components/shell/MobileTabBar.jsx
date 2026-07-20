@@ -7,8 +7,11 @@ export default function MobileTabBar({ activeScreen, onNavigate }) {
   const { currentRole } = useApp();
   const items = NAV_CONFIG[currentRole] || [];
 
+  // Icon-only in mobile — full labels stay on the desktop Sidebar. With no
+  // text to fall back on, the active tab needs a stronger visual cue than
+  // color alone, hence the underline dot.
   return (
-    <div className="absolute bottom-0 left-0 right-0 flex overflow-x-auto border-t border-nz-border bg-white">
+    <div className="absolute bottom-0 left-0 right-0 flex border-t border-nz-border bg-white">
       {items.map((item) => {
         const Icon = Icons[item.icon] || Icons.Circle;
         const active = activeScreen === item.key;
@@ -16,12 +19,12 @@ export default function MobileTabBar({ activeScreen, onNavigate }) {
           <button
             key={item.key}
             onClick={() => onNavigate(item.key)}
-            className={`flex min-w-[68px] flex-1 flex-shrink-0 flex-col items-center gap-1 whitespace-nowrap px-1.5 py-2.5 text-[10px] font-semibold ${
-              active ? 'text-nz-blue' : 'text-slate-400'
-            }`}
+            title={item.label}
+            aria-label={item.label}
+            className={`flex flex-1 flex-col items-center gap-1 py-3 ${active ? 'text-nz-blue' : 'text-slate-400'}`}
           >
-            <Icon size={19} />
-            {item.label}
+            <Icon size={21} />
+            <span className={`h-1 w-1 rounded-full ${active ? 'bg-nz-blue' : 'bg-transparent'}`} />
           </button>
         );
       })}

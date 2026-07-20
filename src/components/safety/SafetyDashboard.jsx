@@ -42,9 +42,9 @@ export default function SafetyDashboard({ navigate }) {
                   onClick={() => navigate('monitor', { id: p.id })}
                   className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left hover:bg-nz-surface"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <span className="font-bold text-nz-navy">{p.id}</span>
-                    <div className="text-xs text-slate-500">{p.warnings[0].text}</div>
+                    <div className="truncate text-xs text-slate-500">{p.warnings[0].text}</div>
                   </div>
                   <RiskBadge risk={p.risk} />
                 </button>
@@ -63,12 +63,12 @@ export default function SafetyDashboard({ navigate }) {
               onClick={() => navigate('monitor', { id: p.id })}
               className="flex w-full flex-col gap-1.5 px-4 py-3 text-left hover:bg-nz-surface"
             >
-              <div className="flex w-full items-center justify-between">
-                <div>
-                  <div className="font-bold text-nz-navy">{p.id} — {p.equipment}</div>
-                  <div className="text-xs text-slate-400">{(p.types || [p.type]).join(', ')} · {p.location} · {p.requester}</div>
+              <div className="flex w-full items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="truncate font-bold text-nz-navy">{p.id} — {p.equipment}</div>
+                  <div className="truncate text-xs text-slate-400">{(p.types || [p.type]).join(', ')} · {p.location} · {p.requester}</div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-shrink-0 items-center gap-2">
                   <RiskBadge risk={p.risk} />
                   <StatusBadge status={p.status} />
                   <ChevronRight size={14} className="text-slate-300" />

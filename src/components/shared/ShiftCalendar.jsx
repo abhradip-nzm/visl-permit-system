@@ -20,8 +20,8 @@ export default function ShiftCalendar({ scopeLabel = 'All Departments' }) {
   const days = SHIFT_CALENDAR.slice(weekOffset * 7, weekOffset * 7 + 7);
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <div className="space-y-4 sm:col-span-2">
+    <div className="grid grid-cols-1 gap-4 @lg:grid-cols-3">
+      <div className="space-y-4 @lg:col-span-2">
         <Card className="p-4">
           <div className="mb-3 flex items-center justify-between">
             <SectionLabel>
@@ -37,7 +37,7 @@ export default function ShiftCalendar({ scopeLabel = 'All Departments' }) {
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-7">
+          <div className="grid grid-cols-2 gap-2 @lg:grid-cols-7">
             {days.map((day) => (
               <div key={day.date} className="rounded-lg border border-nz-border p-2">
                 <div className="mb-1.5 text-[11px] font-bold text-nz-navy">{day.date.slice(5)}</div>

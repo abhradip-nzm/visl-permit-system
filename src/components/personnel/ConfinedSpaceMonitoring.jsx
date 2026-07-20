@@ -76,8 +76,8 @@ export default function ConfinedSpaceMonitoring({ navigate, params }) {
         </div>
         <div className="space-y-1.5">
           {personalEntry.map((p, i) => (
-            <div key={i} className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-              <input placeholder="Name" value={p.name} onChange={(e) => setPersonalEntry((prev) => prev.map((r, idx) => idx === i ? { ...r, name: e.target.value } : r))} className="col-span-2 rounded-lg border border-nz-border px-2 py-1.5 text-xs focus-ring sm:col-span-1" />
+            <div key={i} className="grid grid-cols-2 gap-1.5 @lg:grid-cols-3">
+              <input placeholder="Name" value={p.name} onChange={(e) => setPersonalEntry((prev) => prev.map((r, idx) => idx === i ? { ...r, name: e.target.value } : r))} className="col-span-2 rounded-lg border border-nz-border px-2 py-1.5 text-xs focus-ring @lg:col-span-1" />
               <input placeholder="In" value={p.in} onChange={(e) => setPersonalEntry((prev) => prev.map((r, idx) => idx === i ? { ...r, in: e.target.value } : r))} className="rounded-lg border border-nz-border px-2 py-1.5 text-xs focus-ring" />
               <input placeholder="Out" value={p.out} onChange={(e) => setPersonalEntry((prev) => prev.map((r, idx) => idx === i ? { ...r, out: e.target.value } : r))} className="rounded-lg border border-nz-border px-2 py-1.5 text-xs focus-ring" />
             </div>

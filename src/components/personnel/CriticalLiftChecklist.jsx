@@ -37,7 +37,7 @@ export default function CriticalLiftChecklist({ navigate, params }) {
 
       <Card className="mb-4 p-4">
         <SectionLabel>Basic Details</SectionLabel>
-        <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 text-sm @lg:grid-cols-2">
           <Field label="Date" value={basics.date} onChange={(v) => setBasics((b) => ({ ...b, date: v }))} />
           <Field label="Plant" value={basics.plant} onChange={(v) => setBasics((b) => ({ ...b, plant: v }))} />
           <Field label="Time" value={basics.time} onChange={(v) => setBasics((b) => ({ ...b, time: v }))} />
@@ -67,7 +67,7 @@ export default function CriticalLiftChecklist({ navigate, params }) {
 
       <Card className="mb-4 p-4">
         <SectionLabel>{isCritical ? 'Critical' : 'Routine'} Lift Plan</SectionLabel>
-        <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 text-sm @lg:grid-cols-2">
           {[
             ['diameterLength', 'Diameter & length of sling (L)'], ['slingSwl', 'SWL of slings as per marking & TPI'],
             ['noSlings', 'Nos. of slings used (N)'], ['craneCapacity', 'Capacity of crane at position'],
