@@ -15,9 +15,10 @@ export const WI_NUMBERS = ['WI-4108', 'WI-4111', 'WI-4523', 'WI-4890', 'WI-5012'
 // external contractor.
 export const CONTRACTORS = ['N/A', 'L&T Construction', 'Voltas Ltd', 'Thermax Engineering', 'Local Contractor — Other'];
 
-// Isolation Officer LOTO ID register (fixed list, matches the format already
-// used in seed data e.g. LOTO-014).
-export const LOTO_IDS = ['LOTO-011', 'LOTO-012', 'LOTO-013', 'LOTO-014', 'LOTO-015', 'LOTO-016'];
+// Isolation Officer LOTO IDs now live in lotoIdRegisterData.js — tracked
+// live in AppContext (reserveLotoId/releaseLotoId) with the same
+// uniqueness enforcement as the departmental lock register, instead of
+// this being a free-pick static list.
 
 // Phase 9: personal locks are no longer a free-pick list — every person has
 // exactly one personal LOTO key permanently associated with their account,

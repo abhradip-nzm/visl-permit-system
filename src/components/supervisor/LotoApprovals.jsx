@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { CheckCircle2, Lock, LockOpen, Plus, Trash2, ShieldAlert } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { isOwnPermit } from '../../utils/segregationOfDuties.js';
-import { LOTO_IDS } from '../../data/ptwFormData.js';
 import { USERS } from '../../data/usersData.js';
 import { Card, SectionLabel, Button, StatusBadge } from '../shared/Primitives.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
@@ -24,6 +23,10 @@ function generateIsolationPermitNo() {
   return `ISO-${1000 + Math.floor(Math.random() * 9000)}`;
 }
 
+function timestamp() {
+  return new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
 function emptyForm(permit) {
   return {
     isolationPermitNo: generateIsolationPermitNo(),
@@ -41,7 +44,7 @@ function emptyForm(permit) {
 // (type, permit no, toolbox/personal locks, topics, LOTO ID, dept lock) is
 // entered here and here only.
 export default function LotoApprovals({ params }) {
-  const { permits, updatePermit, addTimelineEvent, pushToast, currentUser, currentDepartment, lockRegister, reserveLock, personalLockRegister } = useApp();
+  const { permits, updatePermit, addTimelineEvent, pushToast, currentUser, currentDepartment, lockRegister, reserveLock, personalLockRegister, lotoIdRegister, reserveLotoId } = useApp();
   const pending = permits.filter((p) => p.isolationRequired && p.status === 'pending-isolation');
   const verified = permits.filter((p) => p.isolationRequired && p.isolationDetails?.[0]?.lotoIdNo);
   const [permitId, setPermitId] = useState(params?.id || pending[0]?.id);
@@ -54,6 +57,10 @@ export default function LotoApprovals({ params }) {
   // offered here. Isolation Officer is department-free (Phase 9), so every
   // available lock is offered regardless of department.
   const availableLocks = lockRegister.filter((l) => l.state === 'available' && (!currentDepartment || l.department === currentDepartment));
+  // LOTO ID No. is dept-free (like the Isolation Officer role itself) and,
+  // like Dept. Lock No above, only ever offers IDs not already in use on
+  // another live permit — see AppContext's reserveLotoId/releaseLotoId.
+  const availableLotoIds = lotoIdRegister.filter((l) => l.state === 'available');
   const personnelRoster = USERS.filter((u) => u.status === 'active' && u.roles.some((r) => r.role === 'personnel'));
 
   // Phase 9: personal lock IDs are no longer freely picked — each person has
@@ -68,12 +75,17 @@ export default function LotoApprovals({ params }) {
 
   function verifyIsolation() {
     if (!permit) return;
-    // Reserve first: if another action beat us to this lock since the
-    // dropdown was rendered, the register refuses the double-booking and we
-    // bail out without advancing the permit.
+    // Reserve first: if another action beat us to this lock/LOTO ID since
+    // the dropdowns were rendered, the registers refuse the double-booking
+    // and we bail out without advancing the permit.
     const reserved = reserveLock(form.deptLockNo, permit.id);
     if (!reserved) {
       pushToast(`Lock ${form.deptLockNo} was just taken by another permit — pick a different lock`, 'error');
+      return;
+    }
+    const lotoReserved = reserveLotoId(form.lotoIdNo, permit.id);
+    if (!lotoReserved) {
+      pushToast(`LOTO ID ${form.lotoIdNo} was just taken by another permit — pick a different LOTO ID`, 'error');
       return;
     }
     const details = [{
@@ -82,7 +94,8 @@ export default function LotoApprovals({ params }) {
       isolationPermitNo: form.isolationPermitNo,
       isolationOfficerName: currentUser.name,
       lotoIdNo: form.lotoIdNo,
-      deptLockNo: form.deptLockNo
+      deptLockNo: form.deptLockNo,
+      appliedAt: timestamp()
     }];
     updatePermit(permit.id, {
       isolationDetails: details,
@@ -184,9 +197,10 @@ export default function LotoApprovals({ params }) {
               <label className="block">
                 <span className="mb-1 block text-xs font-semibold text-slate-500">Isolation Officer LOTO ID No</span>
                 <select value={form.lotoIdNo} onChange={(e) => setForm((f) => ({ ...f, lotoIdNo: e.target.value }))} className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring">
-                  <option value="">Select…</option>
-                  {LOTO_IDS.map((id) => <option key={id}>{id}</option>)}
+                  <option value="">Select an available LOTO ID…</option>
+                  {availableLotoIds.map((l) => <option key={l.id} value={l.id}>{l.id}</option>)}
                 </select>
+                {availableLotoIds.length === 0 && <span className="mt-1 block text-[11px] text-nz-red">No available LOTO IDs right now.</span>}
               </label>
               <label className="block">
                 <span className="mb-1 block text-xs font-semibold text-slate-500">Dept. Lock No</span>
@@ -272,7 +286,7 @@ export default function LotoApprovals({ params }) {
 // confirms the equipment has been de-isolated — this is what actually
 // releases the lock back to the register (see AppContext.releaseLock).
 function DeIsolationSection() {
-  const { permits, updatePermit, addTimelineEvent, pushToast, currentUser, releaseLock } = useApp();
+  const { permits, updatePermit, addTimelineEvent, pushToast, currentUser, releaseLock, releaseLotoId } = useApp();
   const pendingDeIsolation = permits.filter((p) => p.isolationRequired && p.status === 'pending-closure' && !p.deIsolation);
   const [comments, setComments] = useState({});
 
@@ -286,11 +300,13 @@ function DeIsolationSection() {
 
   function confirm(p) {
     const lockId = p.isolationDetails?.[0]?.deptLockNo;
+    const lotoId = p.isolationDetails?.[0]?.lotoIdNo;
     const comment = comments[p.id]?.trim();
     if (lockId) releaseLock(lockId);
-    updatePermit(p.id, { deIsolation: { by: currentUser.name, at: 'Just now', comment: comment || '' } });
-    addTimelineEvent(p.id, `De-isolation confirmed — lock ${lockId || '—'} released${comment ? ` — "${comment}"` : ''}`, `${currentUser.name} (Isolation Officer)`);
-    pushToast(`${p.id} de-isolated — lock released back to register`);
+    if (lotoId) releaseLotoId(lotoId);
+    updatePermit(p.id, { deIsolation: { by: currentUser.name, at: timestamp(), comment: comment || '' } });
+    addTimelineEvent(p.id, `De-isolation confirmed — lock ${lockId || '—'} and LOTO ${lotoId || '—'} released${comment ? ` — "${comment}"` : ''}`, `${currentUser.name} (Isolation Officer)`);
+    pushToast(`${p.id} de-isolated — lock and LOTO ID released back to register`);
   }
 
   return (

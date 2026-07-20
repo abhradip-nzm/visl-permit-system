@@ -212,7 +212,7 @@ export const PERMITS = [
     }),
     isolationRequired: true,
     isolationDetails: [
-      { equipment: 'Hydraulic Accumulator H-9', typeOfIsolation: 'Mechanical', isolationPermitNo: 'ISO-0231', isolationOfficerName: 'J. Mehta', lotoIdNo: 'LOTO-014', deptLockNo: 'LK-198' }
+      { equipment: 'Hydraulic Accumulator H-9', typeOfIsolation: 'Mechanical', isolationPermitNo: 'ISO-0231', isolationOfficerName: 'J. Mehta', lotoIdNo: 'LOTO-014', deptLockNo: 'LK-198', appliedAt: '05 Jul, 08:30' }
     ],
     toolboxRecord: [{ name: 'A. Chatterjee', company: 'Vedanta', personalLockId: 'PL-005', signed: true }],
     workers: [{ name: 'K. Reddy', personalLockId: 'PL-016', applied: false, appliedAt: null, removed: false, removedAt: null, started: false, startedAt: null }],

@@ -4,6 +4,7 @@ import { TASKS } from '../data/tasksData.js';
 import { USERS } from '../data/usersData.js';
 import { LOCK_REGISTER } from '../data/lockRegisterData.js';
 import { PERSONAL_LOCK_REGISTER } from '../data/personalLockRegisterData.js';
+import { LOTO_ID_REGISTER } from '../data/lotoIdRegisterData.js';
 
 const AppContext = createContext(null);
 
@@ -25,6 +26,7 @@ export function AppProvider({ children }) {
   const [tasks, setTasks] = useState(TASKS);
   const [lockRegister, setLockRegister] = useState(LOCK_REGISTER);
   const [personalLockRegister, setPersonalLockRegister] = useState(PERSONAL_LOCK_REGISTER);
+  const [lotoIdRegister, setLotoIdRegister] = useState(LOTO_ID_REGISTER);
   const [notifications, setNotifications] = useState(NOTIFICATIONS);
   const [shiftTransfers, setShiftTransfers] = useState([]);
   const [toasts, setToasts] = useState([]);
@@ -102,6 +104,24 @@ export function AppProvider({ children }) {
     setPersonalLockRegister((prev) => prev.map((l) => (l.id === lockId && l.state === 'in-use' ? { ...l, state: 'available', permitId: null } : l)));
   }, []);
 
+  // LOTO ID No. gets the exact same live uniqueness guarantee as the
+  // departmental lock register and personal locks — a LOTO ID already
+  // assigned to one live permit can never be picked for another until the
+  // Isolation Officer de-isolates and releases it.
+  const reserveLotoId = useCallback(
+    (lotoId, permitId) => {
+      const target = lotoIdRegister.find((l) => l.id === lotoId);
+      if (!target || target.state !== 'available') return false;
+      setLotoIdRegister((prev) => prev.map((l) => (l.id === lotoId ? { ...l, state: 'in-use', permitId } : l)));
+      return true;
+    },
+    [lotoIdRegister]
+  );
+
+  const releaseLotoId = useCallback((lotoId) => {
+    setLotoIdRegister((prev) => prev.map((l) => (l.id === lotoId && l.state === 'in-use' ? { ...l, state: 'available', permitId: null } : l)));
+  }, []);
+
   const pushToast = useCallback((message, tone = 'success') => {
     const id = ++toastId;
     setToasts((t) => [...t, { id, message, tone }]);
@@ -168,6 +188,9 @@ export function AppProvider({ children }) {
       personalLockRegister,
       reservePersonalLock,
       releasePersonalLock,
+      lotoIdRegister,
+      reserveLotoId,
+      releaseLotoId,
       notifications,
       markNotificationsRead,
       shiftTransfers,
@@ -183,9 +206,9 @@ export function AppProvider({ children }) {
     }),
     [
       currentUser, currentRole, currentDepartment, login, selectRole, logout,
-      permits, tasks, lockRegister, personalLockRegister, notifications, shiftTransfers, toasts, language, aiOpen,
+      permits, tasks, lockRegister, personalLockRegister, lotoIdRegister, notifications, shiftTransfers, toasts, language, aiOpen,
       pushToast, updatePermit, addTimelineEvent, updateTask, reserveLock, releaseLock,
-      reservePersonalLock, releasePersonalLock, markNotificationsRead, transferShift, viewMode, toggleViewMode
+      reservePersonalLock, releasePersonalLock, reserveLotoId, releaseLotoId, markNotificationsRead, transferShift, viewMode, toggleViewMode
     ]
   );
 

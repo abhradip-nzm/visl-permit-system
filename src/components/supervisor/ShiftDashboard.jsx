@@ -16,9 +16,16 @@ export default function ShiftDashboard({ navigate }) {
 
   // Phase 10: every logged isolation event, flattened from each permit's
   // own isolationDetails record (the same data the Isolation Officer fills
-  // in on LotoApprovals.jsx) — most recently isolated first.
+  // in on LotoApprovals.jsx) — most recently isolated first. appliedAt /
+  // removedAt come straight from that same record and from permit.deIsolation
+  // (both stamped at the moment of the actual isolate/de-isolate action).
   const isolationLogs = permits
-    .flatMap((p) => (p.isolationDetails || []).map((d) => ({ ...d, permitId: p.id, deisolated: !!p.deIsolation })))
+    .flatMap((p) => (p.isolationDetails || []).map((d) => ({
+      ...d,
+      permitId: p.id,
+      deisolated: !!p.deIsolation,
+      removedAt: p.deIsolation?.at || null
+    })))
     .filter((l) => l.isolationPermitNo || l.lotoIdNo);
 
   return (
@@ -114,6 +121,8 @@ export default function ShiftDashboard({ navigate }) {
                   <th className="px-4 py-2.5">LOTO ID</th>
                   <th className="px-4 py-2.5">Dept Lock</th>
                   <th className="px-4 py-2.5">Isolation Officer</th>
+                  <th className="px-4 py-2.5">Applied At</th>
+                  <th className="px-4 py-2.5">Removed At</th>
                   <th className="px-4 py-2.5">Status</th>
                 </tr>
               </thead>
@@ -127,6 +136,8 @@ export default function ShiftDashboard({ navigate }) {
                     <td className="px-4 py-2.5 text-slate-600">{l.lotoIdNo || '—'}</td>
                     <td className="px-4 py-2.5 text-slate-600">{l.deptLockNo || '—'}</td>
                     <td className="px-4 py-2.5 text-slate-600">{l.isolationOfficerName || '—'}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{l.appliedAt || '—'}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{l.removedAt || '—'}</td>
                     <td className="px-4 py-2.5">
                       <span className={l.deisolated ? 'font-semibold text-slate-400' : 'font-semibold text-nz-amber'}>
                         {l.deisolated ? 'De-isolated' : 'Isolated'}
@@ -135,7 +146,7 @@ export default function ShiftDashboard({ navigate }) {
                   </tr>
                 ))}
                 {isolationLogs.length === 0 && (
-                  <tr><td colSpan={8} className="px-4 py-6 text-center text-xs text-slate-400">No isolation events logged yet.</td></tr>
+                  <tr><td colSpan={10} className="px-4 py-6 text-center text-xs text-slate-400">No isolation events logged yet.</td></tr>
                 )}
               </tbody>
             </table>
