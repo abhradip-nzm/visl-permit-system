@@ -36,9 +36,9 @@ export default function ShiftDashboard({ navigate }) {
         <Stat label="Shift Alerts" value={alerts} tone="red" />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2 space-y-4">
-          <Card>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="space-y-4 sm:col-span-2">
+          <Card className="overflow-x-auto">
             <div className="border-b border-nz-border px-4 py-3 text-sm font-bold text-nz-navy">Active Personnel</div>
             <table className="w-full text-left text-sm">
               <thead>

@@ -177,7 +177,7 @@ export default function PrecautionsDeclaration({ navigate, params }) {
         </button>
       </Card>
 
-      <div className="mb-4 grid grid-cols-2 gap-4">
+      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Card className="p-4">
           <SectionLabel>Topics Covered — I</SectionLabel>
           <textarea rows={3} value={topicsA} onChange={(e) => setTopicsA(e.target.value)} className="w-full rounded-lg border border-nz-border bg-nz-surface px-3 py-2 text-sm focus-ring focus:bg-white" />

@@ -75,7 +75,7 @@ export default function DepartmentalClearance({ navigate, params }) {
 
       <PermitSummary permit={permit} defaultOpen />
 
-      <Card className="mb-4 p-4">
+      <Card className="mb-4 overflow-x-auto p-4">
         <SectionLabel>G. Clearance from Concerned Department</SectionLabel>
         <table className="w-full text-left text-sm">
           <thead>

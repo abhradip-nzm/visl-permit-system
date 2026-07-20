@@ -52,7 +52,7 @@ export default function HodDashboard({ navigate }) {
       </div>
 
       <div className="mb-2 text-sm font-bold text-nz-navy">Pending Departmental Clearance</div>
-      <Card>
+      <Card className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-nz-border text-xs uppercase text-slate-400">

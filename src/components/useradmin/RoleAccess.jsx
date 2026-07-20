@@ -99,7 +99,7 @@ export default function RoleAccess() {
       )}
 
       {tab === 'Access Assignment' && (
-        <Card>
+        <Card className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-nz-border text-xs uppercase text-slate-400">

@@ -32,7 +32,14 @@ export function AppProvider({ children }) {
   const [aiOpen, setAiOpen] = useState(false);
   // Phase 10: a session-wide Desktop/Mobile toggle (see AppShell.jsx) —
   // independent of role, unlike the old per-role ROLE_PLATFORM split.
-  const [viewMode, setViewMode] = useState('desktop');
+  // Defaults to whichever chrome actually fits the real screen on load (the
+  // desktop Sidebar is a fixed 256px-wide element with no responsive
+  // collapse, so a phone visitor landing in the desktop branch would see it
+  // eat most of the viewport) — the toggle still lets anyone switch freely
+  // afterwards.
+  const [viewMode, setViewMode] = useState(() =>
+    typeof window !== 'undefined' && window.innerWidth < 640 ? 'mobile' : 'desktop'
+  );
   const toggleViewMode = useCallback(() => {
     setViewMode((m) => (m === 'desktop' ? 'mobile' : 'desktop'));
   }, []);

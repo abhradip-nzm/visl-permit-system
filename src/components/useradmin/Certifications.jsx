@@ -36,7 +36,7 @@ function TypesTab() {
       <div className="flex justify-end">
         <Button variant="primary" onClick={() => pushToast('Certification type created')}>Create Type</Button>
       </div>
-      <Card>
+      <Card className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-nz-border text-xs uppercase text-slate-400">
@@ -82,7 +82,7 @@ function PersonnelTab() {
           <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} /> {syncing ? 'Syncing…' : 'Sync from Portal'}
         </Button>
       </div>
-      <Card>
+      <Card className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-nz-border text-xs uppercase text-slate-400">
@@ -114,7 +114,7 @@ function PersonnelTab() {
 
 function GeofenceTab() {
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {GEOFENCE_LOCATIONS.map((z) => (
         <Card key={z.zone} className="p-4">
           <div className="mb-2 flex items-center gap-2 text-sm font-bold text-nz-navy"><MapPin size={14} className="text-nz-orange" /> {z.zone}</div>

@@ -28,7 +28,7 @@ export default function AppShell({ renderScreen, titleFor }) {
 
   if (viewMode === 'mobile') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-nz-charcoal/5">
+      <div className="flex h-screen w-full items-center justify-center overflow-hidden bg-nz-charcoal/5">
         <PhoneFrame
           statusLabel="Vedanta Field App · Demo"
           overlay={
