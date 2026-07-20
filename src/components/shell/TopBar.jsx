@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Bell, ChevronDown, Globe, User, Check, LogOut } from 'lucide-react';
+import { Search, Bell, ChevronDown, Globe, User, Check, LogOut, Smartphone } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { ROLE_LABELS } from '../../data/navConfig.js';
 import NotificationsPanel from './NotificationsPanel.jsx';
@@ -7,7 +7,7 @@ import NotificationsPanel from './NotificationsPanel.jsx';
 const LANGUAGES = ['English', 'Hindi', 'Odia'];
 
 export default function TopBar({ title }) {
-  const { currentRole, currentDepartment, currentUser, selectRole, logout, language, setLanguage, notifications, pushToast } = useApp();
+  const { currentRole, currentDepartment, currentUser, selectRole, logout, language, setLanguage, notifications, pushToast, toggleViewMode } = useApp();
   const [showLang, setShowLang] = useState(false);
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
@@ -44,6 +44,15 @@ export default function TopBar({ title }) {
             readOnly
           />
         </div>
+
+        {/* Desktop/Mobile view toggle */}
+        <button
+          onClick={toggleViewMode}
+          title="Switch to mobile view"
+          className="flex items-center gap-1.5 rounded-lg border border-nz-border px-3 py-2 text-sm font-medium text-slate-600 hover:bg-nz-surface focus-ring"
+        >
+          <Smartphone size={15} /> <span className="hidden lg:inline">Mobile View</span>
+        </button>
 
         {/* Language selector */}
         <div className="relative">

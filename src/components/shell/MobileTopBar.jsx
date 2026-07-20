@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, ChevronDown, Wifi, WifiOff, Globe, User, Check, LogOut } from 'lucide-react';
+import { Bell, ChevronDown, Wifi, WifiOff, Globe, User, Check, LogOut, Monitor } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
 import { ROLE_LABELS } from '../../data/navConfig.js';
 import NotificationsPanel from './NotificationsPanel.jsx';
@@ -8,7 +8,7 @@ import { DemoBadge } from '../shared/Primitives.jsx';
 const LANGUAGES = ['English', 'Hindi', 'Odia'];
 
 export default function MobileTopBar({ title }) {
-  const { currentRole, currentDepartment, currentUser, selectRole, logout, notifications, pushToast, language, setLanguage } = useApp();
+  const { currentRole, currentDepartment, currentUser, selectRole, logout, notifications, pushToast, language, setLanguage, toggleViewMode } = useApp();
   const [showNotifs, setShowNotifs] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [showLang, setShowLang] = useState(false);
@@ -35,6 +35,13 @@ export default function MobileTopBar({ title }) {
           <h2 className="text-base font-bold text-nz-navy">{title}</h2>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={toggleViewMode}
+            title="Switch to desktop view"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-nz-surface text-slate-600"
+          >
+            <Monitor size={14} />
+          </button>
           <div className="relative">
             <button
               onClick={() => setShowLang((s) => !s)}
