@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, CheckCircle2, AlertTriangle, Plus, Trash2, X } from 'lucide-react';
 import { EQUIPMENT, SHIFT_ROSTER, emptyDeptClearances, emptyClosure } from '../../data/mockData.js';
 import { PERMIT_TYPES, TOOLS_EQUIPMENT, HAZARDS_IDENTIFIED, RISK_CONTROL_GROUPS, PPE_FIRE_PROTECTION, PLANT_AREAS, WI_NUMBERS, CONTRACTORS, AUTO_CHECK_BY_TYPE } from '../../data/ptwFormData.js';
-import { DEPARTMENTS, departmentsForTypes } from '../../data/departmentsData.js';
+import { DEPARTMENTS, departmentsForTypes, needsClearance } from '../../data/departmentsData.js';
 import { USERS } from '../../data/usersData.js';
 import { Button, Card, SectionLabel } from '../shared/Primitives.jsx';
 import { CheckboxGrid, Accordion } from '../shared/ChecklistGrid.jsx';
@@ -40,6 +40,11 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
 
   const [step, setStep] = useState('form'); // form | review
   const [types, setTypes] = useState(base.permitType ? [base.permitType] : []);
+  // Reordered flow: Approval now comes before Precautions & Declaration, so
+  // a fresh permit enters the pipeline at Clearance (if its types require
+  // it) or straight at Approval — the same branch Declaration's submit used
+  // to make, just moved to the start.
+  const startsAtClearance = needsClearance(types);
   const [jobDetails, setJobDetails] = useState({
     area: base.area || '', location: base.equipment || '', dateFrom: base.date || '', dateTill: base.date || '',
     fromTime: (SHIFT_TIMES[base.shift] || SHIFT_TIMES.Morning)[0], toTime: (SHIFT_TIMES[base.shift] || SHIFT_TIMES.Morning)[1],
@@ -130,7 +135,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
       {
         id: newId, types, type: types[0], equipment: jobDetails.location, location: jobDetails.area,
         area: jobDetails.area, shift: base.shift, requester: currentUser.name, requestor: currentUser.name,
-        status: 'pending-declaration', createdAt: jobDetails.dateFrom,
+        status: startsAtClearance ? 'pending-clearance' : 'pending-approval', createdAt: jobDetails.dateFrom,
         dateFrom: jobDetails.dateFrom, dateTill: jobDetails.dateTill, fromTime: jobDetails.fromTime, toTime: jobDetails.toTime,
         jobDescription: jobDetails.jobDescription, wiNo: jobDetails.wiNo, ownerDepartment: jobDetails.ownerDepartment, contractor: jobDetails.contractor,
         approver: jobDetails.approver, isolationOfficer: jobDetails.isolationOfficer,
@@ -152,12 +157,12 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
         checklist: [{ id: 1, label: 'Pre-job briefing', done: false }],
         timeline: [
           { stage: 'Created — Request & Risk Assessment', at: 'Just now', by: currentUser.name },
-          { stage: 'Awaiting Precautions & Declaration', at: 'Just now', by: 'System' }
+          { stage: startsAtClearance ? 'Awaiting Departmental Clearance' : 'Awaiting Approval', at: 'Just now', by: 'System' }
         ]
       },
       ...prev
     ]);
-    pushToast(`${newId} submitted — Precautions & Declaration required next`);
+    pushToast(`${newId} submitted — ${startsAtClearance ? 'Departmental Clearance' : 'Approval'} required next`);
     setTimeout(() => navigate('mytasks'), 900);
   }
 
@@ -168,7 +173,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
           <ArrowLeft size={15} /> Back to form
         </button>
         <h2 className="mb-1 text-lg font-bold text-nz-navy">Review Before Submitting</h2>
-        <p className="mb-4 text-sm text-slate-500">Confirm every section is correct — you'll complete Precautions & Declaration next.</p>
+        <p className="mb-4 text-sm text-slate-500">Confirm every section is correct — it goes to {startsAtClearance ? 'Departmental Clearance' : 'Approval'} next.</p>
 
         <SummaryCard title="A. Type of Permit" items={types} />
         <Card className="mb-3 p-3 text-xs text-slate-600">

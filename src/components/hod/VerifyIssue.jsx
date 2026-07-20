@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext.jsx';
 import { isOwnPermit } from '../../utils/segregationOfDuties.js';
 import { Card, SectionLabel, Button, StatusBadge } from '../shared/Primitives.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
+import WorkflowActorsBanner from '../shared/WorkflowActorsBanner.jsx';
 
 const REQUESTER_ITEMS = [
   ['controlsBack', 'All controls back in place'], ['interlocksRestored', 'All interlocks restored'],
@@ -52,6 +53,8 @@ export default function VerifyIssue({ navigate, params }) {
       </div>
 
       <div className="mb-4"><PTWStepper permit={permit} /></div>
+
+      <WorkflowActorsBanner permit={permit} />
 
       <Card className="mb-4 p-4">
         <SectionLabel>M. Requester Closure Checklist (as submitted)</SectionLabel>

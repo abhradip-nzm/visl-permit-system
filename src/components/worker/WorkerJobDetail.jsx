@@ -3,6 +3,7 @@ import { ArrowLeft, Lock, LockOpen, ShieldAlert, CheckCircle2, ClipboardCheck, P
 import { useApp } from '../../context/AppContext.jsx';
 import { Card, SectionLabel, Button, StatusBadge } from '../shared/Primitives.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
+import WorkflowActorsBanner from '../shared/WorkflowActorsBanner.jsx';
 
 const CHECKLIST_ITEMS = [
   ['controlsBack', 'All controls back in place'],
@@ -112,6 +113,8 @@ export default function WorkerJobDetail({ navigate, params }) {
       </div>
 
       <div className="mb-4 overflow-x-auto"><PTWStepper permit={permit} compact /></div>
+
+      <WorkflowActorsBanner permit={permit} />
 
       {needsIsolation ? (
         <Card className="mb-4 p-4">

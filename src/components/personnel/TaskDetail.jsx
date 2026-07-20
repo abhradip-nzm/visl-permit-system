@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Send, CheckCircle2, AlertOctagon, WifiOff, ArrowRight, RotateCcw } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
+import { needsClearance } from '../../data/departmentsData.js';
 import { StatusBadge, WarningBanner, Card, SectionLabel, Button, SignaturePad } from '../shared/Primitives.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
 import PermitSummary from '../shared/PermitSummary.jsx';
+import WorkflowActorsBanner from '../shared/WorkflowActorsBanner.jsx';
 
 export default function TaskDetail({ navigate, params }) {
   const { permits, updatePermit, pushToast } = useApp();
@@ -26,6 +28,8 @@ export default function TaskDetail({ navigate, params }) {
       <div className="mb-4 overflow-x-auto">
         <PTWStepper permit={permit} compact />
       </div>
+
+      <WorkflowActorsBanner permit={permit} />
 
       {permit.warnings?.length > 0 && (
         <div className="mb-4 space-y-2">
@@ -95,7 +99,11 @@ function StatusAction({ navigate, permit, updatePermit, pushToast }) {
           variant="danger"
           className="w-full"
           onClick={() => {
-            updatePermit(permit.id, { status: 'pending-declaration' });
+            // Resubmission re-enters the pipeline at the same point a
+            // brand-new permit would — Clearance if its types require it,
+            // otherwise straight back to Approval.
+            const status = needsClearance(permit.types || [permit.type]) ? 'pending-clearance' : 'pending-approval';
+            updatePermit(permit.id, { status });
             pushToast(`${permit.id} corrected and resubmitted`);
           }}
         >

@@ -6,6 +6,7 @@ import { CLEARANCE_DEPARTMENTS } from '../../data/ptwFormData.js';
 import { Card, SectionLabel, Button, StatusBadge } from '../shared/Primitives.jsx';
 import PermitSummary from '../shared/PermitSummary.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
+import WorkflowActorsBanner from '../shared/WorkflowActorsBanner.jsx';
 
 export default function DepartmentalClearance({ navigate, params }) {
   const { currentUser, currentDepartment, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
@@ -63,6 +64,8 @@ export default function DepartmentalClearance({ navigate, params }) {
       </div>
 
       <div className="mb-4"><PTWStepper permit={permit} /></div>
+
+      <WorkflowActorsBanner permit={permit} />
 
       {blocked && (
         <Card className="mb-4 border-nz-red/30 bg-nz-red-light p-4">

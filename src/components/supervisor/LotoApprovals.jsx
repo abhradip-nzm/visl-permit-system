@@ -5,6 +5,7 @@ import { isOwnPermit } from '../../utils/segregationOfDuties.js';
 import { USERS } from '../../data/usersData.js';
 import { Card, SectionLabel, Button, StatusBadge } from '../shared/Primitives.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
+import WorkflowActorsBanner from '../shared/WorkflowActorsBanner.jsx';
 
 const ISOLATION_TYPES = ['Electrical', 'Mechanical', 'Production', 'Other'];
 
@@ -170,6 +171,8 @@ export default function LotoApprovals({ params }) {
               <StatusBadge status={permit.status} />
             </div>
             <div className="mb-3"><PTWStepper permit={permit} compact /></div>
+
+            <WorkflowActorsBanner permit={permit} />
 
             {blocked && (
               <div className="mb-3 flex items-center gap-2 rounded-lg bg-nz-red-light px-3 py-2 text-xs font-semibold text-nz-red">

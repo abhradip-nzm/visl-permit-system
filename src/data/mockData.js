@@ -125,7 +125,7 @@ export const PERMITS = [
   },
   {
     id: 'WP-1037', types: ['Confined Space'], type: 'Confined Space', equipment: 'Storage Tank T-5', location: 'Tank Farm',
-    area: 'Tank Farm', shift: 'Night', requester: 'A. Chatterjee', requestor: 'A. Chatterjee', status: 'pending-declaration', createdAt: '2026-07-04',
+    area: 'Tank Farm', shift: 'Night', requester: 'A. Chatterjee', requestor: 'A. Chatterjee', status: 'pending-clearance', createdAt: '2026-07-04',
     dateFrom: '2026-07-05', dateTill: '2026-07-05', fromTime: '22:00', toTime: '06:00',
     jobDescription: 'Internal tank inspection and sludge removal.', wiNo: 'WI-4102', ownerDepartment: 'Mechanical', contractor: 'Coastal Industrial Services',
     hazards: HAZARD_CONTROL_LIBRARY['Confined Space'].hazards, ppe: HAZARD_CONTROL_LIBRARY['Confined Space'].ppe,
@@ -146,7 +146,7 @@ export const PERMITS = [
     checklist: [{ id: 1, label: 'Atmosphere test', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '04 Jul, 22:10', by: 'A. Chatterjee' },
-      { stage: 'Awaiting Precautions & Declaration', at: '04 Jul, 22:30', by: 'System' }
+      { stage: 'Awaiting Departmental Clearance', at: '04 Jul, 22:15', by: 'System' }
     ]
   },
   {
@@ -182,10 +182,10 @@ export const PERMITS = [
     checklist: [{ id: 1, label: 'Voltage test to zero', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '05 Jul, 07:30', by: 'S. Iyer' },
-      { stage: 'Precautions & Declaration signed', at: '05 Jul, 07:45', by: 'S. Iyer' },
-      { stage: 'Safety Officer review complete', at: '05 Jul, 08:00', by: 'T. Roy (Safety Officer)' },
-      { stage: 'Departmental Clearance granted', at: '05 Jul, 08:12', by: 'D. Fernandes (Approver)' },
-      { stage: 'Approved — On-Ground Verification complete', at: '05 Jul, 08:20', by: 'D. Fernandes (Approver)' },
+      { stage: 'Safety Officer review complete', at: '05 Jul, 07:40', by: 'T. Roy (Safety Officer)' },
+      { stage: 'Departmental Clearance granted', at: '05 Jul, 07:50', by: 'D. Fernandes (Approver)' },
+      { stage: 'Approved — On-Ground Verification complete', at: '05 Jul, 08:05', by: 'D. Fernandes (Approver)' },
+      { stage: 'Precautions & Declaration signed', at: '05 Jul, 08:15', by: 'S. Iyer' },
       { stage: 'Awaiting Isolation Setup', at: '05 Jul, 08:21', by: 'System' }
     ]
   },
@@ -217,7 +217,7 @@ export const PERMITS = [
     toolboxRecord: [{ name: 'A. Chatterjee', company: 'Vedanta', personalLockId: 'PL-005', signed: true }],
     workers: [{ name: 'K. Reddy', personalLockId: 'PL-016', applied: false, appliedAt: null, removed: false, removedAt: null, started: false, startedAt: null }],
     isolationTopicsCovered: 'Reviewed hydraulic bleed-down sequence and lock/tag placement with crew before entry.',
-    additionalPrecautions: '', declaration: { requestorName: 'A. Chatterjee', date: '05 Jul', time: '15:20', toolboxTalkConfirmed: true, signed: { name: 'A. Chatterjee', timestamp: '05 Jul, 15:20' } },
+    additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
     approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
     criticalLift: null,
     confinedSpaceMonitoring: { gasMonitorSlNo: 'GM-2077', calibrationValid: true, confinedSpaceId: 'CS-CP-09', standbyPerson: 'P. Rao', rescuers: 'A. Singh', gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' },
@@ -226,8 +226,7 @@ export const PERMITS = [
     checklist: [{ id: 1, label: 'Atmosphere monitoring active', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '05 Jul, 14:00', by: 'A. Chatterjee' },
-      { stage: 'Precautions & Declaration signed', at: '05 Jul, 15:20', by: 'A. Chatterjee' },
-      { stage: 'Awaiting Departmental Clearance', at: '05 Jul, 15:21', by: 'System' }
+      { stage: 'Awaiting Departmental Clearance', at: '05 Jul, 14:05', by: 'System' }
     ]
   },
   {
@@ -248,15 +247,14 @@ export const PERMITS = [
       Production: { status: 'cleared', name: 'N. Bose', datetime: '01 Jul, 08:25' }
     }),
     isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
-    additionalPrecautions: 'Vessel to remain depressurized and cooled below 40°C before gasket removal.',
-    declaration: { requestorName: 'T. Roy', date: '01 Jul', time: '08:00', toolboxTalkConfirmed: true, signed: { name: 'T. Roy', timestamp: '01 Jul, 08:00' } },
+    additionalPrecautions: '',
+    declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
     approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
     safetyOfficer: 'T. Roy', safetyReview: { comment: 'No additional flags — standard mechanical gasket job.', by: 'T. Roy', at: '01 Jul, 08:10' }, safetyInspection: null,
     criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
     checklist: [{ id: 1, label: 'Pre-job briefing', done: true }, { id: 2, label: 'Isolation confirmed', done: false }],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '01 Jul, 07:50', by: 'T. Roy' },
-      { stage: 'Precautions & Declaration signed', at: '01 Jul, 08:00', by: 'T. Roy' },
       { stage: 'Safety Officer review complete', at: '01 Jul, 08:10', by: 'T. Roy (Safety Officer)' },
       { stage: 'Departmental Clearance granted', at: '01 Jul, 08:25', by: 'D. Fernandes (Approver)' },
       { stage: 'Awaiting Approval', at: '01 Jul, 09:01', by: 'System' }
@@ -297,10 +295,10 @@ export const PERMITS = [
     ],
     timeline: [
       { stage: 'Created — Request & Risk Assessment', at: '02 Jul, 08:00', by: 'S. Iyer' },
-      { stage: 'Precautions & Declaration signed', at: '02 Jul, 08:10', by: 'S. Iyer' },
-      { stage: 'Safety Officer review complete', at: '02 Jul, 08:15', by: 'T. Roy (Safety Officer)' },
+      { stage: 'Safety Officer review complete', at: '02 Jul, 08:05', by: 'T. Roy (Safety Officer)' },
       { stage: 'Departmental Clearance granted', at: '02 Jul, 08:20', by: 'D. Fernandes (Approver)' },
-      { stage: 'Approved — Permit is LIVE', at: '02 Jul, 08:45', by: 'D. Fernandes (Approver)' },
+      { stage: 'Approved — Routed to Precautions & Declaration', at: '02 Jul, 08:30', by: 'D. Fernandes (Approver)' },
+      { stage: 'Precautions & Declaration signed', at: '02 Jul, 08:45', by: 'S. Iyer' },
       { stage: 'Job Execution started', at: '02 Jul, 09:20', by: 'System' }
     ]
   },

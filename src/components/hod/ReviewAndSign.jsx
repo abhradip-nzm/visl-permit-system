@@ -5,6 +5,7 @@ import { isOwnPermit } from '../../utils/segregationOfDuties.js';
 import { Card, SectionLabel, Button, WarningBanner, SignaturePad, StatusBadge } from '../shared/Primitives.jsx';
 import PermitSummary from '../shared/PermitSummary.jsx';
 import PTWStepper from '../shared/PTWStepper.jsx';
+import WorkflowActorsBanner from '../shared/WorkflowActorsBanner.jsx';
 
 export default function ReviewAndSign({ navigate, params }) {
   const { currentUser, permits, updatePermit, addTimelineEvent, pushToast } = useApp();
@@ -19,16 +20,14 @@ export default function ReviewAndSign({ navigate, params }) {
   function approve() {
     const now = { name: currentUser.name, timestamp: 'Just now' };
     setSigned(now);
-    // Phase 7: Isolation now sits right before Live instead of before
-    // Declaration — a permit that needs isolation still can't go live
-    // (and the Requester still can't start real work) until the
-    // Isolation Officer independently confirms it, same guarantee as
-    // before, just later in the sequence.
-    const nextStatus = permit.isolationRequired ? 'pending-isolation' : 'live';
-    updatePermit(permit.id, { status: nextStatus, approval: { approverName: currentUser.name, date: 'Today', time: 'Just now', onGroundVerified: true, signed: now, rejectionReason: '', comment: comment.trim() } });
+    // Reordered flow: Approval now comes right after (optional)
+    // Departmental Clearance and BEFORE Precautions & Declaration — once
+    // approved, the Requester assigns workers and runs the toolbox talk
+    // next, and only after that does the permit reach Isolation/Live.
+    updatePermit(permit.id, { status: 'pending-declaration', approval: { approverName: currentUser.name, date: 'Today', time: 'Just now', onGroundVerified: true, signed: now, rejectionReason: '', comment: comment.trim() } });
     addTimelineEvent(permit.id, `Approved${comment.trim() ? ` — "${comment.trim()}"` : ''}`, `${currentUser.name} (Approver)`);
-    addTimelineEvent(permit.id, permit.isolationRequired ? 'Awaiting Isolation Setup' : 'Job Execution started', 'System');
-    pushToast(permit.isolationRequired ? `${permit.id} approved — routed to Isolation Setup` : `${permit.id} approved — Permit is now LIVE`);
+    addTimelineEvent(permit.id, 'Awaiting Precautions & Declaration', 'System');
+    pushToast(`${permit.id} approved — routed to Precautions & Declaration`);
     setTimeout(() => navigate('dashboard'), 900);
   }
 
@@ -55,6 +54,8 @@ export default function ReviewAndSign({ navigate, params }) {
       </div>
 
       <div className="mb-4"><PTWStepper permit={permit} /></div>
+
+      <WorkflowActorsBanner permit={permit} />
 
       {blocked && (
         <Card className="mb-4 border-nz-red/30 bg-nz-red-light p-4">
@@ -134,7 +135,7 @@ export default function ReviewAndSign({ navigate, params }) {
 
       <div className="flex gap-3">
         <Button variant="success" className="flex-1" disabled={blocked || !verified || !!signed} onClick={approve}>
-          <CheckCircle2 size={16} /> {permit.isolationRequired ? 'Approve — Route to Isolation Setup' : 'Approve — Permit is Now LIVE'}
+          <CheckCircle2 size={16} /> Approve — Route to Precautions & Declaration
         </Button>
         {!returnOpen ? (
           <Button variant="danger" className="flex-1" disabled={blocked} onClick={() => setReturnOpen(true)}>

@@ -4,8 +4,8 @@ import { PTW_STEPS } from '../../data/ptwFormData.js';
 import { needsClearance } from '../../data/departmentsData.js';
 
 const STATUS_ORDER = [
-  'draft', 'pending-declaration', 'pending-clearance',
-  'pending-approval', 'pending-isolation', 'live', 'pending-closure', 'closed'
+  'draft', 'pending-clearance', 'pending-approval',
+  'pending-declaration', 'pending-isolation', 'live', 'pending-closure', 'closed'
 ];
 
 // Steps 6 (Job Execution) and 7 (Shift Transfer) both live under the "live"

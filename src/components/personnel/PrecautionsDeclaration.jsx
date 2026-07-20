@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle2, Plus, Trash2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext.jsx';
-import { needsClearance } from '../../data/departmentsData.js';
 import { USERS } from '../../data/usersData.js';
 import { Card, SectionLabel, Button, SignaturePad } from '../shared/Primitives.jsx';
 
@@ -36,11 +35,6 @@ export default function PrecautionsDeclaration({ navigate, params }) {
   const [confirmed, setConfirmed] = useState(false);
   const [signed, setSigned] = useState(null);
 
-  // Phase 9: the Safety Officer is a pure observer now — no gate here.
-  // Clearance is conditional: Excavation-type or Production-department
-  // permits go to the HOD, everything else skips straight to Approval.
-  const goesToClearance = needsClearance(permit.types || [permit.type]);
-
   const workerRoster = USERS.filter((u) => u.status === 'active' && u.roles.some((r) => r.role === 'worker'));
 
   function selectAttendeeName(i, name) {
@@ -73,11 +67,15 @@ export default function PrecautionsDeclaration({ navigate, params }) {
         requestor: { name: currentUser.name, date: 'Today', time: 'Just now', signed: now }
       },
       closure: { ...permit.closure, toolboxTalkRefNo: refNo },
-      status: goesToClearance ? 'pending-clearance' : 'pending-approval'
+      // Reordered flow: Approval already happened before this screen —
+      // Declaration now hands straight off to Isolation Setup (if this
+      // permit needs it) or directly to Live, the same branch Approval
+      // used to make.
+      status: permit.isolationRequired ? 'pending-isolation' : 'live'
     });
     addTimelineEvent(permit.id, `Precautions & Declaration signed — Toolbox Talk ${refNo}`, currentUser.name);
-    addTimelineEvent(permit.id, goesToClearance ? 'Awaiting Departmental Clearance' : 'Awaiting Approval', 'System');
-    pushToast(`${permit.id} submitted for ${goesToClearance ? 'Departmental Clearance' : 'Approval'}`);
+    addTimelineEvent(permit.id, permit.isolationRequired ? 'Awaiting Isolation Setup' : 'Job Execution started', 'System');
+    pushToast(`${permit.id} submitted — ${permit.isolationRequired ? 'routed to Isolation Setup' : 'permit is now LIVE'}`);
     setTimeout(() => navigate('mytasks'), 900);
   }
 
@@ -202,7 +200,7 @@ export default function PrecautionsDeclaration({ navigate, params }) {
       </Card>
 
       <Button variant="orange" size="lg" className="w-full" disabled={!canSubmit || !!signed} onClick={submit}>
-        {signed ? <><CheckCircle2 size={16} /> Submitted</> : `Sign & Submit for ${goesToClearance ? 'Departmental Clearance' : 'Approval'} →`}
+        {signed ? <><CheckCircle2 size={16} /> Submitted</> : `Sign & Submit — ${permit.isolationRequired ? 'Start Isolation Setup' : 'Start Job Execution'} →`}
       </Button>
     </div>
   );

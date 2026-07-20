@@ -215,11 +215,18 @@ export const CLEARANCE_DEPARTMENTS = ['Mechanical', 'E&I', 'Production'];
 // appears in the sequence when needsClearance() says so (see
 // departmentsData.js) — the stepper filters this step out dynamically, same
 // pattern as the existing isolation-required filter.
+//
+// Reordered: Approval now happens right after (optional) Departmental
+// Clearance, BEFORE Precautions & Declaration — the permit is approved
+// first, then the Requester assigns workers and runs the toolbox talk,
+// then (optional) Isolation Setup, then it goes live. Declaration always
+// immediately precedes Isolation/Execution either way, since assigning
+// workers only makes sense once the permit is actually going ahead.
 export const PTW_STEPS = [
   { key: 'request', num: 1, label: 'Request & Risk Assessment', status: 'draft' },
-  { key: 'declaration', num: 2, label: 'Precautions & Declaration', status: 'pending-declaration' },
-  { key: 'clearance', num: 3, label: 'Departmental Clearance', status: 'pending-clearance' },
-  { key: 'approval', num: 4, label: 'Approval', status: 'pending-approval' },
+  { key: 'clearance', num: 2, label: 'Departmental Clearance', status: 'pending-clearance' },
+  { key: 'approval', num: 3, label: 'Approval', status: 'pending-approval' },
+  { key: 'declaration', num: 4, label: 'Precautions & Declaration', status: 'pending-declaration' },
   { key: 'isolation', num: 5, label: 'Isolation Setup', status: 'pending-isolation' },
   { key: 'execution', num: 6, label: 'Job Execution', status: 'live' },
   { key: 'transfer', num: 7, label: 'Shift Transfer', status: 'live' },
