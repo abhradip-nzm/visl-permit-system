@@ -6,6 +6,7 @@ import { StatusBadge, WarningBanner, Card, SectionLabel, Button, SignaturePad } 
 import PTWStepper from '../shared/PTWStepper.jsx';
 import PermitSummary from '../shared/PermitSummary.jsx';
 import WorkflowActorsBanner from '../shared/WorkflowActorsBanner.jsx';
+import DepartmentalClearanceSummary from '../shared/DepartmentalClearanceSummary.jsx';
 
 export default function TaskDetail({ navigate, params }) {
   const { permits, updatePermit, pushToast } = useApp();
@@ -41,7 +42,7 @@ export default function TaskDetail({ navigate, params }) {
 
       <PermitSummary permit={permit} />
 
-      {permit.status !== 'draft' && <ClearanceSummary permit={permit} />}
+      {permit.status !== 'draft' && <DepartmentalClearanceSummary permit={permit} />}
 
       <Card className="mb-4 p-4">
         <SectionLabel>Status Timeline</SectionLabel>
@@ -63,29 +64,6 @@ export default function TaskDetail({ navigate, params }) {
 
       <ChatWithApprover />
     </div>
-  );
-}
-
-function ClearanceSummary({ permit }) {
-  const rows = [
-    ['Mechanical', permit.deptClearances?.Mechanical],
-    ['E&I', permit.deptClearances?.['E&I']],
-    ['Production', permit.deptClearances?.Production]
-  ];
-  return (
-    <Card className="mb-4 p-4">
-      <SectionLabel>G. Departmental Clearance Status</SectionLabel>
-      <div className="space-y-1.5">
-        {rows.map(([dept, c]) => (
-          <div key={dept} className="flex items-center justify-between rounded-lg border border-nz-border px-3 py-2 text-xs">
-            <span className="font-semibold text-nz-navy">{dept}</span>
-            <span className={c?.status === 'cleared' ? 'text-nz-green font-semibold' : c?.status === 'not-applicable' ? 'text-slate-400' : 'text-nz-amber font-semibold'}>
-              {c?.status === 'cleared' ? `Cleared — ${c.name}` : c?.status === 'not-applicable' ? 'Not Applicable' : 'Pending'}
-            </span>
-          </div>
-        ))}
-      </div>
-    </Card>
   );
 }
 

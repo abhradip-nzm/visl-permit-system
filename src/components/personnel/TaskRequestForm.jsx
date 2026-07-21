@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, CheckCircle2, AlertTriangle, Plus, Trash2, X } from 'lucide-react';
-import { EQUIPMENT, SHIFT_ROSTER, emptyDeptClearances, emptyClosure } from '../../data/mockData.js';
-import { PERMIT_TYPES, TOOLS_EQUIPMENT, HAZARDS_IDENTIFIED, RISK_CONTROL_GROUPS, PPE_FIRE_PROTECTION, PLANT_AREAS, WI_NUMBERS, CONTRACTORS, AUTO_CHECK_BY_TYPE } from '../../data/ptwFormData.js';
-import { DEPARTMENTS, departmentsForTypes, needsClearance } from '../../data/departmentsData.js';
+import { EQUIPMENT, emptyDeptClearances, emptyClosure } from '../../data/mockData.js';
+import { PERMIT_TYPES, TOOLS_EQUIPMENT, HAZARDS_IDENTIFIED, RISK_CONTROL_GROUPS, PPE_FIRE_PROTECTION, PLANT_AREAS, WI_NUMBERS, CONTRACTORS, AUTO_CHECK_BY_TYPE, ALL_AUTO_TOOLS, ALL_AUTO_HAZARDS, ALL_AUTO_PPE } from '../../data/ptwFormData.js';
+import { DEPARTMENTS, departmentsForTypes, needsClearance, hodsForDepartment } from '../../data/departmentsData.js';
 import { USERS } from '../../data/usersData.js';
 import { Button, Card, SectionLabel } from '../shared/Primitives.jsx';
 import { CheckboxGrid, Accordion } from '../shared/ChecklistGrid.jsx';
@@ -28,10 +28,16 @@ function toggleItem(list, item) {
   return list.includes(item) ? list.filter((i) => i !== item) : [...list, item];
 }
 
-function unionAutoCheck(prev, types, field) {
-  const additions = types.flatMap((t) => AUTO_CHECK_BY_TYPE[t]?.[field] || []);
-  const merged = new Set([...prev, ...additions]);
-  return [...merged];
+// Fully re-syncs the type-derived items in `prev` against the currently
+// selected types: items explained by SOME type (allAutoItems) are
+// re-derived from scratch every time `types` changes, so deselecting a
+// type correctly un-checks the items only it required — while items not
+// tied to any type at all (the Requester's own manual additions, e.g. a
+// custom "Other" entry) are always preserved untouched.
+function syncAutoChecked(prev, types, field, allAutoItems) {
+  const required = [...new Set(types.flatMap((t) => AUTO_CHECK_BY_TYPE[t]?.[field] || []))];
+  const manualOnly = prev.filter((i) => !allAutoItems.includes(i));
+  return [...new Set([...manualOnly, ...required])];
 }
 
 export default function TaskRequestForm({ source, prefillData, navigate, onBack }) {
@@ -69,10 +75,18 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
   const [ohcInformed, setOhcInformed] = useState(false);
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const [showMissingPopup, setShowMissingPopup] = useState(false);
+  // Which HOD is expected to clear each department this permit routes
+  // through — defaults to that department's (usually sole) HOD as soon as
+  // the department becomes required, but stays a real dropdown so a
+  // department with more than one HOD can be routed to a specific one.
+  const [deptHods, setDeptHods] = useState({});
 
   const isHighRisk = types.some((t) => HIGH_RISK_TYPES.includes(t));
   const isolationRequired = types.includes('Isolation & Electrical');
-  const certifiedRoster = SHIFT_ROSTER.filter((p) => p.certified);
+  // Rescue Provisions must offer only people who actually hold that specific
+  // role — a Rescuer isn't necessarily a First Aider and vice versa.
+  const rescuerRoster = USERS.filter((u) => u.status === 'active' && u.roles.some((r) => r.role === 'rescuer'));
+  const firstAiderRoster = USERS.filter((u) => u.status === 'active' && u.roles.some((r) => r.role === 'firstaider'));
 
   // H-3 / Phase 9: dynamic assignee selection — every general staff account
   // can act as Requester, Approver, and Isolation Officer (see
@@ -111,12 +125,30 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
 
   // Phase 9: selecting a permit type in Section A auto-selects the matching
   // Tools/Hazards/PPE checkboxes below (per-type master data in
-  // AUTO_CHECK_BY_TYPE) — this only adds, it never unchecks something the
-  // Requester (or a previously-selected type) already checked.
+  // AUTO_CHECK_BY_TYPE), and deselecting a type auto-unchecks whichever of
+  // its items aren't also required by another still-selected type — see
+  // syncAutoChecked() above. Manual additions unrelated to any type are
+  // always preserved.
   useEffect(() => {
-    setToolsEquipment((prev) => unionAutoCheck(prev, types, 'tools'));
-    setHazardsIdentified((prev) => unionAutoCheck(prev, types, 'hazards'));
-    setPpeFireProtection((prev) => unionAutoCheck(prev, types, 'ppe'));
+    setToolsEquipment((prev) => syncAutoChecked(prev, types, 'tools', ALL_AUTO_TOOLS));
+    setHazardsIdentified((prev) => syncAutoChecked(prev, types, 'hazards', ALL_AUTO_HAZARDS));
+    setPpeFireProtection((prev) => syncAutoChecked(prev, types, 'ppe', ALL_AUTO_PPE));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [types]);
+
+  // As soon as a department becomes required for clearance, default its
+  // routing to that department's (usually sole) HOD — still a real
+  // dropdown below so the Requester can pick a different one if a
+  // department ever has more than one.
+  useEffect(() => {
+    const depts = departmentsForTypes(types);
+    setDeptHods((prev) => {
+      const next = { ...prev };
+      depts.forEach((d) => {
+        if (!next[d]) next[d] = hodsForDepartment(d)[0]?.name || '';
+      });
+      return next;
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [types]);
 
@@ -145,7 +177,8 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
         hazardsIdentified, hazardJustification, riskControlMeasures, rescue, ppeFireProtection,
         deptClearances: emptyDeptClearances(
           { itApproval: { required: itApprovalRequired, granted: false, name: '' }, ohcInformed },
-          departmentsForTypes(types)
+          departmentsForTypes(types),
+          deptHods
         ),
         isolationRequired, isolationDetails: isolationRequired ? [{ equipment: jobDetails.location, typeOfIsolation: '', isolationPermitNo: '', isolationOfficerName: '', lotoIdNo: '', deptLockNo: '' }] : [],
         toolboxRecord: [], workers: [], tbtRecord: null, isolationTopicsCovered: '',
@@ -217,7 +250,7 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
         )}
 
         <Button variant="orange" size="lg" className="w-full" onClick={submit}>
-          <CheckCircle2 size={16} /> Submit for Precautions & Declaration →
+          <CheckCircle2 size={16} /> Submit for {startsAtClearance ? 'Departmental Clearance' : 'Approval'} →
         </Button>
       </div>
     );
@@ -276,6 +309,41 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
             error={attemptedSubmit && missingFields.ownerDepartment}
             required
           />
+          {jobDetails.ownerDepartment && (
+            <div className="-mt-1.5 text-[11px] text-slate-400">
+              Current HOD: <span className="font-semibold text-slate-500">{hodsForDepartment(jobDetails.ownerDepartment).map((u) => u.name).join(', ') || 'None assigned'}</span>
+            </div>
+          )}
+
+          {departmentsForTypes(types).length > 0 && (
+            <div className="rounded-lg border border-nz-border bg-nz-surface p-3">
+              <div className="mb-2 text-xs font-bold uppercase text-slate-400">Departmental Clearance Routing</div>
+              <p className="mb-2 text-[11px] text-slate-400">
+                {departmentsForTypes(types).length > 1
+                  ? 'This permit needs clearance from more than one department — route each to a specific HOD.'
+                  : 'This permit needs clearance from the department below.'}
+              </p>
+              <div className="space-y-2">
+                {departmentsForTypes(types).map((dept) => {
+                  const candidates = hodsForDepartment(dept);
+                  return (
+                    <label key={dept} className="block">
+                      <span className="mb-1 block text-xs font-semibold text-slate-500">{dept} HOD</span>
+                      <select
+                        value={deptHods[dept] || ''}
+                        onChange={(e) => setDeptHods((prev) => ({ ...prev, [dept]: e.target.value }))}
+                        className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring"
+                      >
+                        <option value="">Select…</option>
+                        {candidates.map((u) => <option key={u.id} value={u.name}>{u.name}</option>)}
+                      </select>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <SelectField
             label="Approver"
             value={jobDetails.approver}
@@ -368,8 +436,8 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
                       onChange={(e) => setRescue((r) => ({ ...r, rescuers: r.rescuers.map((n, idx) => (idx === i ? e.target.value : n)) }))}
                       className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring"
                     >
-                      <option value="">Select a certified rescuer…</option>
-                      {certifiedRoster.map((p) => <option key={p.id} value={p.name}>{p.name}</option>)}
+                      <option value="">Select a rescuer…</option>
+                      {rescuerRoster.map((u) => <option key={u.id} value={u.name}>{u.name}</option>)}
                     </select>
                     {rescue.rescuers.length > 1 && (
                       <button onClick={() => setRescue((r) => ({ ...r, rescuers: r.rescuers.filter((_, idx) => idx !== i) }))}>
@@ -394,8 +462,8 @@ export default function TaskRequestForm({ source, prefillData, navigate, onBack 
                       onChange={(e) => setRescue((r) => ({ ...r, firstAiders: r.firstAiders.map((n, idx) => (idx === i ? e.target.value : n)) }))}
                       className="w-full rounded-lg border border-nz-border bg-white px-3 py-2 text-sm focus-ring"
                     >
-                      <option value="">Select a certified first aider…</option>
-                      {certifiedRoster.map((p) => <option key={p.id} value={p.name}>{p.name}</option>)}
+                      <option value="">Select a first aider…</option>
+                      {firstAiderRoster.map((u) => <option key={u.id} value={u.name}>{u.name}</option>)}
                     </select>
                     {rescue.firstAiders.length > 1 && (
                       <button onClick={() => setRescue((r) => ({ ...r, firstAiders: r.firstAiders.filter((_, idx) => idx !== i) }))}>

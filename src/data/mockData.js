@@ -76,18 +76,18 @@ export const HAZARD_CONTROL_LIBRARY = {
 // "pending" row — an Approver should never have to N/A a department that
 // was never relevant to begin with. Existing callers that omit it keep the
 // old all-pending behavior.
-export function emptyDeptClearances(overrides = {}, requiredDepartments = null) {
+export function emptyDeptClearances(overrides = {}, requiredDepartments = null, deptHods = {}) {
   const base = {
-    Mechanical: { status: 'pending', name: '', datetime: '' },
-    'E&I': { status: 'pending', name: '', datetime: '' },
-    Production: { status: 'pending', name: '', datetime: '' },
+    Mechanical: { status: 'pending', name: '', datetime: '', assignedHod: deptHods.Mechanical || '' },
+    'E&I': { status: 'pending', name: '', datetime: '', assignedHod: deptHods['E&I'] || '' },
+    Production: { status: 'pending', name: '', datetime: '', assignedHod: deptHods.Production || '' },
     itApproval: { required: false, granted: false, name: '' },
     ohcInformed: false
   };
   if (requiredDepartments) {
     ['Mechanical', 'E&I', 'Production'].forEach((d) => {
       if (!requiredDepartments.includes(d)) {
-        base[d] = { status: 'not-applicable', name: 'System', datetime: 'Not required for selected permit type(s)' };
+        base[d] = { status: 'not-applicable', name: 'System', datetime: 'Not required for selected permit type(s)', assignedHod: '' };
       }
     });
   }
@@ -106,304 +106,7 @@ export function emptyClosure(overrides = {}) {
   };
 }
 
-export const PERMITS = [
-  {
-    id: 'WP-1046', types: ['Cold/General'], type: 'Cold/General', equipment: 'Pump P-204', location: 'Utility Block',
-    area: 'Utility Block', shift: 'Morning', requester: 'S. Iyer', requestor: 'S. Iyer', status: 'draft', createdAt: '2026-07-06',
-    dateFrom: '2026-07-07', dateTill: '2026-07-07', fromTime: '07:00', toTime: '15:00',
-    jobDescription: 'Routine pump seal inspection.', wiNo: '', ownerDepartment: 'Mechanical', contractor: '',
-    hazards: [], ppe: [], controls: [], warnings: [], risk: 'low', ageHours: 0,
-    toolsEquipment: [], hazardsIdentified: [], riskControlMeasures: [], ppeFireProtection: [],
-    rescue: { rescuers: [], firstAiders: [], procedureAvailable: false, intimationProvided: false },
-    deptClearances: emptyDeptClearances(), isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
-    additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
-    approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
-    safetyOfficer: '', safetyReview: null, safetyInspection: null,
-    criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
-    checklist: [{ id: 1, label: 'Pre-job briefing', done: false }],
-    timeline: [{ stage: 'Draft started', at: '06 Jul, 15:10', by: 'S. Iyer' }]
-  },
-  {
-    id: 'WP-1037', types: ['Confined Space'], type: 'Confined Space', equipment: 'Storage Tank T-5', location: 'Tank Farm',
-    area: 'Tank Farm', shift: 'Night', requester: 'A. Chatterjee', requestor: 'A. Chatterjee', status: 'pending-clearance', createdAt: '2026-07-04',
-    dateFrom: '2026-07-05', dateTill: '2026-07-05', fromTime: '22:00', toTime: '06:00',
-    jobDescription: 'Internal tank inspection and sludge removal.', wiNo: 'WI-4102', ownerDepartment: 'Mechanical', contractor: 'Coastal Industrial Services',
-    hazards: HAZARD_CONTROL_LIBRARY['Confined Space'].hazards, ppe: HAZARD_CONTROL_LIBRARY['Confined Space'].ppe,
-    controls: HAZARD_CONTROL_LIBRARY['Confined Space'].controls,
-    warnings: [{ type: 'incident', text: '1 near-miss recorded at Tank Farm in last 90 days.' }],
-    ageHours: 30, risk: 'high',
-    toolsEquipment: ['Hand tools', 'Ladder'],
-    hazardsIdentified: ['Oxygen deficiency', 'Toxic/Flammable gas', 'Engulfment', 'Less Illumination'],
-    riskControlMeasures: ['Portable Gas monitor calibrated', 'Respirator/SCBA available', 'Authorized gas tester available', 'Standby person name ___', 'Use of 24V lamp and confined space', 'Ventilation'],
-    ppeFireProtection: ['Safety helmet', 'Full Body harness', 'Safety goggles', 'First Aid Kit'],
-    rescue: { rescuers: ['R. Nair'], firstAiders: ['S. Pillai'], procedureAvailable: true, intimationProvided: true },
-    deptClearances: emptyDeptClearances(), isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
-    additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
-    approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
-    criticalLift: null,
-    confinedSpaceMonitoring: { gasMonitorSlNo: 'GM-2091', calibrationValid: true, confinedSpaceId: 'CS-TF-05', standbyPerson: 'S. Pillai', rescuers: 'R. Nair', gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' },
-    transfers: [], closure: emptyClosure(),
-    checklist: [{ id: 1, label: 'Atmosphere test', done: false }],
-    timeline: [
-      { stage: 'Created — Request & Risk Assessment', at: '04 Jul, 22:10', by: 'A. Chatterjee' },
-      { stage: 'Awaiting Departmental Clearance', at: '04 Jul, 22:15', by: 'System' }
-    ]
-  },
-  {
-    id: 'WP-1039', types: ['Electrical & Instrumentation', 'Isolation & Electrical'], type: 'Isolation & Electrical', equipment: 'MCC-3 Drive Panel', location: 'Crushing Plant',
-    area: 'Crushing Plant', shift: 'Morning', requester: 'S. Iyer', requestor: 'S. Iyer', status: 'pending-isolation', createdAt: '2026-07-05',
-    dateFrom: '2026-07-06', dateTill: '2026-07-06', fromTime: '06:00', toTime: '14:00',
-    jobDescription: 'Replace MCC-3 drive panel contactor.', wiNo: 'WI-4108', ownerDepartment: 'Electrical', contractor: '',
-    hazards: HAZARD_CONTROL_LIBRARY.Electrical.hazards, ppe: HAZARD_CONTROL_LIBRARY.Electrical.ppe,
-    controls: HAZARD_CONTROL_LIBRARY.Electrical.controls,
-    warnings: [], ageHours: 6, risk: 'medium',
-    toolsEquipment: ['Hand tools', 'Power tools'],
-    hazardsIdentified: ['Electric Shock', 'Static Electricity', 'Entrapment'],
-    riskControlMeasures: ['Earthing provided for electrical equipment', 'ELCB / RCCB provided at source', 'Equipment / Panel / Switch gear isolation required'],
-    ppeFireProtection: ['Safety helmet', 'Electrical gloves', 'Arc flash suit', 'Face Shield', 'Safety shoes'],
-    rescue: { rescuers: [], firstAiders: [], procedureAvailable: false, intimationProvided: false },
-    deptClearances: emptyDeptClearances({
-      Mechanical: { status: 'cleared', name: 'D. Fernandes', datetime: '05 Jul, 08:10' },
-      'E&I': { status: 'cleared', name: 'D. Fernandes', datetime: '05 Jul, 08:12' },
-      Production: { status: 'not-applicable', name: '', datetime: '' },
-      itApproval: { required: false, granted: false, name: '' },
-      ohcInformed: false
-    }),
-    isolationRequired: true,
-    isolationDetails: [
-      { equipment: 'MCC-3 Drive Panel', typeOfIsolation: 'Electrical', isolationPermitNo: '', isolationOfficerName: '', lotoIdNo: '', deptLockNo: '' }
-    ],
-    toolboxRecord: [{ name: 'S. Iyer', company: 'Vedanta', personalLockId: '', signed: false }],
-    workers: [{ name: 'K. Reddy', personalLockId: 'PL-016', applied: false, appliedAt: null, removed: false, removedAt: null, started: false, startedAt: null }],
-    isolationTopicsCovered: '',
-    additionalPrecautions: '', declaration: { requestorName: 'S. Iyer', date: '05 Jul', time: '07:45', toolboxTalkConfirmed: true, signed: { name: 'S. Iyer', timestamp: '05 Jul, 07:45' } },
-    approval: { approverName: 'D. Fernandes', date: '05 Jul', time: '08:20', onGroundVerified: true, signed: { name: 'D. Fernandes', timestamp: '05 Jul, 08:20' }, rejectionReason: '' },
-    criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
-    checklist: [{ id: 1, label: 'Voltage test to zero', done: false }],
-    timeline: [
-      { stage: 'Created — Request & Risk Assessment', at: '05 Jul, 07:30', by: 'S. Iyer' },
-      { stage: 'Safety Officer review complete', at: '05 Jul, 07:40', by: 'T. Roy (Safety Officer)' },
-      { stage: 'Departmental Clearance granted', at: '05 Jul, 07:50', by: 'D. Fernandes (Approver)' },
-      { stage: 'Approved — On-Ground Verification complete', at: '05 Jul, 08:05', by: 'D. Fernandes (Approver)' },
-      { stage: 'Precautions & Declaration signed', at: '05 Jul, 08:15', by: 'S. Iyer' },
-      { stage: 'Awaiting Isolation Setup', at: '05 Jul, 08:21', by: 'System' }
-    ]
-  },
-  {
-    id: 'WP-1044', types: ['Confined Space', 'Isolation & Electrical'], type: 'Confined Space', equipment: 'Hydraulic Accumulator H-9', location: 'Crushing Plant',
-    area: 'Crushing Plant', shift: 'Morning', requester: 'A. Chatterjee', requestor: 'A. Chatterjee', status: 'pending-clearance', createdAt: '2026-07-05',
-    dateFrom: '2026-07-06', dateTill: '2026-07-06', fromTime: '06:00', toTime: '14:00',
-    jobDescription: 'Internal inspection of hydraulic accumulator after isolation.', wiNo: 'WI-4111', ownerDepartment: 'Mechanical', contractor: '',
-    hazards: HAZARD_CONTROL_LIBRARY['Confined Space'].hazards, ppe: HAZARD_CONTROL_LIBRARY['Confined Space'].ppe,
-    controls: HAZARD_CONTROL_LIBRARY['Confined Space'].controls,
-    ageHours: 18, risk: 'high',
-    warnings: [],
-    toolsEquipment: ['Hand tools'],
-    hazardsIdentified: ['Oxygen deficiency', 'Engulfment', 'Entrapment'],
-    riskControlMeasures: ['Portable Gas monitor calibrated', 'Respirator/SCBA available', 'Standby person name ___', 'Purging', 'Ventilation'],
-    ppeFireProtection: ['Safety helmet', 'Full Body harness', 'Safety goggles', 'First Aid Kit'],
-    rescue: { rescuers: ['A. Singh'], firstAiders: ['P. Rao'], procedureAvailable: true, intimationProvided: true },
-    deptClearances: emptyDeptClearances({
-      Mechanical: { status: 'cleared', name: 'D. Fernandes', datetime: '05 Jul, 15:10' },
-      'E&I': { status: 'cleared', name: 'D. Fernandes', datetime: '05 Jul, 15:11' },
-      Production: { status: 'not-applicable', name: '', datetime: '' },
-      itApproval: { required: false, granted: false, name: '' },
-      ohcInformed: false
-    }),
-    isolationRequired: true,
-    isolationDetails: [
-      { equipment: 'Hydraulic Accumulator H-9', typeOfIsolation: 'Mechanical', isolationPermitNo: 'ISO-0231', isolationOfficerName: 'J. Mehta', lotoIdNo: 'LOTO-014', deptLockNo: 'LK-198', appliedAt: '05 Jul, 08:30' }
-    ],
-    toolboxRecord: [{ name: 'A. Chatterjee', company: 'Vedanta', personalLockId: 'PL-005', signed: true }],
-    workers: [{ name: 'K. Reddy', personalLockId: 'PL-016', applied: false, appliedAt: null, removed: false, removedAt: null, started: false, startedAt: null }],
-    isolationTopicsCovered: 'Reviewed hydraulic bleed-down sequence and lock/tag placement with crew before entry.',
-    additionalPrecautions: '', declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
-    approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
-    criticalLift: null,
-    confinedSpaceMonitoring: { gasMonitorSlNo: 'GM-2077', calibrationValid: true, confinedSpaceId: 'CS-CP-09', standbyPerson: 'P. Rao', rescuers: 'A. Singh', gasTests: [], personalEntryRegister: [], equipmentEntryRegister: [], specialInstructions: '' },
-    lotoRequired: true, lotoStatus: 'complete', lotoAssignee: 'J. Mehta',
-    transfers: [], closure: emptyClosure(),
-    checklist: [{ id: 1, label: 'Atmosphere monitoring active', done: false }],
-    timeline: [
-      { stage: 'Created — Request & Risk Assessment', at: '05 Jul, 14:00', by: 'A. Chatterjee' },
-      { stage: 'Awaiting Departmental Clearance', at: '05 Jul, 14:05', by: 'System' }
-    ]
-  },
-  {
-    id: 'WP-1028', types: ['Cold/General'], type: 'Mechanical', equipment: 'Reactor Vessel R-12', location: 'Process Unit 2',
-    area: 'Process Unit 2', shift: 'Morning', requester: 'T. Roy', requestor: 'T. Roy', status: 'pending-approval', createdAt: '2026-07-01',
-    dateFrom: '2026-07-02', dateTill: '2026-07-02', fromTime: '07:00', toTime: '15:00',
-    jobDescription: 'Reactor vessel gasket replacement.', wiNo: 'WI-3998', ownerDepartment: 'Mechanical', contractor: '',
-    hazards: HAZARD_CONTROL_LIBRARY.Mechanical.hazards, ppe: HAZARD_CONTROL_LIBRARY.Mechanical.ppe,
-    controls: HAZARD_CONTROL_LIBRARY.Mechanical.controls, warnings: [], risk: 'medium', ageHours: 4,
-    toolsEquipment: ['Hand tools', 'Power tools'],
-    hazardsIdentified: ['Crush/Cut Injury', 'Hot Surface', 'Moving Vehicles'],
-    riskControlMeasures: ['Loose objects removed', 'Maintain safe distance from line of fire hazard', 'Cables / Hoses free from damage'],
-    ppeFireProtection: ['Safety helmet', 'Hand gloves', 'Safety shoes', 'Safety goggles'],
-    rescue: { rescuers: [], firstAiders: [], procedureAvailable: false, intimationProvided: false },
-    deptClearances: emptyDeptClearances({
-      Mechanical: { status: 'cleared', name: 'D. Fernandes', datetime: '01 Jul, 08:20' },
-      'E&I': { status: 'not-applicable', name: '', datetime: '' },
-      Production: { status: 'cleared', name: 'N. Bose', datetime: '01 Jul, 08:25' }
-    }),
-    isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
-    additionalPrecautions: '',
-    declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
-    approval: { approverName: '', date: '', time: '', onGroundVerified: false, signed: null, rejectionReason: '' },
-    safetyOfficer: 'T. Roy', safetyReview: { comment: 'No additional flags — standard mechanical gasket job.', by: 'T. Roy', at: '01 Jul, 08:10' }, safetyInspection: null,
-    criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
-    checklist: [{ id: 1, label: 'Pre-job briefing', done: true }, { id: 2, label: 'Isolation confirmed', done: false }],
-    timeline: [
-      { stage: 'Created — Request & Risk Assessment', at: '01 Jul, 07:50', by: 'T. Roy' },
-      { stage: 'Safety Officer review complete', at: '01 Jul, 08:10', by: 'T. Roy (Safety Officer)' },
-      { stage: 'Departmental Clearance granted', at: '01 Jul, 08:25', by: 'D. Fernandes (Approver)' },
-      { stage: 'Awaiting Approval', at: '01 Jul, 09:01', by: 'System' }
-    ]
-  },
-  {
-    id: 'WP-1031', types: ['Cold/General'], type: 'Mechanical', equipment: 'MCC-3 Drive Panel', location: 'Crushing Plant',
-    area: 'Crushing Plant', shift: 'Morning', requester: 'S. Iyer', requestor: 'S. Iyer', status: 'live', createdAt: '2026-07-02',
-    dateFrom: '2026-07-02', dateTill: '2026-07-02', fromTime: '08:00', toTime: '16:00',
-    jobDescription: 'Drive coupling inspection and bearing lubrication.', wiNo: 'WI-4021', ownerDepartment: 'Mechanical', contractor: '',
-    hazards: HAZARD_CONTROL_LIBRARY.Mechanical.hazards, ppe: HAZARD_CONTROL_LIBRARY.Mechanical.ppe,
-    controls: HAZARD_CONTROL_LIBRARY.Mechanical.controls,
-    warnings: [], risk: 'low', ageHours: 2,
-    receiver: 'S. Iyer',
-    toolsEquipment: ['Hand tools', 'Grinding machine'],
-    hazardsIdentified: ['Crush/Cut Injury', 'Entrapment'],
-    riskControlMeasures: ['Equipment / Panel / Switch gear isolation required', 'Loose objects removed'],
-    ppeFireProtection: ['Safety helmet', 'Hand gloves', 'Safety shoes', 'Safety goggles'],
-    rescue: { rescuers: [], firstAiders: [], procedureAvailable: false, intimationProvided: false },
-    deptClearances: emptyDeptClearances({
-      Mechanical: { status: 'cleared', name: 'D. Fernandes', datetime: '02 Jul, 08:20' },
-      'E&I': { status: 'not-applicable', name: '', datetime: '' },
-      Production: { status: 'not-applicable', name: '', datetime: '' }
-    }),
-    isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
-    additionalPrecautions: '',
-    declaration: { requestorName: 'S. Iyer', date: '02 Jul', time: '08:10', toolboxTalkConfirmed: true, signed: { name: 'S. Iyer', timestamp: '02 Jul, 08:10' } },
-    approval: { approverName: 'D. Fernandes', date: '02 Jul', time: '08:45', onGroundVerified: true, signed: { name: 'D. Fernandes', timestamp: '02 Jul, 08:45' }, rejectionReason: '' },
-    safetyOfficer: 'T. Roy', safetyReview: { comment: 'Cleared — routine mechanical work.', by: 'T. Roy', at: '02 Jul, 08:15' }, safetyInspection: null,
-    criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
-    checklist: [
-      { id: 1, label: 'Confirm isolation with LOTO tag', done: true },
-      { id: 2, label: 'Inspect drive coupling', done: true },
-      { id: 3, label: 'Lubricate bearings', done: false },
-      { id: 4, label: 'Replace belt guard', done: false },
-      { id: 5, label: 'Function test', done: false },
-      { id: 6, label: 'Supervisor sign-off', done: false }
-    ],
-    timeline: [
-      { stage: 'Created — Request & Risk Assessment', at: '02 Jul, 08:00', by: 'S. Iyer' },
-      { stage: 'Safety Officer review complete', at: '02 Jul, 08:05', by: 'T. Roy (Safety Officer)' },
-      { stage: 'Departmental Clearance granted', at: '02 Jul, 08:20', by: 'D. Fernandes (Approver)' },
-      { stage: 'Approved — Routed to Precautions & Declaration', at: '02 Jul, 08:30', by: 'D. Fernandes (Approver)' },
-      { stage: 'Precautions & Declaration signed', at: '02 Jul, 08:45', by: 'S. Iyer' },
-      { stage: 'Job Execution started', at: '02 Jul, 09:20', by: 'System' }
-    ]
-  },
-  {
-    id: 'WP-1019', types: ['Cold/General'], type: 'Mechanical', equipment: 'Storage Tank T-5', location: 'Tank Farm',
-    area: 'Tank Farm', shift: 'Morning', requester: 'K. Verma', requestor: 'K. Verma', status: 'pending-closure', createdAt: '2026-06-28',
-    dateFrom: '2026-06-28', dateTill: '2026-07-05', fromTime: '08:00', toTime: '16:00',
-    jobDescription: 'Tank exterior recoating and housekeeping.', wiNo: 'WI-3902', ownerDepartment: 'Mechanical', contractor: '',
-    hazards: HAZARD_CONTROL_LIBRARY.Mechanical.hazards, ppe: HAZARD_CONTROL_LIBRARY.Mechanical.ppe,
-    controls: HAZARD_CONTROL_LIBRARY.Mechanical.controls, warnings: [], risk: 'low', ageHours: 0,
-    toolsEquipment: ['Hand tools', 'Scaffold'],
-    hazardsIdentified: ['Fall of Person', 'Dust/Fumes'],
-    riskControlMeasures: ['Safe working platform provided', 'Handrails & Toe guards available'],
-    ppeFireProtection: ['Safety helmet', 'Dust Mask', 'Safety shoes', 'Full Body harness'],
-    rescue: { rescuers: [], firstAiders: [], procedureAvailable: false, intimationProvided: false },
-    deptClearances: emptyDeptClearances({
-      Mechanical: { status: 'cleared', name: 'D. Fernandes', datetime: '28 Jun, 08:30' },
-      'E&I': { status: 'not-applicable', name: '', datetime: '' },
-      Production: { status: 'not-applicable', name: '', datetime: '' }
-    }),
-    isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '',
-    additionalPrecautions: '',
-    declaration: { requestorName: 'K. Verma', date: '28 Jun', time: '08:10', toolboxTalkConfirmed: true, signed: { name: 'K. Verma', timestamp: '28 Jun, 08:10' } },
-    approval: { approverName: 'D. Fernandes', date: '28 Jun', time: '09:40', onGroundVerified: true, signed: { name: 'D. Fernandes', timestamp: '28 Jun, 09:40' }, rejectionReason: '' },
-    criticalLift: null, confinedSpaceMonitoring: null, transfers: [],
-    closure: emptyClosure({
-      requesterChecklist: { controlsBack: true, interlocksRestored: true, guardsInPlace: true, permitsSurrendered: true },
-      toolboxTalkRefNo: 'TBT-0562',
-      requesterSigned: { name: 'K. Verma', timestamp: '05 Jul, 16:00' }, requesterDate: '05 Jul', requesterTime: '16:00'
-    }),
-    checklist: [
-      { id: 1, label: 'Isolation verified', done: true }, { id: 2, label: 'Guarding reinstated', done: true },
-      { id: 3, label: 'Area cleared of tools', done: true }, { id: 4, label: 'Supervisor walk-down', done: true },
-      { id: 5, label: 'Housekeeping complete', done: true }, { id: 6, label: 'Final closure sign-off', done: false }
-    ],
-    timeline: [
-      { stage: 'Created — Request & Risk Assessment', at: '28 Jun, 08:10', by: 'K. Verma' },
-      { stage: 'Departmental Clearance granted', at: '28 Jun, 08:30', by: 'D. Fernandes (Approver)' },
-      { stage: 'Approved — Permit is LIVE', at: '28 Jun, 09:40', by: 'D. Fernandes (Approver)' },
-      { stage: 'Job Execution completed', at: '05 Jul, 15:45', by: 'K. Verma' },
-      { stage: 'Closure submitted — awaiting Approver verification', at: '05 Jul, 16:00', by: 'K. Verma' }
-    ]
-  },
-  {
-    id: 'WP-1020', types: ['Cold/General'], type: 'Mechanical', equipment: 'Storage Tank T-5', location: 'Tank Farm',
-    area: 'Tank Farm', shift: 'Morning', requester: 'K. Verma', requestor: 'K. Verma', status: 'closed', createdAt: '2026-06-20',
-    dateFrom: '2026-06-20', dateTill: '2026-06-21', fromTime: '08:00', toTime: '16:00',
-    jobDescription: 'Level gauge calibration.', wiNo: 'WI-3811', ownerDepartment: 'Mechanical', contractor: '',
-    hazards: [], ppe: [], controls: [], warnings: [], risk: 'low', ageHours: 0,
-    toolsEquipment: ['Hand tools'], hazardsIdentified: ['Fall of materials'], riskControlMeasures: ['Loose objects removed'],
-    ppeFireProtection: ['Safety helmet', 'Safety shoes'],
-    rescue: { rescuers: [], firstAiders: [], procedureAvailable: false, intimationProvided: false },
-    deptClearances: emptyDeptClearances({ Mechanical: { status: 'cleared', name: 'D. Fernandes', datetime: '20 Jun, 08:15' } }),
-    isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '', additionalPrecautions: '',
-    declaration: { requestorName: 'K. Verma', date: '20 Jun', time: '08:00', toolboxTalkConfirmed: true, signed: { name: 'K. Verma', timestamp: '20 Jun, 08:00' } },
-    approval: { approverName: 'D. Fernandes', date: '20 Jun', time: '09:00', onGroundVerified: true, signed: { name: 'D. Fernandes', timestamp: '20 Jun, 09:00' }, rejectionReason: '' },
-    safetyOfficer: 'T. Roy', safetyReview: { comment: 'Cleared.', by: 'T. Roy', at: '20 Jun, 08:05' }, safetyInspection: { comment: 'Inspected — normalised.', by: 'T. Roy', at: '21 Jun, 15:45' },
-    criticalLift: null, confinedSpaceMonitoring: null, transfers: [],
-    closure: emptyClosure({
-      requesterChecklist: { controlsBack: true, interlocksRestored: true, guardsInPlace: true, permitsSurrendered: true },
-      toolboxTalkRefNo: 'TBT-0541',
-      requesterSigned: { name: 'K. Verma', timestamp: '21 Jun, 15:30' }, requesterDate: '21 Jun', requesterTime: '15:30',
-      approverChecklist: { controlsRestored: true, siteNormalized: true, materialsRemoved: true }, deviationDetails: '',
-      approverSigned: { name: 'D. Fernandes', timestamp: '21 Jun, 16:10' }, approverDate: '21 Jun', approverTime: '16:10'
-    }),
-    checklist: [{ id: 1, label: 'Final closure sign-off', done: true }],
-    timeline: [
-      { stage: 'Created — Request & Risk Assessment', at: '20 Jun, 08:00', by: 'K. Verma' },
-      { stage: 'Departmental Clearance granted', at: '20 Jun, 08:15', by: 'D. Fernandes (Approver)' },
-      { stage: 'Approved — Permit is LIVE', at: '20 Jun, 09:00', by: 'D. Fernandes (Approver)' },
-      { stage: 'Closure submitted', at: '21 Jun, 15:30', by: 'K. Verma' },
-      { stage: 'Closure verified — Permit Closed', at: '21 Jun, 16:10', by: 'D. Fernandes (Approver)' }
-    ]
-  },
-  {
-    id: 'WP-1042', types: ['Hot Work'], type: 'Hot Work', equipment: 'Conveyor Belt #7', location: 'Crushing Plant',
-    area: 'Crushing Plant', shift: 'Morning', requester: 'S. Iyer', requestor: 'S. Iyer', status: 'returned', createdAt: '2026-07-06',
-    dateFrom: '2026-07-06', dateTill: '2026-07-06', fromTime: '06:00', toTime: '14:00',
-    jobDescription: 'Weld repair on conveyor belt frame.', wiNo: 'WI-4120', ownerDepartment: 'Mechanical', contractor: '',
-    hazards: HAZARD_CONTROL_LIBRARY['Hot Work'].hazards, ppe: HAZARD_CONTROL_LIBRARY['Hot Work'].ppe,
-    controls: HAZARD_CONTROL_LIBRARY['Hot Work'].controls,
-    ageHours: 3, risk: 'high',
-    warnings: [
-      { type: 'equipment', text: 'Equipment Conveyor Belt #7 has an overdue calibration (expired 12 Jun).' },
-      { type: 'competency', text: 'Requester\'s Hot Work certification renews in 4 days.' },
-      { type: 'incident', text: '2 near-misses recorded at Crushing Plant in last 90 days.' }
-    ],
-    toolsEquipment: ['Gas cutter', 'Welding Machine'],
-    hazardsIdentified: ['Fire Hazard', 'Hot Surface', 'Dust/Fumes'],
-    riskControlMeasures: ['Flammable material removed', 'Flash back arrestor provided in gas cutting', 'Gas cylinders with trolley & vertically tied'],
-    ppeFireProtection: ['Safety helmet', 'Leather gloves', 'Face Shield', 'Fire Extinguishers'],
-    rescue: { rescuers: [], firstAiders: [], procedureAvailable: false, intimationProvided: false },
-    deptClearances: emptyDeptClearances(),
-    isolationRequired: false, isolationDetails: [], toolboxRecord: [], isolationTopicsCovered: '', additionalPrecautions: '',
-    declaration: { requestorName: '', date: '', time: '', toolboxTalkConfirmed: false, signed: null },
-    approval: { approverName: 'D. Fernandes', date: '06 Jul', time: '06:50', onGroundVerified: false, signed: null, rejectionReason: 'Equipment calibration is overdue — resolve with the Isolation Officer before resubmission.' },
-    safetyOfficer: '', safetyReview: null, safetyInspection: null,
-    criticalLift: null, confinedSpaceMonitoring: null, transfers: [], closure: emptyClosure(),
-    checklist: [{ id: 1, label: 'Gas test before start', done: false }],
-    timeline: [
-      { stage: 'Created — Request & Risk Assessment', at: '06 Jul, 06:40', by: 'S. Iyer' },
-      { stage: 'Returned to Requester — equipment calibration overdue', at: '06 Jul, 06:50', by: 'D. Fernandes (Approver)' }
-    ]
-  }
-];
+export const PERMITS = [];
 
 export const NOTIFICATIONS = {
   useradmin: [
@@ -412,27 +115,20 @@ export const NOTIFICATIONS = {
     { id: 3, text: 'New announcement scheduled: Plant shutdown 15 Jul.', time: '1d ago', unread: false }
   ],
   hod: [
-    { id: 1, text: 'WP-1044 awaiting Departmental Clearance.', time: '20m ago', unread: true },
-    { id: 2, text: 'WP-1037 aging beyond 24h SLA.', time: '1h ago', unread: true }
+    { id: 1, text: 'No permits currently awaiting Departmental Clearance.', time: 'now', unread: false }
   ],
   approver: [
-    { id: 1, text: 'WP-1042 re-submitted with corrections.', time: '5m ago', unread: true },
-    { id: 2, text: 'WP-1031 and WP-1028 ready to issue.', time: '2h ago', unread: false },
-    { id: 3, text: 'Compliance renewal request from R. Das.', time: '3h ago', unread: false }
+    { id: 1, text: 'Compliance renewal request from R. Das.', time: '3h ago', unread: false }
   ],
   safety: [
-    { id: 1, text: 'Critical flag: LOTO not applied on WP-1044.', time: '20m ago', unread: true },
-    { id: 2, text: 'M. Khan LOTO certification expired.', time: '3h ago', unread: false }
+    { id: 1, text: 'M. Khan LOTO certification expired.', time: '3h ago', unread: false }
   ],
   supervisor: [
-    { id: 1, text: 'WP-1044 needs a LOTO Responsible assignment.', time: '1h ago', unread: true },
-    { id: 2, text: 'M. Khan unavailable for LOTO — certification expired.', time: '2h ago', unread: false },
-    { id: 3, text: 'New maintenance request: MR-308 submitted.', time: '4h ago', unread: false }
+    { id: 1, text: 'M. Khan unavailable for LOTO — certification expired.', time: '2h ago', unread: false },
+    { id: 2, text: 'New maintenance request: MR-308 submitted.', time: '4h ago', unread: false }
   ],
   personnel: [
-    { id: 1, text: 'WP-1042 blocked — equipment calibration overdue.', time: '10m ago', unread: true },
-    { id: 2, text: 'WP-1031 issued to you — acknowledge to begin.', time: '30m ago', unread: true },
-    { id: 3, text: 'Your Hot Work certification expires in 4 days.', time: '1d ago', unread: false }
+    { id: 1, text: 'Your Hot Work certification expires in 4 days.', time: '1d ago', unread: false }
   ]
 };
 

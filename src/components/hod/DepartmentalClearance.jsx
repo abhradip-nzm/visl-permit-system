@@ -30,7 +30,7 @@ export default function DepartmentalClearance({ navigate, params }) {
   // scoped to every outstanding department on this permit.
   function setDeptStatus(dept, status) {
     const comment = comments[dept]?.trim();
-    const updated = { ...clearances, [dept]: { status, name: currentUser.name, datetime: 'Just now', comment: comment || '' } };
+    const updated = { ...clearances, [dept]: { ...clearances[dept], status, name: currentUser.name, datetime: 'Just now', comment: comment || '' } };
     setClearances(updated);
     updatePermit(permit.id, { deptClearances: updated });
     const verb = status === 'cleared' ? 'granted' : 'marked not applicable';
@@ -83,7 +83,7 @@ export default function DepartmentalClearance({ navigate, params }) {
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-nz-border text-xs uppercase text-slate-400">
-              <th className="py-2">Department</th><th className="py-2">Status</th><th className="py-2">Cleared By</th><th className="py-2">Date & Time</th><th className="py-2" />
+              <th className="py-2">Department</th><th className="py-2">Assigned HOD</th><th className="py-2">Status</th><th className="py-2">Cleared By</th><th className="py-2">Date & Time</th><th className="py-2" />
             </tr>
           </thead>
           <tbody>
@@ -93,6 +93,7 @@ export default function DepartmentalClearance({ navigate, params }) {
               return (
                 <tr key={dept} className="border-b border-nz-border/60 last:border-0 align-top">
                   <td className="py-2.5 font-semibold text-nz-navy">{dept}</td>
+                  <td className="py-2.5 text-slate-500">{c.assignedHod || '—'}</td>
                   <td className="py-2.5">
                     <span className={c.status === 'cleared' ? 'font-semibold text-nz-green' : c.status === 'not-applicable' ? 'text-slate-400' : 'font-semibold text-nz-amber'}>
                       {c.status === 'cleared' ? 'Cleared' : c.status === 'not-applicable' ? 'Not Applicable' : 'Pending'}
@@ -120,7 +121,7 @@ export default function DepartmentalClearance({ navigate, params }) {
                       <span className="text-xs italic text-nz-red">Blocked — your own permit</span>
                     )}
                     {c.status === 'pending' && dept !== currentDepartment && (
-                      <span className="text-xs italic text-slate-400">Awaiting {dept} Approver</span>
+                      <span className="text-xs italic text-slate-400">Awaiting clearance from {c.assignedHod || `${dept} HOD`}</span>
                     )}
                   </td>
                 </tr>

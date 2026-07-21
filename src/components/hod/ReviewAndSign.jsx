@@ -84,7 +84,13 @@ export default function ReviewAndSign({ navigate, params }) {
             <div key={dept} className="rounded-lg border border-nz-border px-2.5 py-2">
               <div className="font-semibold text-nz-navy">{dept}</div>
               <div className={c.status === 'cleared' ? 'text-nz-green' : c.status === 'not-applicable' ? 'text-slate-400' : 'text-nz-amber'}>
-                {c.status === 'cleared' ? `Cleared — ${c.name}` : c.status === 'not-applicable' ? 'N/A' : 'Pending'}
+                {c.status === 'cleared'
+                  ? `Cleared — ${c.name}`
+                  : c.status === 'not-applicable'
+                  ? 'N/A'
+                  : c.assignedHod
+                  ? `Awaiting ${c.assignedHod}`
+                  : 'Pending'}
               </div>
             </div>
           ))}

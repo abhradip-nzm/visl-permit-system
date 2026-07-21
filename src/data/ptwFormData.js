@@ -39,9 +39,12 @@ export const PERMIT_TYPES = [
 ];
 
 // Phase 9: auto-check data for Sections C/D/F, keyed by Section A permit
-// type — selecting a type in Section A pre-selects (unions into) the
-// matching Tools/Hazards/PPE checkboxes below. The Requester can still
-// uncheck anything that doesn't apply; this only ever adds, never removes.
+// type — selecting a type in Section A pre-selects the matching
+// Tools/Hazards/PPE checkboxes below, and deselecting a type un-selects
+// whichever of its items aren't also required by another still-selected
+// type (see syncAutoChecked() in TaskRequestForm.jsx). Items that aren't
+// tied to any type at all (the Requester's own manual additions) are
+// always left alone.
 export const AUTO_CHECK_BY_TYPE = {
   'Cold/General': {
     tools: ['Hand tools', 'Power tools', 'Other'],
@@ -84,6 +87,17 @@ export const AUTO_CHECK_BY_TYPE = {
     ppe: ['Safety helmet', 'Safety shoes', 'Safety goggles', 'Hand gloves', 'Dust Mask', 'Ear plug/Muff', 'First Aid Kit']
   }
 };
+
+// The full universe of items any type can ever auto-check, per field —
+// used to tell "this item is type-derived, keep it in sync with the
+// current type selection" apart from "this item was manually added and
+// isn't tied to any type, always leave it alone."
+function allAutoCheckable(field) {
+  return [...new Set(Object.values(AUTO_CHECK_BY_TYPE).flatMap((v) => v[field] || []))];
+}
+export const ALL_AUTO_TOOLS = allAutoCheckable('tools');
+export const ALL_AUTO_HAZARDS = allAutoCheckable('hazards');
+export const ALL_AUTO_PPE = allAutoCheckable('ppe');
 
 // Section C — Tools & Equipment to be Used
 export const TOOLS_EQUIPMENT = [

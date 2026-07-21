@@ -10,7 +10,7 @@ export const LOTO_ID_REGISTER = [
   { id: 'LOTO-011', state: 'available', permitId: null },
   { id: 'LOTO-012', state: 'available', permitId: null },
   { id: 'LOTO-013', state: 'available', permitId: null },
-  { id: 'LOTO-014', state: 'in-use', permitId: 'WP-1044' },
+  { id: 'LOTO-014', state: 'available', permitId: null },
   { id: 'LOTO-015', state: 'available', permitId: null },
   { id: 'LOTO-016', state: 'available', permitId: null }
 ];

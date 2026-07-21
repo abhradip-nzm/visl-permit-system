@@ -1,19 +1,24 @@
-import { USERS } from '../data/usersData.js';
 import { CLEARANCE_DEPARTMENTS } from '../data/ptwFormData.js';
+import { hodsForDepartment } from '../data/departmentsData.js';
 
 function hodForDept(dept) {
-  const u = USERS.find((u) => u.status === 'active' && u.roles.some((r) => r.role === 'hod' && r.department === dept));
-  return u?.name || `HOD — ${dept}`;
+  return hodsForDepartment(dept)[0]?.name || `HOD — ${dept}`;
 }
 
-// Who last acted on this permit — just the most recent timeline entry.
-// addTimelineEvent() always appends in chronological order, so the last
-// entry is always the most recent thing that happened.
+// Who last acted on this permit — the most recent timeline entry actually
+// performed by a person. Most transitions log a real event (e.g. "Approved
+// — ...", by the Approver) immediately followed by a System-authored
+// "Awaiting X" filler describing what's queued up next; that filler isn't
+// an action anyone took, so it's skipped in favor of the last real one.
 export function getLastActor(permit) {
   const events = permit?.timeline || [];
-  if (!events.length) return null;
+  for (let i = events.length - 1; i >= 0; i--) {
+    if (events[i].by && events[i].by !== 'System') {
+      return { stage: events[i].stage, by: events[i].by, at: events[i].at };
+    }
+  }
   const last = events[events.length - 1];
-  return { stage: last.stage, by: last.by, at: last.at };
+  return last ? { stage: last.stage, by: last.by, at: last.at } : null;
 }
 
 // Who acts next, and in what capacity, given the permit's current status —
@@ -28,7 +33,10 @@ export function getNextActor(permit) {
       return { role: 'personnel', label: 'Request & Risk Assessment', name: permit.requester };
     case 'pending-clearance': {
       const pendingDepts = CLEARANCE_DEPARTMENTS.filter((d) => permit.deptClearances?.[d]?.status === 'pending');
-      const names = [...new Set(pendingDepts.map(hodForDept))];
+      // The permit's own assignedHod (chosen at request time) wins when set
+      // — it's specific to this permit, not just "whoever holds the HOD
+      // role for that department in general."
+      const names = [...new Set(pendingDepts.map((d) => permit.deptClearances?.[d]?.assignedHod || hodForDept(d)))];
       return { role: 'hod', label: 'Departmental Clearance', name: names.join(', ') || 'HOD' };
     }
     case 'pending-approval':

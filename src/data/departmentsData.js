@@ -8,6 +8,17 @@
 // clearance enforcement are Phase 1/3 work (C-4, H-5) — this file only
 // establishes the data both phases build on.
 // ============================================================================
+import { USERS } from './usersData.js';
+
+// Every active HOD scoped to a given department — usually just one today,
+// but data-driven (not hardcoded) so a department with more than one HOD
+// works without any code changes. Used both to show "current HOD" for the
+// Owner Department and to populate the per-department clearance-routing
+// dropdown on the request form.
+export function hodsForDepartment(dept) {
+  return USERS.filter((u) => u.status === 'active' && u.roles.some((r) => r.role === 'hod' && r.department === dept));
+}
+
 export const DEPARTMENTS = [
   { key: 'Mechanical', label: 'Mechanical' },
   { key: 'E&I', label: 'Electrical & Instrumentation (E&I)' },

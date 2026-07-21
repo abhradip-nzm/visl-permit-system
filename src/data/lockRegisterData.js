@@ -10,7 +10,7 @@ export const LOCK_REGISTER = [
   { id: 'LK-207', type: 'Electrical Lockout', department: 'E&I', state: 'available', permitId: null },
   { id: 'LK-214', type: 'Electrical Lockout', department: 'E&I', state: 'available', permitId: null },
   { id: 'LK-231', type: 'Hydraulic Isolation', department: 'Mechanical', state: 'available', permitId: null },
-  { id: 'LK-198', type: 'Electrical Lockout', department: 'E&I', state: 'in-use', permitId: 'WP-1044' },
+  { id: 'LK-198', type: 'Electrical Lockout', department: 'E&I', state: 'available', permitId: null },
   { id: 'LK-176', type: 'Electrical Lockout', department: 'E&I', state: 'available', permitId: null },
   { id: 'LK-052', type: 'Mechanical Isolation', department: 'Mechanical', state: 'available', permitId: null },
   { id: 'LK-063', type: 'Mechanical Isolation', department: 'Mechanical', state: 'available', permitId: null },
